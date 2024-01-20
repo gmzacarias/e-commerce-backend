@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from "next"
 import { generate } from "lib/jwt"
-import { Auth } from "lib/auth"
+import { Auth } from "models/auth"
 
 export default async function (req: NextApiRequest, res: NextApiResponse) {
     const auth = await Auth.findByEmailAndCode(req.body.email, req.body.code)
@@ -16,7 +16,7 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
             })
         }
         const token = generate({ userId: auth.data.userId })
-        res.send({token})
+        res.send({ token })
     }
 
 }

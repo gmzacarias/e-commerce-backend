@@ -1,4 +1,4 @@
-import { firestore } from "./firestore"
+import { firestore } from "../lib/firestore"
 
 const collection = firestore.collection("users")
 export class User {

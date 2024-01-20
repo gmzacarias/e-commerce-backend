@@ -1,10 +1,7 @@
-import { firestore } from "./firestore"
+import { firestore } from "../lib/firestore"
 import { isAfter } from "date-fns"
 
 const collection = firestore.collection("auth")
-
-
-
 
 export class Auth {
     ref: FirebaseFirestore.DocumentReference
@@ -20,17 +17,16 @@ export class Auth {
         this.ref.update(this.data)
     }
 
-    iscodeExpired(){
+    iscodeExpired() {
         const now = new Date()
         const expires = this.data.expire.toDate()
-       console.log({now,expires})
-        return isAfter(now,expires)
+        console.log({ now, expires })
+        return isAfter(now, expires)
     }
 
     static cleanEmail(email: string) {
         return email.trim().toLowerCase()
     }
-
 
     //el static lo hace un metodo de toda la clase
     static async findByEmail(email: string) {
@@ -52,6 +48,7 @@ export class Auth {
         newUser.data = data
         return newUser
     }
+
     static async findByEmailAndCode(email: string, code: number) {
         const cleanEmail = Auth.cleanEmail(email)
         const result = await collection.where("email", "==", cleanEmail).where("code", "==", code).get()
@@ -59,9 +56,9 @@ export class Auth {
             console.error("Email y code no coinciden")
             return null
         }
-        const doc=result.docs[0]
+        const doc = result.docs[0]
         const auth = new Auth(doc.id)
-        auth.data=doc.data()
+        auth.data = doc.data()
         return auth
     }
 }

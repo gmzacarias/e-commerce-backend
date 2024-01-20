@@ -1,5 +1,5 @@
-import { User } from "lib/user"
-import { Auth } from "lib/auth"
+import { User } from "models/user"
+import { Auth } from "models/auth"
 import { addMinutes } from "date-fns"
 import gen from "random-seed"
 

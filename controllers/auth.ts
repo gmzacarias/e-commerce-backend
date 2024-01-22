@@ -1,8 +1,9 @@
 import { User } from "models/user"
 import { Auth } from "models/auth"
 import { addMinutes } from "date-fns"
-import gen from "random-seed"
 import { SendCodeAuth } from "lib/emailjs"
+import { generate } from "lib/jwt"
+import gen from "random-seed"
 
 let seed = "my secret code"
 let random = gen.create(seed)
@@ -42,3 +43,19 @@ export async function sendCode(email: string) {
     return true
 }
 
+export async function signIn(email: string, code: number) {
+    const auth = await Auth.findByEmailAndCode(email, code)
+    if (!auth) {
+        console.log("Email o code incorrecto")
+        return null
+    } else {
+        const expires = auth.iscodeExpired()
+        if (expires) {
+            console.log("Code expirado")
+            return null
+        }
+        const token = generate({ userId: auth.data.userId })
+        console.log(token)
+        return token
+    }
+}

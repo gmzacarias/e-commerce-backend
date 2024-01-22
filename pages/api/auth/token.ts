@@ -1,22 +1,25 @@
 import type { NextApiRequest, NextApiResponse } from "next"
-import { generate } from "lib/jwt"
-import { Auth } from "models/auth"
+import method from "micro-method-router"
+import { signIn } from "controllers/auth"
+import { validateBodyAuthToken } from "lib/schemaMiddleware"
 
-export default async function (req: NextApiRequest, res: NextApiResponse) {
-    const auth = await Auth.findByEmailAndCode(req.body.email, req.body.code)
-    // let token=generate({userId:"bO8nVkJYSnoSTt532CHk"})
-    // const auth = await sendCode(req.body.email)
-    if (!auth) {
-        res.status(401).send({ message: "email o code incorrecto" })
-    } else {
-        const expires = auth.iscodeExpired()
-        if (expires) {
-            res.status(401).send({
-                message: "code expirado"
-            })
+async function postHandler(req: NextApiRequest, res: NextApiResponse) {
+    try {
+        await validateBodyAuthToken(req, res)
+        const { email, code } = req.body
+        const token = await signIn(email, code)
+        if (!token) {
+            res.status(401).send({ message: "Acceso no autorizado" })
+        } else {
+            res.status(200).send({ message: "inicio de sesion correcto" })
         }
-        const token = generate({ userId: auth.data.userId })
-        res.send({ token })
+    } catch (error) {
+        res.status(500).send({ message: "Error interno del servidor", error: error })
     }
-
 }
+
+const handler = method({
+    post: postHandler
+})
+
+export default handler

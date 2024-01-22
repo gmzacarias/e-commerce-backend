@@ -37,8 +37,8 @@ export async function sendCode(email: string) {
     auth.data.expire = expirar
     await auth.push()
     await SendCodeAuth(email, code)
-    console.log(SendCodeAuth)
-    console.log("email enviado a " + email + " con codigo:" + auth.data.code)
+    // console.log(SendCodeAuth)
+    // console.log("email enviado a " + email + " con codigo:" + auth.data.code)
     return true
 }
 

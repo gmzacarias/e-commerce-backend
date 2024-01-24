@@ -1,25 +1,32 @@
 import { firestore } from "../lib/firestore"
 import { isAfter } from "date-fns"
 
+interface AuthData {
+    email: string,
+    userId: string,
+    code: number,
+    expire: Date,
+}
+
 const collection = firestore.collection("auth")
 
 export class Auth {
     ref: FirebaseFirestore.DocumentReference
-    data: any
+    data: AuthData
     constructor(id) {
         this.ref = collection.doc(id)
     }
     async pull() {
         const snap = await this.ref.get()
-        this.data = snap.data()
+        this.data = snap.data() as AuthData
     }
     async push() {
-        this.ref.update(this.data)
+        this.ref.update(this.data as Record<string, any>)
     }
 
     iscodeExpired() {
         const now = new Date()
-        const expires = this.data.expire.toDate()
+        const expires = this.data.expire
         console.log({ now, expires })
         return isAfter(now, expires)
     }
@@ -35,7 +42,7 @@ export class Auth {
         if (results.docs.length) {
             const first = results.docs[0]
             const newAuth = new Auth(first.id)
-            newAuth.data = first.data()
+            newAuth.data = first.data() as AuthData
             return newAuth
         } else {
             return null
@@ -58,7 +65,7 @@ export class Auth {
         }
         const doc = result.docs[0]
         const auth = new Auth(doc.id)
-        auth.data = doc.data()
+        auth.data = doc.data() as AuthData
         return auth
     }
 }

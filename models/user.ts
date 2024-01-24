@@ -1,9 +1,16 @@
 import { firestore } from "../lib/firestore"
 
+interface UserData {
+    email: string,
+    userName: string,
+    phoneNumber: number,
+    cart: Array<any>,
+}
+
 const collection = firestore.collection("users")
 export class User {
     ref: FirebaseFirestore.DocumentReference
-    data: any
+    data: UserData
     id: string
     constructor(id) {
         this.id = id
@@ -11,11 +18,11 @@ export class User {
     }
     async pull() {
         const snap = await this.ref.get()
-        this.data = snap.data()
+        this.data = snap.data() as UserData
     }
 
     async push() {
-        this.ref.update(this.data)
+        this.ref.update(this.data as Record<string, any>)
     }
 
     static async createNewUser(data) {

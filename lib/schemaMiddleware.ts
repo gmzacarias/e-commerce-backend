@@ -28,14 +28,14 @@ export async function validateAuthToken(req: NextApiRequest, res: NextApiRespons
     }
 }
 
-let queryUserIdSchema = yup.object({
-    userId: yup.string().required()
-}).noUnknown(true)
+// let queryUserIdSchema = yup.object({
+//     userId: yup.string().required()
+// }).noUnknown(true)
 
-export async function validateUserId(req: NextApiRequest, res?: NextApiResponse) {
-    try {
-        await queryUserIdSchema.validate(req.query, { strict: true })
-    } catch (error) {
-        res.status(403).send({ field: "query", message: error })
-    }
-}
+// export async function validateUserId(req: NextApiRequest, res: NextApiResponse) {
+//     try {
+//         await queryUserIdSchema.validate(req.query, { strict: true })
+//     } catch (error) {
+//         res.status(403).send({ field: "query", message: error })
+//     }
+// }

@@ -38,7 +38,7 @@ export class User {
             const user = await collection.doc(userId).get()
             if (user.exists) {
                 const dataUser = new User(user.id)
-                console.log(dataUser)
+                // console.log(dataUser)
                 dataUser.data = user.data() as UserData;
                 return dataUser
             }else{

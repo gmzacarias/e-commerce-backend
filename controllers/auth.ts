@@ -42,7 +42,7 @@ export async function sendCode(email: string) {
        const auth = await findCreateAuth(email)
        const code = random.intBetween(10000, 99999)
        const now = new Date()
-       const expirar = addMinutes(now, 5)
+       const expirar = addMinutes(now, 30)
        auth.data.code = code
        auth.data.expire = expirar
        await auth.push()

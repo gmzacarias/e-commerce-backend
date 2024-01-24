@@ -6,14 +6,16 @@ export async function getOrderById(id: string): Promise<any> {
     return user.data
 }
 
-export async function getDataById(userId: string) {
+export async function getDataById(userId: string){
     try {
         const user = await User.getMyData(userId)
         if (user) {
-            return user
+            return user.data
+        } else {
+            throw new Error("No se pudo obtener la data")
         }
     } catch (error) {
-        console.error("No se pudo Obtener la data del usuario", error.message)
+        console.error("Data del usuario", error.message)
         return null
     }
 }

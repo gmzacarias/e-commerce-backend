@@ -59,8 +59,7 @@ export async function signIn(email: string, code: number) {
    try{
        const auth = await Auth.findByEmailAndCode(email, code)
        if (!auth) {
-           console.log("Email o code incorrecto")
-           return null
+          throw new Error ("No se pudo autorizar el ingreso")
        } else {
            const expires = auth.iscodeExpired()
            if (expires) {

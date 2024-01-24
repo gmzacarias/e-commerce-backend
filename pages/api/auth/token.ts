@@ -1,11 +1,11 @@
 import type { NextApiRequest, NextApiResponse } from "next"
 import method from "micro-method-router"
 import { signIn } from "controllers/auth"
-import { validateBodyAuthToken } from "lib/schemaMiddleware"
+import { validateAuthToken } from "lib/schemaMiddleware"
 
 async function postHandler(req: NextApiRequest, res: NextApiResponse) {
     try {
-        await validateBodyAuthToken(req, res)
+        await validateAuthToken(req, res)
         const { email, code } = req.body
         const token = await signIn(email, code)
         if (!token) {

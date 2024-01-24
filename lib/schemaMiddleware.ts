@@ -3,11 +3,11 @@ import * as yup from "yup"
 
 let bodyAuthSchema = yup.object({
     email: yup.string().required()
-}).strict(true).noUnknown(true)
+}).noUnknown(true)
 
-export async function validateBodyAuth(req: NextApiRequest, res?: NextApiResponse) {
+export async function validateAuth(req: NextApiRequest, res: NextApiResponse) {
     try {
-        await bodyAuthSchema.validate(req.body)
+        await bodyAuthSchema.validate(req.body, { strict: true })
     } catch (error) {
         res.status(403).send({ field: "body", message: error })
     }
@@ -18,12 +18,24 @@ let bodyAuthTokenSchema = yup
     .shape({
         email: yup.string().required(),
         code: yup.number().required()
-    }).strict(true).noUnknown(true)
+    }).noUnknown(true)
 
-export async function validateBodyAuthToken(req: NextApiRequest, res?: NextApiResponse) {
+export async function validateAuthToken(req: NextApiRequest, res: NextApiResponse) {
     try {
-        await bodyAuthTokenSchema.validate(req.body)
+        await bodyAuthTokenSchema.validate(req.body, { strict: true })
     } catch (error) {
         res.status(403).send({ field: "body", message: error })
+    }
+}
+
+let queryUserIdSchema = yup.object({
+    userId: yup.string().required()
+}).noUnknown(true)
+
+export async function validateUserId(req: NextApiRequest, res?: NextApiResponse) {
+    try {
+        await queryUserIdSchema.validate(req.query, { strict: true })
+    } catch (error) {
+        res.status(403).send({ field: "query", message: error })
     }
 }

@@ -60,7 +60,7 @@ export class Auth {
         const cleanEmail = Auth.cleanEmail(email)
         const result = await collection.where("email", "==", cleanEmail).where("code", "==", code).get()
         if (result.empty) {
-            console.error("Email y code no coinciden")
+            // console.error("Email y code no coinciden")
             return null
         }
         const doc = result.docs[0]

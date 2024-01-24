@@ -8,6 +8,7 @@ interface UserData {
 }
 
 const collection = firestore.collection("users")
+
 export class User {
     ref: FirebaseFirestore.DocumentReference
     data: UserData
@@ -30,5 +31,22 @@ export class User {
         const newUser = new User(newUserSnap.id)
         newUser.data = data
         return newUser
+    }
+
+    static async getMyData(userId: string) {
+        try {
+            const user = await collection.doc(userId).get()
+            if (user.exists) {
+                const dataUser = new User(user.id)
+                console.log(dataUser)
+                dataUser.data = user.data() as UserData;
+                return dataUser
+            }else{
+                throw new Error ("El Usuario no existe")
+            }
+        } catch (error) {
+            console.error("Error al obtener datos del usuario:", error.message);
+            return null
+        }
     }
 }

@@ -62,10 +62,25 @@ export class Auth {
         if (result.empty) {
             // console.error("Email y code no coinciden")
             return null
+        } else {
+            const doc = result.docs[0]
+            const auth = new Auth(doc.id)
+            auth.data = doc.data() as AuthData
+            return auth
         }
-        const doc = result.docs[0]
-        const auth = new Auth(doc.id)
-        auth.data = doc.data() as AuthData
-        return auth
+    }
+
+    static async updateEmail(userId: string, email: string) {
+        const cleanEmail = Auth.cleanEmail(email)
+        const result = await collection.where("userId", "==", userId).get()
+        if (result.empty) {
+            console.error("El user id no existe")
+        } else {
+            const auth = new Auth(result.docs[0].id)
+            auth.data = result.docs[0].data() as AuthData
+            auth.data.email = cleanEmail
+            await auth.push()
+            return auth
+        }
     }
 }

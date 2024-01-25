@@ -22,6 +22,7 @@ export async function findCreateAuth(email: string): Promise<Auth> {
                 email: cleanEmail,
                 userName: "",
                 phoneNumber: 0,
+                address: "",
                 cart: []
             })
             const newAuth = await Auth.createNewAuth({
@@ -38,40 +39,40 @@ export async function findCreateAuth(email: string): Promise<Auth> {
 }
 
 export async function sendCode(email: string) {
-   try{
-       const auth = await findCreateAuth(email)
-       const code = random.intBetween(10000, 99999)
-       const now = new Date()
-       const expirar = addMinutes(now, 30)
-       auth.data.code = code
-       auth.data.expire = expirar
-       await auth.push()
-       await SendCodeAuth(email, code)
-       // console.log("email enviado a " + email + " con codigo:" + auth.data.code)
-       return true
-   }catch(error){
-    console.error("Error al enviar el mail:", error.message);
-    return null
-   }
+    try {
+        const auth = await findCreateAuth(email)
+        const code = random.intBetween(10000, 99999)
+        const now = new Date()
+        const expirar = addMinutes(now, 30)
+        auth.data.code = code
+        auth.data.expire = expirar
+        await auth.push()
+        await SendCodeAuth(email, code)
+        // console.log("email enviado a " + email + " con codigo:" + auth.data.code)
+        return true
+    } catch (error) {
+        console.error("Error al enviar el mail:", error.message);
+        return null
+    }
 }
 
 export async function signIn(email: string, code: number) {
-   try{
-       const auth = await Auth.findByEmailAndCode(email, code)
-       if (!auth) {
-          throw new Error ("No se pudo autorizar el ingreso")
-       } else {
-           const expires = auth.iscodeExpired()
-           if (expires) {
-               console.log("Code expirado")
-               return null
-           }
-           const token = generate({ userId: auth.data.userId })
-           console.log(token)
-           return token
-       }
-   }catch(error){
-    console.error("Error al intentar iniciar sesión:", error.message);
-    return null
-   }
+    try {
+        const auth = await Auth.findByEmailAndCode(email, code)
+        if (!auth) {
+            throw new Error("No se pudo autorizar el ingreso")
+        } else {
+            const expires = auth.iscodeExpired()
+            if (expires) {
+                console.log("Code expirado")
+                return null
+            }
+            const token = generate({ userId: auth.data.userId })
+            console.log(token)
+            return token
+        }
+    } catch (error) {
+        console.error("Error al intentar iniciar sesión:", error.message);
+        return null
+    }
 }

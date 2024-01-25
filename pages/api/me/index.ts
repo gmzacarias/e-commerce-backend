@@ -18,15 +18,15 @@ async function getHandler(req: NextApiRequest, res: NextApiResponse, token) {
 }
 
 async function patchHandler(req: NextApiRequest, res: NextApiResponse, token) {
-    const data = req.body;
+    const data = req.body
     if (!token) {
         res.status(401).send({ message: "No hay token" })
     } else {
         try {
             await validatePatchData(req, res)
-            if (data.email && data.userName && data.phoneNumber) {
-                const dataUser = await updateData(token.userId,data)
-                res.status(200).send({ data: dataUser })
+            if (data.email || data.userName || data.phoneNumber||data.address) {
+                await updateData(token.userId,data)
+                res.status(200).send({ message: "Datos actualizados"})
             }
         } catch (error) {
             res.status(400).send({ message: "Error al obtener la data", error: error })

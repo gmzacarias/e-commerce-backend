@@ -2,7 +2,7 @@ import type { NextApiRequest, NextApiResponse } from "next"
 import * as yup from "yup"
 
 let bodyAuthSchema = yup.object({
-    email: yup.string().required()
+    email: yup.string().email().required()
 }).noUnknown(true)
 
 export async function validateAuth(req: NextApiRequest, res: NextApiResponse) {
@@ -16,7 +16,7 @@ export async function validateAuth(req: NextApiRequest, res: NextApiResponse) {
 let bodyAuthTokenSchema = yup
     .object()
     .shape({
-        email: yup.string().required(),
+        email: yup.string().email().required(),
         code: yup.number().required()
     }).noUnknown(true)
 
@@ -31,9 +31,10 @@ export async function validateAuthToken(req: NextApiRequest, res: NextApiRespons
 let bodyPatchDataSchema = yup
     .object()
     .shape({
-        email: yup.string(),
+        email: yup.string().email(),
         userName: yup.string(),
         phoneNumber: yup.number(),
+        address: yup.string()
     }).noUnknown(true)
 
 export async function validatePatchData(req: NextApiRequest, res: NextApiResponse) {
@@ -41,5 +42,22 @@ export async function validatePatchData(req: NextApiRequest, res: NextApiRespons
         await bodyPatchDataSchema.validate(req.body, { strict: true })
     } catch (error) {
         res.status(403).send({ field: "body", message: error })
+    }
+}
+
+let queryPatchDataSchema = yup
+    .object()
+    .shape({
+        email: yup.string(),
+        userName: yup.string(),
+        phoneNumber: yup.number(),
+        address: yup.string()
+    }).noUnknown(true)
+
+export async function validatePatchSpecifiedData(req: NextApiRequest, res: NextApiResponse) {
+    try {
+        await queryPatchDataSchema.validate(req.query, { strict: true })
+    } catch (error) {
+        res.status(403).send({ field: "query", message: error })
     }
 }

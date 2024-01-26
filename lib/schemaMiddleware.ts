@@ -61,3 +61,19 @@ export async function validatePatchSpecifiedData(req: NextApiRequest, res: NextA
         res.status(403).send({ field: "query", message: error })
     }
 }
+
+let querySearchProductSchema = yup
+    .object()
+    .shape({
+        q: yup.string(),
+        offset: yup.string(),
+        limit: yup.string(),
+    }).noUnknown(true)
+
+export async function validateSearchProduct(req: NextApiRequest, res: NextApiResponse) {
+    try {
+        await querySearchProductSchema.validate(req.query, { strict: true })
+    } catch (error) {
+        res.status(403).send({ field: "query", message: error })
+    }
+}

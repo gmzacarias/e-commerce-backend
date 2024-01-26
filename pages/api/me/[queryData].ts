@@ -12,7 +12,7 @@ async function patchHandler(req: NextApiRequest, res: NextApiResponse, token) {
         res.status(401).send({ message: "No hay token" })
     } else {
         try {
-            await validatePatchSpecifiedData(queryData, res)
+            await validatePatchSpecifiedData(queryData,res)
             await validatePatchData(req, res)
             const dataKeys = Object.keys(data).toString();
             if (queryData !== dataKeys) {

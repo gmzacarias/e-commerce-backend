@@ -53,4 +53,23 @@ export class Order {
         }
     }
 
+    static async getOrderById(orderId: string): Promise<Order> {
+        try {
+            console.log(orderId)
+            const order = await collection.doc(orderId).get()
+            if (order.exists) {
+                const orderFound = new Order(order.id)
+                orderFound.data = order.data() as OrderData
+                // console.log(orderFound.data)
+                const orderById = orderFound.data as any
+                return orderById
+            } else {
+                throw new Error("No existen órdenes para este usuario");
+            }
+        } catch (error) {
+            console.error("Error al obtener orderes del usuario: ", error.message);
+            return null
+        }
+    }
+
 }

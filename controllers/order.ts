@@ -68,3 +68,18 @@ export async function getMyOrders(userId: string) {
         return null
     }
 }
+
+export async function getMyOrdersById(orderId: string) {
+    try {
+        const orders = await Order.getOrderById(orderId)
+        // console.log(orders)
+        if (orders) {
+            return orders
+        } else {
+            throw new Error("No se pudo obtener las ordenes")
+        }
+    } catch (error) {
+        console.error("Ordenes del usuario", error.message)
+        return null
+    }
+}

@@ -26,10 +26,31 @@ export class Order {
         this.ref.update(this.data as Record<string, any>)
     }
 
-    static async createNewOrder(newOrderData = {}){
+    static async createNewOrder(newOrderData = {}) {
         const newOrderSnap = await collection.add(newOrderData)
         const newOrder = new Order(newOrderSnap.id)
         newOrder.data = newOrderData as OrderData
         return newOrder
     }
+
+    static async getOrders(userId: string): Promise<Array<Order>> {
+        try {
+            console.log(userId)
+            const ordersSnap = await collection.where('userId', '==', userId).get();
+            if (ordersSnap.empty) {
+                throw new Error("No existen órdenes para este usuario");
+            }
+            const ordersData = ordersSnap.docs.map(doc => {
+                const order = new Order(doc.id) as any
+                order.data = doc.data() as OrderData
+                return order.data
+            })
+            // console.log("list", ordersData)
+            return ordersData;
+        } catch (error) {
+            console.error("Error al obtener orderes del usuario: ", error.message);
+            return []
+        }
+    }
+
 }

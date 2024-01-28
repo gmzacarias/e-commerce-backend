@@ -1,7 +1,6 @@
 import { Order } from "models/order"
 import { createPreference } from "lib/mercadopago"
-import { productIndex } from "lib/algolia"
-import { cleanResults, searchProductById } from "./products"
+import { searchProductById } from "./products"
 
 type CreateOrderRes = {
     url: string
@@ -53,4 +52,19 @@ export async function createOrder(userId: string, productId: string, additionalI
         console.error("No se pudo crear la preferencia: ", error.message)
     }
 
+}
+
+export async function getMyOrders(userId: string) {
+    try {
+        const orders = await Order.getOrders(userId)
+        // console.log(orders)
+        if (orders) {
+            return orders
+        } else {
+            throw new Error("No se pudo obtener las ordenes")
+        }
+    } catch (error) {
+        console.error("Ordenes del usuario", error.message)
+        return null
+    }
 }

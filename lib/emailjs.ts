@@ -2,7 +2,7 @@ import emailjs from '@emailjs/browser';
 
 const serviceId = process.env.SERVICE_ID
 const templateId = process.env.TEMPLATE_ID_SEND_CODE_AUTH
-const publicKey = process.env.EMAILJS_KEY
+const emailjsKey = process.env.EMAILJS_KEY
 
 type sendData = {
     email: string,
@@ -14,9 +14,9 @@ export async function SendCodeAuth(email: string, code: number) {
         email: email,
         code: code,
     }
-    
+
     try {
-        const sendMail = await emailjs.send(serviceId, templateId, data, publicKey)
+        const sendMail = await emailjs.send(serviceId, templateId, data, emailjsKey)
         console.log(`Envio de mail: status${sendMail.status}, text:${sendMail.text}`)
         return sendMail
     } catch (error) {

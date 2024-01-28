@@ -1,3 +1,4 @@
+import { User } from "models/user"
 import { productIndex } from "lib/algolia";
 import { authAirtable } from "lib/airtable";
 import { getOffsetAndLimit } from "controllers/request";
@@ -54,12 +55,11 @@ export async function searchProducts(req, res) {
     }
 }
 
-export async function searchProductById(id: string, res) {
+export async function searchProductById(productId: string,) {
     try {
-        const results = await productIndex.getObject(id)
+        const results = await productIndex.getObject(productId)
         return results
     } catch (error) {
-        res.send({ message: error.message })
-        return null
+        return (error.message)
     }
 }

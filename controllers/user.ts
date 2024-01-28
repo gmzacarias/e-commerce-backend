@@ -1,5 +1,7 @@
 import { User } from "models/user"
 import { Auth } from "models/auth"
+import { productIndex } from "lib/algolia"
+import { searchProductById } from "./products"
 
 export async function getOrderById(id: string): Promise<any> {
     const user = new User(id)
@@ -65,6 +67,66 @@ export async function updateSpecifiedData(userId: string, newData: any) {
         }
     } catch (error) {
         console.error("Error con el usuario:", error.message);
+        return null
+    }
+}
+
+
+export async function getCartById(userId: string) {
+    try {
+        const user = await User.getMyCart(userId)
+        if (user) {
+            return user
+        } else {
+            throw new Error("No se pudo obtener el carrito")
+        }
+    } catch (error) {
+        console.error("Data del carrito", error.message)
+        return null
+    }
+}
+
+export async function addProductCartById(userId: string, productId: string) {
+    try {
+        const product = await searchProductById(productId)
+        const addProduct = await User.addProductCart(userId, product)
+        if (addProduct) {
+            return addProduct
+        } else {
+            throw new Error("No se pudo agregar el producto")
+        }
+    } catch (error) {
+        console.error("Data del producto agregado", error.message)
+        return null
+    }
+}
+
+export async function deleteProductCartById(userId: string, productId: string) {
+    try {
+        const product = await searchProductById(productId)
+        const dataProduct =product.objectID
+        const deleteProduct = await User.deleteProductCart(userId, dataProduct)
+        if (deleteProduct) {
+            return deleteProduct
+        } else {
+            throw new Error("No se pudo agregar el producto")
+        }
+    } catch (error) {
+        console.error("Data del producto eliminado", error.message)
+        return null
+    }
+}
+
+export async function resetCart(userId: string) {
+    try {
+        const response = await User.resetProductCart(userId)
+        if (response) {
+            return response
+        } else {
+            throw new Error("No se pudo resetear el carrito")
+        }
+    } catch (error) {
+        console.error("Data del producto eliminado", error.message)
         return null
     }
 }

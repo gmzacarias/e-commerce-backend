@@ -77,3 +77,18 @@ export async function validateSearchProduct(req: NextApiRequest, res: NextApiRes
         res.status(403).send({ field: "query", message: error })
     }
 }
+
+let queryProductCartSchema = yup
+    .object({
+        productId: yup.string(),
+    })
+    .noUnknown(true)
+
+export async function validateQueryProduct(req: NextApiRequest, res: NextApiResponse) {
+    try {
+        await queryProductCartSchema.validate(req.query, { strict: true })
+        console.log(req.query)
+    } catch (error) {
+        res.status(403).send({ field: "query", message: error })
+    }
+}

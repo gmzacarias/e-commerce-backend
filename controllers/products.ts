@@ -25,6 +25,14 @@ export async function saveProductsAlgolia() {
     }
 }
 
+export async function cleanResults(results) {
+    const data = results.hits.map(product => {
+        const { _highlightResult, ...productData } = product
+        return productData
+    })
+    return data
+}
+
 export async function searchProducts(req, res) {
     try {
         const { offset, limit } = getOffsetAndLimit(req)
@@ -36,11 +44,7 @@ export async function searchProducts(req, res) {
         if (results.nbHits === 0) {
             throw new Error("No hay Resultados")
         } else {
-            const resultsData = results.hits.map(product => {
-                const { _highlightResult, ...productData } = product;
-                return productData;
-            });
-            // console.log(resultsData)
+            const resultsData = await cleanResults(results)
             res.send({
                 results: resultsData,
                 pagination: {
@@ -58,6 +62,7 @@ export async function searchProducts(req, res) {
 export async function searchProductById(productId: string,) {
     try {
         const results = await productIndex.getObject(productId)
+        console.log(results.objectID)
         return results
     } catch (error) {
         return (error.message)

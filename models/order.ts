@@ -1,10 +1,16 @@
 import { firestore } from "../lib/firestore"
 
-const collection = firestore.collection("orders")
+interface OrderData {
+    userId: string,
+    productId: string,
+    status: string,
+    additionalInfo: string,
+}
 
+const collection = firestore.collection("orders")
 export class Order {
     ref: FirebaseFirestore.DocumentReference
-    data: any
+    data: OrderData
     id: string
     constructor(id) {
         this.id = id
@@ -13,17 +19,17 @@ export class Order {
 
     async pull() {
         const snap = await this.ref.get()
-        this.data = snap.data()
+        this.data = snap.data() as OrderData
     }
 
     async push() {
-        this.ref.update(this.data)
+        this.ref.update(this.data as Record<string, any>)
     }
 
-    static async createNewOrder(newOrderData = {}) {
+    static async createNewOrder(newOrderData = {}){
         const newOrderSnap = await collection.add(newOrderData)
         const newOrder = new Order(newOrderSnap.id)
-        newOrder.data = newOrderData
+        newOrder.data = newOrderData as OrderData
         return newOrder
     }
 }

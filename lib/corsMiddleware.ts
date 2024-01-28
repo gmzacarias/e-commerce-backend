@@ -1,33 +1,54 @@
 // middleware.ts (va al lado de la carpeta pages)
 
-// import type { NextRequest, NextResponse } from "next/server";
+
+import type { NextRequest } from "next/server";
 
 
-// export function middleware(req: NextRequest, res: NextResponse) {
-//   if (req.method == "OPTIONS") {
-//     return res.status()
-//     res.send(null, {
-//       "Access-Control-Allow-Credentials": "true",
-//       "Access-Control-Allow-Origin": "*",
-//       "Access-Control-Allow-Methods": "GET,OPTIONS,PATCH,DELETE,POST,PUT",
-//       "Access-Control-Allow-Headers":
-//         req.headers.get("Access-Control-Request-Headers") || "",
-//       Vary: "Access-Control-Request-Headers",
-//       "Content-Length": "0",
-//     });
-//   }
-// }
+export function middleware(req: NextRequest) {
 
-// export const config = {
-//   matcher: ["/api/:path*"],
-// };
-import type { NextApiRequest, NextApiResponse } from 'next';
-import NextCors from 'nextjs-cors';
+  if (req.method == "OPTIONS") {
 
-export default async function middleware(req: NextApiRequest, res: NextApiResponse) {
-  await NextCors(req, res, {
-    methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE'],
-    origin: '*',
-    optionsSuccessStatus: 200,
-  });
+    return new Response(null, {
+
+      status: 204,
+
+      headers: {
+
+        "Access-Control-Allow-Credentials": "true",
+
+        "Access-Control-Allow-Origin": "*",
+
+        "Access-Control-Allow-Methods": "GET,OPTIONS,PATCH,DELETE,POST,PUT",
+
+        "Access-Control-Allow-Headers":
+
+          req.headers.get("Access-Control-Request-Headers") || "",
+
+        Vary: "Access-Control-Request-Headers",
+
+        "Content-Length": "0",
+
+      },
+
+    });
+
+  }
+
 }
+
+
+export const config = {
+
+  matcher: ["/api/:path*"],
+
+};
+// import type { NextApiRequest, NextApiResponse } from 'next';
+// import NextCors from 'nextjs-cors';
+
+// export default async function middleware(req: NextApiRequest, res: NextApiResponse) {
+//   await NextCors(req, res, {
+//     methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE'],
+//     origin: '*',
+//     optionsSuccessStatus: 200,
+//   });
+// }

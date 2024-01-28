@@ -8,18 +8,19 @@ export async function saveProductsAlgolia() {
         if (!response) {
             throw new Error("no se pudo obtener la base de datos")
         } else {
-            const addStock = await response.map((product) => ({
+            const productsData = await response.map((product) => ({
+                objectID: product.Id,
                 ...product,
                 stock: 10
             }))
-            const products = addStock
-            const syncAlgolia = await productIndex.saveObjects(products, {
-                autoGenerateObjectIDIfNotExist: true
-            })
+            // console.log({productsData})
+            const products = productsData
+            const syncAlgolia = await productIndex.saveObjects(products)
             return syncAlgolia
         }
     } catch (error) {
         console.error("Hubo un problema con la sincronizacion: ", error.message)
+        throw error;
     }
 }
 
@@ -53,12 +54,12 @@ export async function searchProducts(req, res) {
     }
 }
 
-export async function searchProductById(id: string,res) {
+export async function searchProductById(id: string, res) {
     try {
         const results = await productIndex.getObject(id)
         return results
     } catch (error) {
-       res.send({message:error.message})
+        res.send({ message: error.message })
         return null
     }
 }

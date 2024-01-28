@@ -2,13 +2,17 @@ import type { NextApiRequest, NextApiResponse } from "next"
 import { authMiddleware } from "lib/middleware"
 import { createOrder } from "controllers/order"
 import method from "micro-method-router"
+import { validateBodyCreateOrder, validateQueryCreateOrder } from "lib/schemaMiddleware"
 
 
 async function postHandler(req: NextApiRequest, res: NextApiResponse, token) {
     const { productId } = req.query as any
-    const {additionalInfo} = req.body
+    const { additionalInfo } = req.body
     try {
-        console.log(productId)
+        // console.log(productId)
+        // console.log(additionalInfo)
+        await validateQueryCreateOrder(req, res)
+        await validateBodyCreateOrder(req, res)
         const response = await createOrder(token.userId, productId, additionalInfo)
         res.send({ message: response })
     } catch (error) {
@@ -19,13 +23,6 @@ async function postHandler(req: NextApiRequest, res: NextApiResponse, token) {
 const handler = method({
     post: postHandler
 })
-
-//desafio hacerlo en los middlewares asi no hay tanta logica aca
-// const posthandlerValidation= schemamiddleware(bodySchema,postHandler)
-
-// const handler2= method({
-//     post:posthandlerValidation
-// })
 
 export default authMiddleware(handler)
 

@@ -92,3 +92,63 @@ export async function validateQueryProduct(req: NextApiRequest, res: NextApiResp
         res.status(403).send({ field: "query", message: error })
     }
 }
+
+let queryCreateOrderSchema = yup
+    .object({
+        productId: yup.string(),
+    })
+    .noUnknown(true)
+
+export async function validateQueryCreateOrder(req: NextApiRequest, res: NextApiResponse) {
+    try {
+        await queryCreateOrderSchema.validate(req.query, { strict: true })
+        // console.log(req.query)
+    } catch (error) {
+        res.status(403).send({ field: "query", message: error })
+    }
+}
+
+let bodyCreateOrderSchema = yup
+    .object({
+        additionalInfo: yup.string(),
+    })
+    .noUnknown(true)
+
+export async function validateBodyCreateOrder(req: NextApiRequest, res: NextApiResponse) {
+    try {
+        await bodyCreateOrderSchema.validate(req.body, { strict: true })
+        // console.log(req.body)
+    } catch (error) {
+        res.status(403).send({ field: "body", message: error })
+    }
+}
+
+let queryFindOrderSchema = yup
+    .object({
+        orderId: yup.string(),
+    })
+    .noUnknown(true)
+
+export async function validateQueryFindOrder(req: NextApiRequest, res: NextApiResponse) {
+    try {
+        await queryFindOrderSchema.validate(req.query, { strict: true })
+        // console.log(req.query)
+    } catch (error) {
+        res.status(403).send({ field: "query", message: error })
+    }
+}
+
+let querySearchProductIdSchema = yup
+    .object({
+        productId: yup.string(),
+    })
+    .noUnknown(true)
+
+export async function validateQuerySearchProductId(req: NextApiRequest, res: NextApiResponse) {
+    try {
+        await querySearchProductIdSchema.validate(req.query, { strict: true })
+        // console.log(req.query)
+    } catch (error) {
+        res.status(403).send({ field: "query", message: error })
+    }
+}

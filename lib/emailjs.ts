@@ -2,7 +2,7 @@ import emailjs from '@emailjs/browser';
 
 const serviceId = process.env.SERVICE_ID
 const templateId = process.env.TEMPLATE_ID_SEND_CODE_AUTH
-const publicKey = process.env.PUBLIC_KEY
+const publicKey = process.env.EMAILJS_KEY
 
 type sendData = {
     email: string,

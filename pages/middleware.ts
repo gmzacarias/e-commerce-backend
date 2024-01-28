@@ -1,8 +1,9 @@
 // middleware.ts (va al lado de la carpeta pages)
 
-import type { NextRequest } from "next/server";
+import type { NextRequest, NextResponse } from "next/server";
 
-export function middleware(req: NextRequest) {
+
+export function middleware(req: NextRequest,res:NextResponse) {
   if (req.method == "OPTIONS") {
     return new Response(null, {
       status: 204,

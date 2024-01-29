@@ -1,7 +1,7 @@
 import { User } from "models/user"
 import { Auth } from "models/auth"
 import { addMinutes } from "date-fns"
-import { SendCodeAuth } from "lib/emailjs"
+import {sendCodeAuth} from "lib/sendgrid"
 import { generate } from "lib/jwt"
 import gen from "random-seed"
 
@@ -15,7 +15,7 @@ export async function findCreateAuth(email: string): Promise<Auth> {
     const auth = await Auth.findByEmail(cleanEmail)
     try {
         if (auth) {
-            console.log("auth encontrado")
+            // console.log("auth encontrado")
             return auth
         } else {
             const newUser = await User.createNewUser({
@@ -47,7 +47,7 @@ export async function sendCode(email: string) {
         auth.data.code = code
         auth.data.expire = expirar
         await auth.push()
-        await SendCodeAuth(email, code)
+        await sendCodeAuth(email, code)
         // console.log("email enviado a " + email + " con codigo:" + auth.data.code)
         return true
     } catch (error) {

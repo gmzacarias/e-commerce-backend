@@ -1,8 +1,6 @@
 // middleware.ts (va al lado de la carpeta pages)
 
-
 import type { NextRequest } from "next/server";
-
 
 export function middleware(req: NextRequest) {
 
@@ -42,13 +40,3 @@ export const config = {
   matcher: ["/api/:path*"],
 
 };
-// import type { NextApiRequest, NextApiResponse } from 'next';
-// import NextCors from 'nextjs-cors';
-
-// export default async function middleware(req: NextApiRequest, res: NextApiResponse) {
-//   await NextCors(req, res, {
-//     methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE'],
-//     origin: '*',
-//     optionsSuccessStatus: 200,
-//   });
-// }

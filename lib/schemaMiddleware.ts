@@ -93,21 +93,6 @@ export async function validateQueryProduct(req: NextApiRequest, res: NextApiResp
     }
 }
 
-let queryCreateOrderSchema = yup
-    .object({
-        productId: yup.string(),
-    })
-    .noUnknown(true)
-
-export async function validateQueryCreateOrder(req: NextApiRequest, res: NextApiResponse) {
-    try {
-        await queryCreateOrderSchema.validate(req.query, { strict: true })
-        // console.log(req.query)
-    } catch (error) {
-        res.status(403).send({ field: "query", message: error })
-    }
-}
-
 let bodyCreateOrderSchema = yup
     .object({
         additionalInfo: yup.string(),

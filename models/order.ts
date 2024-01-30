@@ -2,7 +2,7 @@ import { firestore } from "../lib/firestore"
 
 interface OrderData {
     userId: string,
-    productId: string,
+    products: [string],
     status: string,
     additionalInfo: string,
 }

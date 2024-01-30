@@ -67,6 +67,23 @@ export class User {
         }
     }
 
+    static async getDataUser(userId:string):Promise<User>{
+        try {
+            const user = await collection.doc(userId).get()
+            if (user.exists) {
+                const dataUser = new User(user.id)
+                // console.log(dataUser)
+                dataUser.data = user.data() as UserData;
+                return dataUser
+            } else {
+                throw new Error("El Usuario no existe")
+            }
+        } catch (error) {
+            console.error("Error al obtener datos del usuario: ", error.message);
+            return null
+        }
+    }
+
     static async updateUserData(userId: string, newData: any): Promise<User> {
         try {
             const user = await collection.doc(userId).get()

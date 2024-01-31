@@ -2,7 +2,13 @@ import { Order } from "models/order"
 import { getDataById, getCartById, resetCart } from "controllers/user"
 import { createPreference, getMerchantOrderId } from "lib/mercadopago"
 import { sendPaymentConfirmed, sendSaleConfirmed } from "lib/sendgrid"
-import { MerchantOrder } from "mercadopago"
+
+if (process.env.NODE_ENV == "production") {
+    var notificationUrl = "https://e-commerce-backend-lake.vercel.app/api/ipn/mercadopago";
+
+} else if (process.env.NODE_ENV == "development") {
+    var notificationUrl = "https://webhook.site/115e6d94-141f-43b2-965f-db6fd6e18264";
+}
 
 export async function getMyOrders(userId: string) {
     try {
@@ -128,8 +134,7 @@ export async function createOrder(userId: string, additionalInfo: string): Promi
             body:
             {
                 external_reference: order.id,
-                // notification_url: "https://e-commerce-backend-lake.vercel.app/api/ipn/mercadopago",
-                notification_url: "https://webhook.site/115e6d94-141f-43b2-965f-db6fd6e18264",
+                notification_url: notificationUrl,
                 items: items,
                 payer: {
                     "name": dataUser.userName,
@@ -173,36 +178,36 @@ async function saleAlert(userId: string, order: string, price: number) {
     }
 }
 
-export async function Hola(userId: string, orderId: string) {
-    const order = await getOrderDataById(orderId)
-    if (order) {
-        try {
-            const user = await getDataById(userId)
-            const send = await purchaseAlert(user.email, user.userName, orderId)
-            console.log("soy el user", user)
-            return send
-        } catch (error) {
-            console.error("No se envio el alerta", error.message)
-        }
-    } else {
-        return null
-    }
-}
+// export async function Hola(userId: string, orderId: string) {
+//     const order = await getOrderDataById(orderId)
+//     if (order) {
+//         try {
+//             const user = await getDataById(userId)
+//             const send = await purchaseAlert(user.email, user.userName, orderId)
+//             console.log("soy el user", user)
+//             return send
+//         } catch (error) {
+//             console.error("No se envio el alerta", error.message)
+//         }
+//     } else {
+//         return null
+//     }
+// }
 
-export async function Venta(userId: string, orderId: string) {
-    const order = await getOrderDataById(orderId) as any
-    if (order) {
-        try {
-            const send = await saleAlert(userId, orderId, order.totalPrice)
-            console.log("soy la venta", send)
-            return send
-        } catch (error) {
-            console.error("No se envio el alerta", error.message)
-        }
-    } else {
-        return null
-    }
-}
+// export async function Venta(userId: string, orderId: string) {
+//     const order = await getOrderDataById(orderId) as any
+//     if (order) {
+//         try {
+//             const send = await saleAlert(userId, orderId, order.totalPrice)
+//             console.log("soy la venta", send)
+//             return send
+//         } catch (error) {
+//             console.error("No se envio el alerta", error.message)
+//         }
+//     } else {
+//         return null
+//     }
+// }
 
 
 

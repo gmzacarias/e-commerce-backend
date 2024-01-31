@@ -5,6 +5,16 @@ type codeProps = {
     code: number
 }
 
+type paymentProps = {
+    userName?: string,
+    order: string
+}
+
+type saleProps = {
+    userId: string,
+    order: string,
+    price: number,
+}
 
 export function CodeMail({ code }: codeProps) {
     return (
@@ -16,24 +26,23 @@ export function CodeMail({ code }: codeProps) {
     )
 }
 
-export function PaymentMail(props) {
-    const { code } = props
+export function PaymentMail({ userName, order }: paymentProps) {
     return (
         <div>
-            <h1>Hola te enviamos el codigo para iniciar Sesion</h1>
-            <h3>{code}</h3>
-            <p>"este codigo expira en 30 minutos"</p>
+            <h1>Hola {userName} tu compra fue exitosa</h1>
+            <h3>codigo de orden:{order}</h3>
+            <p>Podes chequear el estado de tus compras, en mis ordenes</p>
         </div>
     )
 }
 
-export function SaleMail(props) {
-    const { code } = props
+export function SaleMail({ userId,order, price }: saleProps) {
     return (
         <div>
-            <h1>Hola te enviamos el codigo para iniciar Sesion</h1>
-            <h3>{code}</h3>
-            <p>"este codigo expira en 30 minutos"</p>
+            <h1>Recibiste una aprobacion de compra</h1>
+            <p>codigo de orden:{order}</p>
+            <p>userId:{userId}</p>
+            <p>Precio:${price}</p>
         </div>
     )
 }

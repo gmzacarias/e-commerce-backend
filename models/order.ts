@@ -4,6 +4,7 @@ interface OrderData {
     userId: string,
     products: [string],
     status: string,
+    totalPrice: number,
     additionalInfo: string,
 }
 
@@ -58,11 +59,9 @@ export class Order {
             console.log(orderId)
             const order = await collection.doc(orderId).get()
             if (order.exists) {
-                const orderFound = new Order(order.id)
+                const orderFound = new Order(order.id) as any
                 orderFound.data = order.data() as OrderData
-                // console.log(orderFound.data)
-                const orderById = orderFound.data as any
-                return orderById
+                return orderFound.data
             } else {
                 throw new Error("No existen órdenes para este usuario");
             }

@@ -1,4 +1,3 @@
-import { User } from "models/user"
 import { productIndex } from "lib/algolia";
 import { authAirtable } from "lib/airtable";
 import { getOffsetAndLimit } from "controllers/request";

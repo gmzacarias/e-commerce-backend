@@ -2,6 +2,7 @@ import { Order } from "models/order"
 import { getDataById, getCartById, resetCart } from "controllers/user"
 import { createPreference, getMerchantOrderId } from "lib/mercadopago"
 import { sendPaymentConfirmed, sendSaleConfirmed } from "lib/sendgrid"
+import { MerchantOrder } from "mercadopago"
 
 export async function getMyOrders(userId: string) {
     try {
@@ -127,7 +128,8 @@ export async function createOrder(userId: string, additionalInfo: string): Promi
             body:
             {
                 external_reference: order.id,
-                notification_url: "https://e-commerce-backend-lake.vercel.app/api/ipn/mercadopago",
+                // notification_url: "https://e-commerce-backend-lake.vercel.app/api/ipn/mercadopago",
+                notification_url: "https://webhook.site/115e6d94-141f-43b2-965f-db6fd6e18264",
                 items: items,
                 payer: {
                     "name": dataUser.userName,
@@ -204,24 +206,31 @@ export async function Venta(userId: string, orderId: string) {
 
 
 
-export async function updateStatusOrder(id: string | number) {
-    const order = await getMerchantOrderId({ merchantOrderId: id as string | number })
-    if (order.order_status === "paid") {
-        try {
-            const orderId = order.external_reference
-            const myOrder = new Order(orderId)
-            await myOrder.pull()
-            const userId = myOrder.data.userId
-            console.log(myOrder.data.status)
-            await myOrder.push()
-            console.log(myOrder.data.status)
-            const user = await getDataById(userId)
-            await purchaseAlert(user.email, user.userName, orderId)
-            await saleAlert(userId, orderId, myOrder.data.totalPrice)
-            await resetCart(userId)
-        } catch (error) {
-            console.error("No se pudo obtener el estado de la orden: ", error.message)
+export async function updateStatusOrder(topic: string, id: String) {
+    if (topic === "merchant_order") {
+        const order = await getMerchantOrderId({ merchantOrderId: id as string })
+        // console.log("order", order.order_status)
+        // console.log("status", order.order_status === "paid")
+        const orderStatus = order.order_status
+        if (orderStatus === "paid") {
+            try {
+                const orderId = order.external_reference
+                const myOrder = new Order(orderId)
+                await myOrder.pull()
+                const userId = myOrder.data.userId
+                // console.log(myOrder.data.status)
+                myOrder.data.status = "closed"
+                await myOrder.push()
+                // console.log(myOrder.data.status)
+                const user = await getDataById(userId)
+                await purchaseAlert(user.email, user.userName, orderId)
+                await saleAlert(userId, orderId, myOrder.data.totalPrice)
+                await resetCart(userId)
+                return myOrder.data
+            } catch (error) {
+                console.error("No se pudo obtener el estado de la orden: ", error.message)
+            }
+            return
         }
-        return
     }
 }

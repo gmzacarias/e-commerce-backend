@@ -137,3 +137,20 @@ export async function validateQuerySearchProductId(req: NextApiRequest, res: Nex
         res.status(403).send({ field: "query", message: error })
     }
 }
+
+let queryIpnMercadoPagoSchema = yup
+    .object()
+    .shape({
+        topic: yup.string().required(),
+        id: yup.string().required()
+    })
+    .noUnknown(true)
+
+export async function validateIpnMercadoPago(req: NextApiRequest, res: NextApiResponse) {
+    try {
+        await queryIpnMercadoPagoSchema.validate(req.query, { strict: true })
+        console.log(req.query)
+    } catch (error) {
+        res.status(403).send({ field: "query", message: error })
+    }
+}

@@ -1,5 +1,5 @@
 import { Order } from "models/order"
-import { getDataById, getCartById } from "controllers/user"
+import { getDataById, getCartById, resetCart } from "controllers/user"
 import { createPreference, getMerchantOrderId } from "lib/mercadopago"
 import { sendPaymentConfirmed, sendSaleConfirmed } from "lib/sendgrid"
 
@@ -218,6 +218,7 @@ export async function updateStatusOrder(id: string | number) {
             const user = await getDataById(userId)
             await purchaseAlert(user.email, user.userName, orderId)
             await saleAlert(userId, orderId, myOrder.data.totalPrice)
+            await resetCart(userId)
         } catch (error) {
             console.error("No se pudo obtener el estado de la orden: ", error.message)
         }

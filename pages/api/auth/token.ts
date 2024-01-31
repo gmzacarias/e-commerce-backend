@@ -9,9 +9,9 @@ async function postHandler(req: NextApiRequest, res: NextApiResponse) {
         const { email, code } = req.body
         const token = await signIn(email, code)
         if (!token) {
-            res.status(401).send({ message: "Acceso no autorizado" })
+            res.status(401).send({ message: "Acceso no autorizado",token: token })
         } else {
-            res.status(200).send({ message: "inicio de sesion correcto" })
+            res.status(200).send({ message: "inicio de sesion correcto", token: token })
         }
     } catch (error) {
         res.status(500).send({ message: "Error interno del servidor", error: error })

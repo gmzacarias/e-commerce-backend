@@ -3,11 +3,11 @@ import { getDataById, getCartById, resetCart } from "controllers/user"
 import { createPreference, getMerchantOrderId } from "lib/mercadopago"
 import { sendPaymentConfirmed, sendSaleConfirmed } from "lib/sendgrid"
 
-if (process.env.NODE_ENV == "production") {
-    var notificationUrl = "https://e-commerce-backend-lake.vercel.app/api/ipn/mercadopago";
-
-} else if (process.env.NODE_ENV == "development") {
+if (process.env.NODE_ENV == "development") {
     var notificationUrl = "https://webhook.site/115e6d94-141f-43b2-965f-db6fd6e18264";
+    
+} else if (process.env.NODE_ENV == "production") {
+   var notificationUrl = "https://e-commerce-backend-lake.vercel.app/api/ipn/mercadopago";
 }
 
 export async function getMyOrders(userId: string) {

@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from "next"
-import { authMiddleware } from "lib/middleware"
 import method from "micro-method-router"
+import { authMiddleware } from "lib/middleware"
 import { getOrderDataById } from "controllers/order"
 import { validateQueryFindOrder } from "lib/schemaMiddleware"
 

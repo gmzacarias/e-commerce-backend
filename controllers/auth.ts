@@ -1,8 +1,8 @@
 import { User } from "models/user"
 import { Auth } from "models/auth"
-import { addMinutes } from "date-fns"
-import {sendCodeAuth} from "lib/sendgrid"
 import { generate } from "lib/jwt"
+import { sendCodeAuth } from "lib/sendgrid"
+import { addMinutes } from "date-fns"
 import gen from "random-seed"
 
 //Generar una nueva semilla,cada vez que crea un numero aleatorio
@@ -68,7 +68,7 @@ export async function signIn(email: string, code: number) {
                 return null
             }
             const token = generate({ userId: auth.data.userId })
-            console.log(token)
+            // console.log(token)
             return token
         }
     } catch (error) {

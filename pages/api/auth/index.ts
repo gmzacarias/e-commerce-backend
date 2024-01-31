@@ -3,7 +3,6 @@ import method from "micro-method-router"
 import { sendCode } from "controllers/auth"
 import { validateAuth } from "lib/schemaMiddleware"
 
-
 async function postHandler(req: NextApiRequest, res: NextApiResponse) {
     try {
         await validateAuth(req, res)

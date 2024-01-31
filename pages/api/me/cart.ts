@@ -1,8 +1,8 @@
 import type { NextApiRequest, NextApiResponse } from "next"
 import method from "micro-method-router"
 import { authMiddleware } from "lib/middleware"
-import { validateQueryProduct } from "lib/schemaMiddleware"
 import { addProductCartById, deleteProductCartById, getCartById, resetCart, updateData } from "controllers/user"
+import { validateQueryProduct } from "lib/schemaMiddleware"
 
 async function getHandler(req: NextApiRequest, res: NextApiResponse, token) {
     if (!token) {

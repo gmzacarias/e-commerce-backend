@@ -1,9 +1,8 @@
 import type { NextApiRequest, NextApiResponse } from "next"
+import method from "micro-method-router" 
 import { authMiddleware } from "lib/middleware"
 import { createOrder } from "controllers/order"
-import method from "micro-method-router"
 import { validateBodyCreateOrder } from "lib/schemaMiddleware"
-
 
 async function postHandler(req: NextApiRequest, res: NextApiResponse, token) {
     const { additionalInfo } = req.body

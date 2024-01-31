@@ -1,6 +1,5 @@
 import { User } from "models/user"
 import { Auth } from "models/auth"
-import { productIndex } from "lib/algolia"
 import { searchProductById } from "./products"
 
 export async function getOrderById(id: string): Promise<any> {

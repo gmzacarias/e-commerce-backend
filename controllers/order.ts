@@ -1,7 +1,7 @@
 import { Order } from "models/order"
-import { getDataById, getCartById, resetCart } from "controllers/user"
 import { createPreference, getMerchantOrderId } from "lib/mercadopago"
 import { sendPaymentConfirmed, sendSaleConfirmed } from "lib/sendgrid"
+import { getDataById, getCartById, resetCart } from "controllers/user"
 
 if (process.env.NODE_ENV == "development") {
     var notificationUrl = "https://webhook.site/115e6d94-141f-43b2-965f-db6fd6e18264";
@@ -177,39 +177,6 @@ async function saleAlert(userId: string, order: string, price: number) {
         console.error("No se pudo enviar el mail ", error.message)
     }
 }
-
-// export async function Hola(userId: string, orderId: string) {
-//     const order = await getOrderDataById(orderId)
-//     if (order) {
-//         try {
-//             const user = await getDataById(userId)
-//             const send = await purchaseAlert(user.email, user.userName, orderId)
-//             console.log("soy el user", user)
-//             return send
-//         } catch (error) {
-//             console.error("No se envio el alerta", error.message)
-//         }
-//     } else {
-//         return null
-//     }
-// }
-
-// export async function Venta(userId: string, orderId: string) {
-//     const order = await getOrderDataById(orderId) as any
-//     if (order) {
-//         try {
-//             const send = await saleAlert(userId, orderId, order.totalPrice)
-//             console.log("soy la venta", send)
-//             return send
-//         } catch (error) {
-//             console.error("No se envio el alerta", error.message)
-//         }
-//     } else {
-//         return null
-//     }
-// }
-
-
 
 export async function updateStatusOrder(topic: string, id: String) {
     if (topic === "merchant_order") {

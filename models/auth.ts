@@ -27,7 +27,7 @@ export class Auth {
     iscodeExpired() {
         const now = new Date()
         const expires = this.data.expire
-        console.log({ now, expires })
+        // console.log({ now, expires })
         return isAfter(now, expires)
     }
 

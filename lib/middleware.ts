@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from "next"
-import parseToken from "parse-bearer-token"
 import { decode } from "lib/jwt"
+import parseToken from "parse-bearer-token"
 
 export function authMiddleware(callback) {
     return function (req: NextApiRequest, res: NextApiResponse) {

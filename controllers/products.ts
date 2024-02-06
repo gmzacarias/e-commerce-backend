@@ -34,22 +34,27 @@ export async function searchProducts(req, res) {
         })
         if (results.nbHits === 0) {
             throw new Error("No hay Resultados")
-            // return res.send({
-            //     results: results.hits,
-            //     pagination: {
-            //         offset,
-            //         limit,
-            //         results: results.nbHits
-            //     }
-            // })
         }
         console.log(results)
-        return res.send(results)
+        return res.send({
+            results: results.hits,
+            pagination: {
+                offset,
+                limit,
+                results: results.nbHits
+            }
+        })
     } catch (error) {
         console.error("Hubo un problema con la busqueda: ", error.message)
     } finally {
         res.end()
     }
+}
+
+export async function productos(req,res){
+    const { q } = req.query
+    const results= await productIndex.search(q)
+    return results
 }
 
 export async function searchProductById(productId: string,) {

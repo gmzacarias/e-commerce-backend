@@ -52,8 +52,12 @@ export async function searchProducts(req, res) {
 }
 
 export async function productos(req,res){
+    const { offset, limit } = getOffsetAndLimit(req)
     const { q } = req.query
-    const results= await productIndex.search(q)
+    const results = await productIndex.search(q, {
+        hitsPerPage: limit,
+        page: offset > 1 ? Math.floor(offset / limit) : 0
+    })
     return results
 }
 

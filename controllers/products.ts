@@ -43,17 +43,17 @@ export async function searchProducts(req, res) {
         if (results.nbHits === 0) {
             throw new Error("No hay Resultados")
         } else {
-            // const resultsData = await cleanResults(results)
+            const resultsData = await cleanResults(results)
             res.send({
-                results: results,
+                results: resultsData,
                 pagination: {
                     offset,
                     limit,
                     total: results.nbHits
                 }
             })
-            res.end()
         }
+        res.end()
     } catch (error) {
         console.error("Hubo un problema con la busqueda: ", error.message)
     }

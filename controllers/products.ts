@@ -32,8 +32,8 @@ export async function searchProducts(req, res) {
             hitsPerPage: limit,
             page: offset > 1 ? Math.floor(offset / limit) : 0
         })
-        if (results.nbHits >= 1) {
-            res.send(results)
+        if (results.nbHits === 0) {
+            throw new Error("No hay Resultados")
             // return res.send({
             //     results: results.hits,
             //     pagination: {
@@ -43,8 +43,8 @@ export async function searchProducts(req, res) {
             //     }
             // })
         }
-        throw new Error("No hay Resultados")
-
+        console.log(results)
+        return res.send(results)
     } catch (error) {
         console.error("Hubo un problema con la busqueda: ", error.message)
     } finally {

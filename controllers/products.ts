@@ -41,21 +41,19 @@ export async function searchProducts(req, res) {
         })
         if (results.nbHits === 0) {
             throw new Error("No hay Resultados")
-        } else {
-            const resultsData = cleanResults(results)
-            res.send({
-                results: resultsData,
-                pagination: {
-                    offset,
-                    limit,
-                    total: results.nbHits
-                }
-            })
-            res.end()
         }
+        const resultsData = cleanResults(results)
+        res.json({
+            results: resultsData,
+            pagination: {
+                offset,
+                limit,
+                total: results.nbHits
+            }
+        })
     } catch (error) {
         console.error("Hubo un problema con la busqueda: ", error.message)
-    }
+    } 
 }
 
 export async function searchProductById(productId: string,) {

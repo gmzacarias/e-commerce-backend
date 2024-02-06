@@ -52,6 +52,7 @@ export async function searchProducts(req, res) {
                     total: results.nbHits
                 }
             })
+            res.end()
         }
     } catch (error) {
         console.error("Hubo un problema con la busqueda: ", error.message)

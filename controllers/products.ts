@@ -25,11 +25,10 @@ export async function saveProductsAlgolia() {
 }
 
 export function cleanResults(results) {
-    const data = results.hits.map(product => {
+    return results.hits.map(product => {
         const { _highlightResult, ...productData } = product
         return productData
     })
-    return data
 }
 
 export async function searchProducts(req, res) {

@@ -51,7 +51,7 @@ export async function searchProducts(req, res) {
     }
 }
 
-export async function productos(req) {
+export async function searchQueryProducts(req) {
     const { offset, limit } = getOffsetAndLimit(req)
     const { q } = req.query
     try {

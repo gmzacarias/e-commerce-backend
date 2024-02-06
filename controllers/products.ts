@@ -53,7 +53,9 @@ export async function searchProducts(req, res) {
         })
     } catch (error) {
         console.error("Hubo un problema con la busqueda: ", error.message)
-    } 
+    } finally{
+        res.end()
+    }
 }
 
 export async function searchProductById(productId: string,) {

@@ -7,7 +7,7 @@ async function postHandler(req: NextApiRequest, res: NextApiResponse) {
     const { topic, id } = req.query as any
     // console.log(topic, id)
     try {
-        await validateIpnMercadoPago(req, res)
+        // await validateIpnMercadoPago(req, res)
         await updateStatusOrder(topic, id)
         res.send({ message: "Compra exitosa" })
     }

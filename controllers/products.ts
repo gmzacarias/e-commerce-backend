@@ -24,38 +24,25 @@ export async function saveProductsAlgolia() {
     }
 }
 
-export function cleanResults(results) {
-    return results.hits.map(product => {
-        const { _highlightResult, ...productData } = product
-        return productData
-    })
-}
-
-export async function getModifyResults(q, limit, offset) {
-    const results = await productIndex.search(q, {
-        hitsPerPage: limit,
-        page: offset > 1 ? Math.floor(offset / limit) : 0
-    })
-    const resultsData = cleanResults(results)
-    return {
-        results: resultsData,
-        pagination: {
-            offset,
-            limit,
-            total: results.nbHits
-        }
-    }
-}
-
 export async function searchProducts(req, res) {
     try {
         const { offset, limit } = getOffsetAndLimit(req)
         const { q } = req.query
-        const results = await getModifyResults(q, limit, offset) as any
-        if (results.nbHits === 0) {
-            throw new Error("No hay Resultados")
+        const results = await productIndex.search(q, {
+            hitsPerPage: limit,
+            page: offset > 1 ? Math.floor(offset / limit) : 0
+        })
+        if (results.nbHits >= 1) {
+            return res.send({
+                results: results.hits,
+                pagination: {
+                    offset,
+                    limit,
+                    results: results.nbHits
+                }
+            })
         }
-        return res.send(results)
+        throw new Error("No hay Resultados")
 
     } catch (error) {
         console.error("Hubo un problema con la busqueda: ", error.message)

@@ -58,13 +58,17 @@ export async function productos(req, res) {
         hitsPerPage: limit,
         page: offset > 1 ? Math.floor(offset / limit) : 0
     })
-    return {
-        results: results.hits,
-        pagination: {
-            offset,
-            limit,
-            results: results.nbHits
+    if (results.nbHits !== 0) {
+        return {
+            results: results.hits,
+            pagination: {
+                offset,
+                limit,
+                totalResults: results.nbHits
+            }
         }
+    } else {
+        return "hola"
     }
 }
 

@@ -24,33 +24,6 @@ export async function saveProductsAlgolia() {
     }
 }
 
-export async function searchProducts(req, res) {
-    try {
-        const { offset, limit } = getOffsetAndLimit(req)
-        const { q } = req.query
-        const results = await productIndex.search(q, {
-            hitsPerPage: limit,
-            page: offset > 1 ? Math.floor(offset / limit) : 0
-        })
-        if (results.nbHits === 0) {
-            throw new Error("No hay Resultados")
-        }
-        console.log(results)
-        return res.send({
-            results: results.hits,
-            pagination: {
-                offset,
-                limit,
-                results: results.nbHits
-            }
-        })
-    } catch (error) {
-        console.error("Hubo un problema con la busqueda: ", error.message)
-    } finally {
-        res.end()
-    }
-}
-
 export async function searchQueryProducts(req) {
     const { offset, limit } = getOffsetAndLimit(req)
     const { q } = req.query

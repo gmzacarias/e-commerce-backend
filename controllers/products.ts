@@ -24,7 +24,7 @@ export async function saveProductsAlgolia() {
     }
 }
 
-export async function cleanResults(results) {
+export function cleanResults(results) {
     const data = results.hits.map(product => {
         const { _highlightResult, ...productData } = product
         return productData
@@ -43,7 +43,7 @@ export async function searchProducts(req, res) {
         if (results.nbHits === 0) {
             throw new Error("No hay Resultados")
         } else {
-            const resultsData = await cleanResults(results)
+            const resultsData = cleanResults(results)
             res.send({
                 results: resultsData,
                 pagination: {
@@ -52,8 +52,8 @@ export async function searchProducts(req, res) {
                     total: results.nbHits
                 }
             })
+            res.end()
         }
-        res.end()
     } catch (error) {
         console.error("Hubo un problema con la busqueda: ", error.message)
     }

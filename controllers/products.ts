@@ -33,14 +33,15 @@ export async function searchProducts(req, res) {
             page: offset > 1 ? Math.floor(offset / limit) : 0
         })
         if (results.nbHits >= 1) {
-            return res.send({
-                results: results.hits,
-                pagination: {
-                    offset,
-                    limit,
-                    results: results.nbHits
-                }
-            })
+            res.send(results)
+            // return res.send({
+            //     results: results.hits,
+            //     pagination: {
+            //         offset,
+            //         limit,
+            //         results: results.nbHits
+            //     }
+            // })
         }
         throw new Error("No hay Resultados")
 

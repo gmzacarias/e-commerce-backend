@@ -5,7 +5,7 @@ import { validateSearchProduct } from "lib/schemaMiddleware"
 
 async function getHandler(req: NextApiRequest, res: NextApiResponse) {
     try {
-        const response = await productos(req, res)
+        const response = await productos(req)
         res.status(200).send({ message: response })
     } catch (error) {
         res.status(400).send({ message: "Error al obtener la data", error: error })

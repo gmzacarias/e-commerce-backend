@@ -51,24 +51,28 @@ export async function searchProducts(req, res) {
     }
 }
 
-export async function productos(req, res) {
+export async function productos(req) {
     const { offset, limit } = getOffsetAndLimit(req)
     const { q } = req.query
-    const results = await productIndex.search(q, {
-        hitsPerPage: limit,
-        page: offset > 1 ? Math.floor(offset / limit) : 0
-    })
-    if (results.nbHits !== 0) {
-        return {
-            results: results.hits,
-            pagination: {
-                offset,
-                limit,
-                totalResults: results.nbHits
+    try {
+        const results = await productIndex.search(q, {
+            hitsPerPage: limit,
+            page: offset > 1 ? Math.floor(offset / limit) : 0
+        })
+        if (results.nbHits !== 0) {
+            return {
+                results: results.hits,
+                pagination: {
+                    offset,
+                    limit,
+                    totalResults: results.nbHits
+                }
             }
+        } else {
+            throw new Error("No hay Resultados")
         }
-    } else {
-        return "hola"
+    } catch (error) {
+        console.error("Hubo un problema con la busqueda: ", error.message)
     }
 }
 

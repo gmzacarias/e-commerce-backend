@@ -6,8 +6,8 @@ import { validateAuth } from "lib/schemaMiddleware"
 
 async function postHandler(req: NextApiRequest, res: NextApiResponse) {
     try {
-        const resCors = await cors(req, res)
-        console.log(resCors)
+        await cors(req, res)
+        
         await validateAuth(req, res)
         if (res.statusCode === 403) {
             throw new Error("No se envio el mail")

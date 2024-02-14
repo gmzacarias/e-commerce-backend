@@ -1,14 +1,14 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import Cors from 'cors';
 
-if (process.env.NODE_ENV == "development") {
-  var origin = "http://localhost:3000";
+// if (process.env.NODE_ENV == "development") {
+//   var origin = "http://localhost:3000";
 
-}
- else if (process.env.NODE_ENV == "production") {
-  var origin = "*";
-}
-
+// }
+// else if (process.env.NODE_ENV == "production") {
+//   var origin = "*";
+// }
+var origin = "http://localhost:3000";
 
 
 const cors = Cors({
@@ -24,7 +24,7 @@ export function runMiddleware(req: NextApiRequest, res: NextApiResponse) {
       if (result instanceof Error) {
         return reject(result);
       }
-      console.log(cors.origin)
+      console.log(result)
       return resolve(result);
     });
   });

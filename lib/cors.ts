@@ -1,12 +1,20 @@
+import { NextApiRequest, NextApiResponse } from "next";
 import Cors from 'cors';
 
-// Inicializa el middleware CORS con las opciones deseadas
-const corsOptions = {
-  origin: "*",  // Reemplaza con tu dominio permitido
-  methods: ["GET", "POST","PUT","PATCH","DELETE","OPTIONS"],         // Métodos permitidos
-  allowedHeaders: ['Content-Type'],            // Encabezados permitidos
-};
+  const cors = Cors({
+    origin: "*",
+    methods: ["GET", "POST", "PATCH", "DELETE", "PUT", "OPTIONS", "HEAD"],
+    preflightContinue: false,
+    optionsSuccessStatus: 204,
+  });
 
-// Inicializa el middleware CORS con las opciones
-export const cors = Cors(corsOptions)
-console.log(cors)
+  export function runMiddleware(req: NextApiRequest, res: NextApiResponse) {
+    return new Promise((resolve, reject) => {
+      cors(req, res, (result) => {
+        if (result instanceof Error) {
+          return reject(result);
+        }
+        return resolve(result);
+      });
+    });
+  }

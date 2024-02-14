@@ -1,16 +1,11 @@
 import Cors from 'cors';
 
-// Inicializa el middleware CORS
-const cors = Cors({
-  methods: ['GET', 'POST', 'OPTIONS'], // Puedes ajustar los métodos permitidos según tus necesidades
-});
+// Inicializa el middleware CORS con las opciones deseadas
+const corsOptions = {
+  origin: 'http://tu-dominio-permitido.com',  // Reemplaza con tu dominio permitido
+  methods: ['GET', 'POST', 'OPTIONS'],         // Métodos permitidos
+  allowedHeaders: ['Content-Type'],            // Encabezados permitidos
+};
 
-// ... Resto de tu código ...
-
-// Agrega el middleware a tu controlador de API
-export default async function handler(req, res) {
-  // Habilita CORS
-  await cors(req, res);
-
-  // ... Resto de tu código ...
-}
+// Inicializa el middleware CORS con las opciones
+export const cors = Cors(corsOptions)

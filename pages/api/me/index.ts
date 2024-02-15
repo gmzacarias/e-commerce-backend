@@ -1,13 +1,11 @@
 import type { NextApiRequest, NextApiResponse } from "next"
 import method from "micro-method-router"
-import { runMiddleware } from "lib/cors"
 import { authMiddleware } from "lib/middleware"
 import { getDataById, updateData } from "controllers/user"
 import { validatePatchData } from "lib/schemaMiddleware"
 
 async function getHandler(req: NextApiRequest, res: NextApiResponse, token) {
     try {
-        await runMiddleware(req, res);
         if (!token) {
             res.status(401).send({ message: "No hay token" })
         } else {

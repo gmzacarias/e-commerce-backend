@@ -1,5 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from "next"
 import method from "micro-method-router"
+import { handlerCORS } from "lib/corsMiddleware"
 import { authMiddleware } from "lib/middleware"
 import { getOrderDataById } from "controllers/order"
 import { validateQueryFindOrder } from "lib/schemaMiddleware"
@@ -20,4 +21,6 @@ const handler = method({
     get: getHandler
 })
 
-export default authMiddleware(handler)
+const authHandler = authMiddleware(handler)
+
+export default handlerCORS(authHandler)

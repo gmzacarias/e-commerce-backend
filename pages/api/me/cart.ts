@@ -1,5 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from "next"
 import method from "micro-method-router"
+import { handlerCORS } from "lib/corsMiddleware"
 import { authMiddleware } from "lib/middleware"
 import { addProductCartById, deleteProductCartById, getCartById, resetCart, updateData } from "controllers/user"
 import { validateQueryProduct } from "lib/schemaMiddleware"
@@ -71,4 +72,6 @@ const handler = method({
     delete: deleteHandler,
 })
 
-export default authMiddleware(handler)
+const authHandler = authMiddleware(handler)
+
+export default handlerCORS(authHandler)

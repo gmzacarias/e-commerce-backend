@@ -1,5 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from "next"
 import method from "micro-method-router"
+import { handlerCORS } from "lib/corsMiddleware"
 import { authMiddleware } from "lib/middleware"
 import { getDataById, updateData } from "controllers/user"
 import { validatePatchData } from "lib/schemaMiddleware"
@@ -39,4 +40,6 @@ const handler = method({
     patch: patchHandler
 })
 
-export default authMiddleware(handler)
+const authHandler = authMiddleware(handler)
+
+export default handlerCORS(authHandler)

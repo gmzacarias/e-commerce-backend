@@ -1,5 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from "next"
 import method from "micro-method-router"
+import { handlerCORS } from "lib/corsMiddleware"
 import { updateStatusOrder } from "controllers/order"
 
 async function postHandler(req: NextApiRequest, res: NextApiResponse) {
@@ -17,4 +18,4 @@ const handler = method({
     post: postHandler
 })
 
-export default handler
+export default handlerCORS(handler)

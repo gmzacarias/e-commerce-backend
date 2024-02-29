@@ -1,5 +1,6 @@
 import { productIndex } from "lib/algolia";
 import { authAirtable } from "lib/airtable";
+import { uploadCloudinary } from "lib/cloudinary"
 import { getOffsetAndLimit } from "controllers/request";
 
 export async function saveProductsAlgolia() {
@@ -8,15 +9,24 @@ export async function saveProductsAlgolia() {
         if (!response) {
             throw new Error("no se pudo obtener la base de datos")
         } else {
-            const productsData = await response.map((product) => ({
-                objectID: product.Id,
-                ...product,
-                stock: 10
-            }))
-            // console.log({productsData})
-            const products = productsData
+            const productsData = await response.map(async (product) => {
+                if (product.photo) {
+                    const photoUrl = await uploadCloudinary(product.photo);
+                    // console.log(photoUrl.secure_url)
+                    return {
+                        objectID: product.id,
+                        ...product,
+                        photo: photoUrl.secure_url
+                    }
+                } else {
+                    return null
+                }
+            })
+            const productsPromises = await Promise.all(productsData)
+            const products = productsPromises
             const syncAlgolia = await productIndex.saveObjects(products)
             return syncAlgolia
+
         }
     } catch (error) {
         console.error("Hubo un problema con la sincronizacion: ", error.message)

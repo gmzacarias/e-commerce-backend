@@ -11,7 +11,7 @@ async function getHandler(req: NextApiRequest, res: NextApiResponse, token) {
     } else {
         try {
             const cart = await getCartById(token.userId)
-            res.status(200).send({ message: { cart } })
+            res.status(200).send(cart)
 
         } catch (error) {
             res.status(400).send({ message: "Error al obtener la data", error: error })
@@ -27,7 +27,7 @@ async function postHandler(req: NextApiRequest, res: NextApiResponse, token) {
         try {
             await validateQueryProduct(req,res)
             const cart = await addProductCartById(token.userId, productId)
-            res.status(200).send({ message: { cart } })
+            res.status(200).send({ message: `el producto id ${productId} fue agregado` })
 
         } catch (error) {
             res.status(400).send({ message: "Error al agregar la data", error: error })

@@ -9,7 +9,7 @@ async function getHandler(req: NextApiRequest, res: NextApiResponse) {
     try {
         await validateQuerySearchProductId(req, res)
         const product = await searchProductById(productId)
-        res.status(200).send({ message: product })
+        res.status(200).send(product)
     } catch (error) {
         res.status(400).send({ message: "Error al obtener la data" })
     }

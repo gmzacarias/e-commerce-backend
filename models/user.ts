@@ -2,19 +2,19 @@ import { firestore } from "../lib/firestore"
 
 interface ProductData {
     objectID: string,
-    Model: string,
-    Colour: string,
-    Photo: string,
-    Storage: string,
-    FrontCamera: string,
-    Brand: string,
-    Price: number,
-    Id: string,
-    Android: string,
-    Camera: string,
-    Ram: string,
-    stock: number,
-}
+    model: string,
+    colour: string,
+    photo: string,
+    storage: string,
+    frontCamera: string,
+    brand: string,
+    price: number,
+    id: string,
+    android: string,
+    camera: string,
+    ram: string,
+    quantity: number
+    totalPrice: number}
 
 interface UserData {
     email: string,
@@ -67,7 +67,7 @@ export class User {
         }
     }
 
-    static async getDataUser(userId:string):Promise<User>{
+    static async getDataUser(userId: string): Promise<User> {
         try {
             const user = await collection.doc(userId).get()
             if (user.exists) {
@@ -193,6 +193,7 @@ export class User {
         }
     }
 
+
     static async addProductCart(userId: string, product: ProductData) {
         try {
             const user = await collection.doc(userId).get()
@@ -200,7 +201,13 @@ export class User {
                 const dataUser = new User(user.id)
                 // console.log(dataUser)
                 dataUser.data = user.data() as UserData;
-                dataUser.data.cart.push(product)
+                const existingProduct = dataUser.data.cart.findIndex(item => item.id === product.id);
+                if (existingProduct !== -1) {
+                    dataUser.data.cart[existingProduct].quantity += 1;
+                    dataUser.data.cart[existingProduct].totalPrice += product.price;
+                } else {
+                    dataUser.data.cart.push({ ...product, quantity: 1 });
+                }
                 await dataUser.push()
                 return product
             } else {
@@ -212,11 +219,6 @@ export class User {
         }
     }
 
-    async findProduct() {
-
-    }
-
-
     static async deleteProductCart(userId: string, productId: string): Promise<User> {
         try {
             const user = await collection.doc(userId).get()
@@ -224,7 +226,7 @@ export class User {
                 const dataUser = new User(user.id)
                 await dataUser.pull()
                 // console.log(productId)
-                const newCart = dataUser.data.cart.filter(product => product.objectID !== productId)
+                const newCart = dataUser.data.cart[productId]
                 // console.log("soy el newcart", newCart)
                 dataUser.data.cart = newCart
                 await dataUser.push()

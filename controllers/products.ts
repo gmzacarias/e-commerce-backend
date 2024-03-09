@@ -16,7 +16,9 @@ export async function saveProductsAlgolia() {
                     return {
                         objectID: product.id,
                         ...product,
-                        photo: photoUrl.secure_url
+                        photo: photoUrl.secure_url,
+                        quantity:0,
+                        totalPrice:product.price
                     }
                 } else {
                     return null
@@ -26,7 +28,6 @@ export async function saveProductsAlgolia() {
             const products = productsPromises
             const syncAlgolia = await productIndex.saveObjects(products)
             return syncAlgolia
-
         }
     } catch (error) {
         console.error("Hubo un problema con la sincronizacion: ", error.message)

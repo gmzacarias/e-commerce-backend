@@ -11,7 +11,7 @@ async function postHandler(req: NextApiRequest, res: NextApiResponse, token) {
         // console.log(additionalInfo)
         await validateBodyCreateOrder(req, res)
         const response = await createOrder(token.userId, additionalInfo)
-        res.send({ url: response })
+        res.send(response)
     } catch (error) {
         res.status(400).send({ message: error })
     }

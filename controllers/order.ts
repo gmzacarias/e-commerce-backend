@@ -83,13 +83,13 @@ async function getProductsCart(userId: string) {
         try {
             const mapProducts = dataCart.map(product => {
                 return {
-                    title: product.Model,
-                    description: `${product.Brand} ${product.Model}`,
-                    picture_url: product.Photo,
+                    title: product.model,
+                    description: `${product.brand} ${product.model}`,
+                    picture_url: product.photo,
                     category_id: "Phones",
-                    quantity: 1,
+                    quantity: product.quantity,
                     currency_id: "ARS",
-                    unit_price: product.Price
+                    unit_price: product.price
                 };
             });
             return mapProducts
@@ -102,10 +102,10 @@ async function getProductsCart(userId: string) {
 }
 
 async function getTotalPrice(userId: string) {
-    const products = await getProductsCart(userId);
+    const products = await getCartById(userId);
     if (products) {
         const totalPrice = products.reduce((total, product) => {
-            return total + product.unit_price;
+            return total + product.totalPrice;
         }, 0);
         console.log(totalPrice)
         return totalPrice;

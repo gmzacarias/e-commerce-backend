@@ -14,7 +14,8 @@ interface ProductData {
     camera: string,
     ram: string,
     quantity: number
-    totalPrice: number}
+    totalPrice: number
+}
 
 interface UserData {
     email: string,
@@ -194,22 +195,16 @@ export class User {
     }
 
 
-    static async addProductCart(userId: string, product: ProductData) {
+    static async addProductCart(userId: string, product: ProductData, quantity: number) {
         try {
             const user = await collection.doc(userId).get()
             if (user.exists) {
                 const dataUser = new User(user.id)
                 // console.log(dataUser)
                 dataUser.data = user.data() as UserData;
-                const existingProduct = dataUser.data.cart.findIndex(item => item.id === product.id);
-                if (existingProduct !== -1) {
-                    dataUser.data.cart[existingProduct].quantity += 1;
-                    dataUser.data.cart[existingProduct].totalPrice += product.price;
-                } else {
-                    dataUser.data.cart.push({ ...product, quantity: 1 });
-                }
+                dataUser.data.cart.push({ ...product, quantity })
                 await dataUser.push()
-                return product
+                return
             } else {
                 throw new Error("El Usuario no existe")
             }

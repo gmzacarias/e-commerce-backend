@@ -11,6 +11,9 @@ async function getHandler(req: NextApiRequest, res: NextApiResponse, token) {
     } else {
         try {
             const cart = await getCartById(token.userId)
+            if (cart.length < 1) {
+                res.status(200).send({ message: "El carrito esta vacio" })
+            }
             res.status(200).send(cart)
 
         } catch (error) {
@@ -21,12 +24,13 @@ async function getHandler(req: NextApiRequest, res: NextApiResponse, token) {
 
 async function postHandler(req: NextApiRequest, res: NextApiResponse, token) {
     const { productId } = req.query as any
+    const { quantity } = req.body as any
     if (!token) {
         res.status(401).send({ message: "No hay token" })
     } else {
         try {
-            await validateQueryProduct(req,res)
-            const cart = await addProductCartById(token.userId, productId)
+            await validateQueryProduct(req, res)
+            await addProductCartById(token.userId, productId, quantity)
             res.status(200).send({ message: `el producto id ${productId} fue agregado` })
 
         } catch (error) {
@@ -41,7 +45,7 @@ async function deleteHandler(req: NextApiRequest, res: NextApiResponse, token) {
         res.status(401).send({ message: "No hay token" })
     } else {
         try {
-            await validateQueryProduct(req,res)
+            await validateQueryProduct(req, res)
             await deleteProductCartById(token.userId, productId)
             res.status(200).send({ message: `el producto id ${productId} fue eliminado` })
 
@@ -60,7 +64,7 @@ async function putHandler(req: NextApiRequest, res: NextApiResponse, token) {
             res.status(200).send({ message: "el carrito esta vacio" })
 
         } catch (error) {
-            res.status(400).send({ message: "Error al agregar la data", error: error })
+            res.status(400).send({ message: "Error al resetear el carrito", error: error })
         }
     }
 }

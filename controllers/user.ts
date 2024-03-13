@@ -85,10 +85,10 @@ export async function getCartById(userId: string) {
     }
 }
 
-export async function addProductCartById(userId: string, productId: string) {
+export async function addProductCartById(userId: string, productId: string,quantity:number) {
     try {
         const product = await searchProductById(productId)
-        const addProduct = await User.addProductCart(userId, product)
+        const addProduct = await User.addProductCart(userId, product,quantity)
         if (addProduct) {
             return addProduct
         } else {

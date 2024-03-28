@@ -5,9 +5,9 @@ import { getDataById, getCartById, resetCart } from "controllers/user"
 
 if (process.env.NODE_ENV == "development") {
     var notificationUrl = "https://webhook.site/115e6d94-141f-43b2-965f-db6fd6e18264";
-    
+
 } else if (process.env.NODE_ENV == "production") {
-   var notificationUrl = "https://e-commerce-backend-lake.vercel.app/api/ipn/mercadopago";
+    var notificationUrl = "https://e-commerce-backend-lake.vercel.app/api/ipn/mercadopago";
 }
 
 export async function getMyOrders(userId: string) {
@@ -128,6 +128,7 @@ export async function createOrder(userId: string, additionalInfo: string): Promi
             products: productIds,
             status: "pending",
             totalPrice: totalPrice,
+            url: "",
             additionalInfo
         })
         const pref = await createPreference({
@@ -152,6 +153,12 @@ export async function createOrder(userId: string, additionalInfo: string): Promi
                 additional_info: additionalInfo,
             }
         })
+
+        const orderUrl = pref.init_point
+        const setUrl = await Order.setOrderUrl(order.id, orderUrl)
+        console.log("newUrl", setUrl)
+
+
         return {
             url: pref.init_point
         }

@@ -3,7 +3,7 @@ import method from "micro-method-router"
 import { handlerCORS } from "lib/corsMiddleware"
 import { authMiddleware } from "lib/middleware"
 import { addProductCartById, deleteProductCartById, getCartById, resetCart, updateData } from "controllers/user"
-import { validateQueryProduct } from "lib/schemaMiddleware"
+import { validateBodyProduct, validateQueryProduct } from "lib/schemaMiddleware"
 
 async function getHandler(req: NextApiRequest, res: NextApiResponse, token) {
     if (!token) {
@@ -30,6 +30,7 @@ async function postHandler(req: NextApiRequest, res: NextApiResponse, token) {
     } else {
         try {
             await validateQueryProduct(req, res)
+            await validateBodyProduct(req, res)
             await addProductCartById(token.userId, productId, quantity)
             res.status(200).send({ message: `el producto id ${productId} fue agregado` })
 

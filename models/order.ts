@@ -6,6 +6,7 @@ interface OrderData {
     status: string,
     totalPrice: number,
     additionalInfo: string,
+    url: string
 }
 
 const collection = firestore.collection("orders")
@@ -68,6 +69,26 @@ export class Order {
         } catch (error) {
             console.error("Error al obtener orderes del usuario: ", error.message);
             return null
+        }
+    }
+
+    static async setOrderUrl(orderId: string, url: string): Promise<Order> {
+        try {
+            console.log(orderId)
+            const order = await collection.doc(orderId).get()
+            if (order.exists) {
+                const orderFound = new Order(order.id)
+                orderFound.data = order.data() as OrderData
+                console.log("mercadopago", url)
+                orderFound.data.url = url
+                await orderFound.push()
+                console.log("url guardada", url)
+
+                return orderFound
+            }
+
+        } catch (error) {
+
         }
     }
 

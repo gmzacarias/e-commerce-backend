@@ -93,6 +93,23 @@ export async function validateQueryProduct(req: NextApiRequest, res: NextApiResp
     }
 }
 
+let bodyProductCartSchema = yup
+    .object({
+        quantity: yup.number(),
+    })
+    .noUnknown(true)
+
+export async function validateBodyProduct(req: NextApiRequest, res: NextApiResponse) {
+    try {
+        await bodyProductCartSchema.validate(req.body, { strict: true })
+        console.log(req.body)
+    } catch (error) {
+        res.status(403).send({ field: "body", message: error })
+    }
+}
+
+
+
 let bodyCreateOrderSchema = yup
     .object({
         additionalInfo: yup.string(),

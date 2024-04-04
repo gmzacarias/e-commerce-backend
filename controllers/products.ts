@@ -1,7 +1,7 @@
 import { productIndex } from "lib/algolia";
 import { authAirtable } from "lib/airtable";
 import { uploadCloudinary } from "lib/cloudinary"
-import { getOffsetAndLimit } from "controllers/request";
+import { getOffsetAndLimit } from "utils/request";
 
 export async function saveProductsAlgolia() {
     try {

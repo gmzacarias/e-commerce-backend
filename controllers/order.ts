@@ -156,8 +156,8 @@ export async function createOrder(userId: string, additionalInfo: string): Promi
 
         const orderUrl = pref.init_point
         const setUrl = await Order.setOrderUrl(order.id, orderUrl)
-        console.log("newUrl", setUrl)
-
+        // console.log("newUrl", setUrl)
+        await resetCart(userId)
 
         return {
             url: pref.init_point

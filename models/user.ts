@@ -182,8 +182,8 @@ export class User {
             const user = await collection.doc(userId).get()
             if (user.exists) {
                 const dataUser = new User(user.id)
-                // console.log(dataUser)
                 dataUser.data = user.data() as UserData;
+                // console.log("obtener carrito",dataUser.data.cart)
                 return dataUser.data.cart
             } else {
                 throw new Error("El Usuario no existe")
@@ -245,8 +245,8 @@ export class User {
                 dataUser.data = user.data() as UserData
                 dataUser.data.cart = []
                 await dataUser.push()
-                // console.log("soy el cart", dataUser)
-                return dataUser
+                // console.log("soy el cart reseteado", dataUser.data)
+                return dataUser.data.cart
             } else {
                 throw new Error("El Usuario no existe")
             }

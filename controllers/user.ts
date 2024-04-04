@@ -119,13 +119,14 @@ export async function deleteProductCartById(userId: string, productId: string) {
 export async function resetCart(userId: string) {
     try {
         const response = await User.resetProductCart(userId)
+        console.log("controllers reset cart",response)
         if (response) {
             return response
         } else {
             throw new Error("No se pudo resetear el carrito")
         }
     } catch (error) {
-        console.error("Data del producto eliminado", error.message)
+        console.error("Error al resetear el carrito de compras", error.message)
         return null
     }
 }

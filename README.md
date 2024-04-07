@@ -3,7 +3,8 @@ Proyecto e-commerce basado en Next.js,se utilizo Firebase para la base de datos 
 **Tecnologias Utilizadas**:
 Next.js,Firebase,Airtable,Algolia,Yup.
 
-**Deploy**:https://e-commerce-backend-lake.vercel.app  
+**Deploy**:https://e-commerce-backend-lake.vercel.app
+**Deploy Frontend**:  https://smartshop-lake.vercel.app
 **Collection Postman**:https://documenter.getpostman.com/view/23206998/2s9YywgL2L  
 
 **Datos MercadoPago**:Cuentas de prueba  

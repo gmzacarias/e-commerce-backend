@@ -9,12 +9,12 @@ Next.js,Firebase,Airtable,Algolia,Yup.
 **Datos MercadoPago**:Cuentas de prueba  
   
 **Cuenta vendedor**  
-Usuario: TESTUSER968904680  
-Contraseña: 8eXK9qAVqz  
+**Usuario**: TESTUSER968904680  
+**Contraseña**: 8eXK9qAVqz  
   
 **Cuenta comprador**
-Usuario: TESTUSER1381110430  
-Contraseña: Wvrf2Aacup  
+**Usuario**: TESTUSER1381110430  
+**Contraseña**: Wvrf2Aacup  
   
 **Tarjetas de Pruebas**: Podes testear la integración con las tarjetas que provee Mercado Pago en su documentación.  
 

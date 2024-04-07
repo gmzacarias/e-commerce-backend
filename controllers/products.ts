@@ -52,11 +52,19 @@ export async function searchQueryProducts(req) {
                     totalResults: results.nbHits
                 }
             }
-        } else {
-            throw new Error("No hay Resultados")
+        } else { 
+            return{
+                results: [],
+                pagination: {
+                    offset,
+                    limit,
+                    totalResults:0
+                }
+            }
         }
     } catch (error) {
         console.error("Hubo un problema con la busqueda: ", error.message)
+        throw new Error("No hay Resultados")
     }
 }
 

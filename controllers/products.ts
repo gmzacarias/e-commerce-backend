@@ -71,7 +71,7 @@ export async function searchQueryProducts(req) {
 export async function searchProductById(productId: string,) {
     try {
         const results = await productIndex.getObject(productId)
-        console.log(results.objectID)
+        // console.log(results.objectID)
         return results
     } catch (error) {
         return (error.message)

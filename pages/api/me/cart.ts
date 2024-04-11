@@ -62,7 +62,7 @@ async function putHandler(req: NextApiRequest, res: NextApiResponse, token) {
     } else {
         try {
             await resetCart(token.userId)
-            res.status(200).send({ message: "el carrito esta vacio" })
+            res.status(200).send({ message: "El carrito esta vacio" })
 
         } catch (error) {
             res.status(400).send({ message: "Error al resetear el carrito", error: error })

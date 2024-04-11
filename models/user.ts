@@ -214,19 +214,20 @@ export class User {
         }
     }
 
-    static async deleteProductCart(userId: string, productId: string): Promise<User> {
+    static async deleteProductCart(userId: string, productId: string): Promise<Array<any>> {
         try {
             const user = await collection.doc(userId).get()
             if (user.exists) {
                 const dataUser = new User(user.id)
                 await dataUser.pull()
                 // console.log(productId)
-                const newCart = dataUser.data.cart[productId]
-                // console.log("soy el newcart", newCart)
+                const myCart = dataUser.data.cart
+                const newCart = myCart.filter(item => item.id !== productId)
                 dataUser.data.cart = newCart
                 await dataUser.push()
                 // console.log("current", dataUser.data.cart)
-                return dataUser
+                const currentCart=dataUser.data.cart
+                return currentCart
             } else {
                 throw new Error("El Usuario no existe")
             }
@@ -236,7 +237,7 @@ export class User {
         }
     }
 
-    static async resetProductCart(userId: string) {
+    static async resetProductCart(userId: string): Promise<Array<any>> {
         try {
             const user = await collection.doc(userId).get()
             if (user.exists) {
@@ -245,8 +246,8 @@ export class User {
                 dataUser.data = user.data() as UserData
                 dataUser.data.cart = []
                 await dataUser.push()
-                // console.log("soy el cart reseteado", dataUser.data)
-                return dataUser.data.cart
+                const currentCart=dataUser.data.cart
+                return currentCart
             } else {
                 throw new Error("El Usuario no existe")
             }

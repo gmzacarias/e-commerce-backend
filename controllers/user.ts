@@ -102,13 +102,13 @@ export async function addProductCartById(userId: string, productId: string,quant
 
 export async function deleteProductCartById(userId: string, productId: string) {
     try {
-        const product = await searchProductById(productId)
-        const dataProduct =product.objectID
-        const deleteProduct = await User.deleteProductCart(userId, dataProduct)
+        // console.log("productId",productId)
+        const deleteProduct = await User.deleteProductCart(userId, productId)
+        // console.log("delete product",deleteProduct)
         if (deleteProduct) {
             return deleteProduct
         } else {
-            throw new Error("No se pudo agregar el producto")
+            throw new Error("No se pudo eliminar el producto")
         }
     } catch (error) {
         console.error("Data del producto eliminado", error.message)
@@ -119,7 +119,7 @@ export async function deleteProductCartById(userId: string, productId: string) {
 export async function resetCart(userId: string) {
     try {
         const response = await User.resetProductCart(userId)
-        console.log("controllers reset cart",response)
+        // console.log("controllers reset cart",response)
         if (response) {
             return response
         } else {

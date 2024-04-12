@@ -17,8 +17,8 @@ export async function saveProductsAlgolia() {
                         objectID: product.id,
                         ...product,
                         photo: photoUrl.secure_url,
-                        quantity:0,
-                        totalPrice:product.price
+                        quantity: 0,
+                        totalPrice: product.price
                     }
                 } else {
                     return null
@@ -52,13 +52,13 @@ export async function searchQueryProducts(req) {
                     totalResults: results.nbHits
                 }
             }
-        } else { 
-            return{
+        } else {
+            return {
                 results: [],
                 pagination: {
                     offset,
                     limit,
-                    totalResults:0
+                    totalResults: 0
                 }
             }
         }
@@ -70,10 +70,9 @@ export async function searchQueryProducts(req) {
 
 export async function searchProductById(productId: string,) {
     try {
-        const results = await productIndex.getObject(productId)
-        // console.log(results.objectID)
+        const results = await productIndex.getObject(productId)as any
         return results
     } catch (error) {
-        return (error.message)
+        console.error("Error al encontrar el producto:", error.message)
     }
 }

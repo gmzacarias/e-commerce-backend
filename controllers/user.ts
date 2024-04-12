@@ -85,17 +85,17 @@ export async function getCartById(userId: string) {
     }
 }
 
-export async function addProductCartById(userId: string, productId: string,quantity:number) {
+export async function addProductCartById(userId: string, productId: string, quantity: number) {
     try {
         const product = await searchProductById(productId)
-        const addProduct = await User.addProductCart(userId, product,quantity)
-        if (addProduct) {
-            return addProduct
-        } else {
-            throw new Error("No se pudo agregar el producto")
+        if (product == undefined) {
+            throw new Error(`No se pudo encontrar el ${productId}`)
         }
+        const addProduct = await User.addProductCart(userId, product, quantity)
+        return addProduct
+
     } catch (error) {
-        console.error("Data del producto agregado", error.message)
+        console.error("Error en agregar el producto", error.message)
         return null
     }
 }
@@ -111,7 +111,7 @@ export async function deleteProductCartById(userId: string, productId: string) {
             throw new Error("No se pudo eliminar el producto")
         }
     } catch (error) {
-        console.error("Data del producto eliminado", error.message)
+        console.error("Error en eliminar el producto", error.message)
         return null
     }
 }

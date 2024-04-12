@@ -114,7 +114,7 @@ async function getTotalPrice(userId: string) {
     }
 }
 
-export async function createOrder(userId: string, additionalInfo: string): Promise<CreateOrderRes> {
+export async function createOrder(userId: string, additionalInfo?: string): Promise<CreateOrderRes> {
     const items = await getProductsCart(userId)
     if (!items) {
         throw new Error("El producto no existe")

@@ -31,7 +31,10 @@ async function postHandler(req: NextApiRequest, res: NextApiResponse, token) {
         try {
             await validateQueryProduct(req, res)
             await validateBodyProduct(req, res)
-            await addProductCartById(token.userId, productId, quantity)
+            const addItem = await addProductCartById(token.userId, productId, quantity)
+            if (!addItem) {
+                res.status(404).send({ message: `el producto id ${productId} no se encontro en la base de datos` })
+            }
             res.status(200).send({ message: `el producto id ${productId} fue agregado` })
 
         } catch (error) {

@@ -87,12 +87,14 @@ export async function getCartById(userId: string) {
 
 export async function addProductCartById(userId: string, productId: string, quantity: number) {
     try {
-        const product = await searchProductById(productId)
-        if (product == undefined) {
-            throw new Error(`No se pudo encontrar el ${productId}`)
+        const product = await searchProductById(productId) as any
+        if (!product) {
+            throw new Error("No existe el producto en el indie")
+        } else {
+            const addProduct = await User.addProductCart(userId, product, quantity)
+            // console.log("response", addProduct)
+            return addProduct
         }
-        const addProduct = await User.addProductCart(userId, product, quantity)
-        return addProduct
 
     } catch (error) {
         console.error("Error en agregar el producto", error.message)
@@ -102,10 +104,10 @@ export async function addProductCartById(userId: string, productId: string, quan
 
 export async function deleteProductCartById(userId: string, productId: string) {
     try {
-        // console.log("productId",productId)
+        console.log("productId", productId)
         const deleteProduct = await User.deleteProductCart(userId, productId)
-        // console.log("delete product",deleteProduct)
-        if (deleteProduct) {
+        console.log("delete product", deleteProduct)
+        if (deleteProduct.length > 1) {
             return deleteProduct
         } else {
             throw new Error("No se pudo eliminar el producto")

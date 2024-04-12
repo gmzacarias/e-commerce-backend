@@ -204,13 +204,13 @@ export class User {
                 dataUser.data = user.data() as UserData;
                 dataUser.data.cart.push({ ...product, quantity })
                 await dataUser.push()
-                return
+                return true
             } else {
                 throw new Error("El Usuario no existe")
             }
         } catch (error) {
-            console.error("Error al agregar productos al cart del usuario: ", error.message);
-            return null
+            console.error("Error al agregar producto al carrito:", error.message);
+            return false
         }
     }
 
@@ -232,7 +232,7 @@ export class User {
                 throw new Error("El Usuario no existe")
             }
         } catch (error) {
-            console.error("Error al eliminar el producto: ", error.message);
+            console.error("Error al eliminar producto del carrito:", error.message);
             return null
         }
     }

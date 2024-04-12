@@ -70,7 +70,7 @@ export async function searchQueryProducts(req) {
 
 export async function searchProductById(productId: string,) {
     try {
-        const results = await productIndex.getObject(productId)as any
+        const results = await productIndex.getObject(productId)
         return results
     } catch (error) {
         console.error("Error al encontrar el producto:", error.message)

@@ -214,7 +214,7 @@ export class User {
         }
     }
 
-    static async deleteProductCart(userId: string, productId: string): Promise<Array<any>> {
+    static async deleteProductCart(userId: string, productId: string) {
         try {
             const user = await collection.doc(userId).get()
             if (user.exists) {
@@ -223,11 +223,10 @@ export class User {
                 // console.log(productId)
                 const myCart = dataUser.data.cart
                 const newCart = myCart.filter(item => item.id !== productId)
+                console.log("eliminar",newCart)
                 dataUser.data.cart = newCart
                 await dataUser.push()
-                // console.log("current", dataUser.data.cart)
-                const currentCart=dataUser.data.cart
-                return currentCart
+                return true
             } else {
                 throw new Error("El Usuario no existe")
             }
@@ -246,7 +245,7 @@ export class User {
                 dataUser.data = user.data() as UserData
                 dataUser.data.cart = []
                 await dataUser.push()
-                const currentCart=dataUser.data.cart
+                const currentCart = dataUser.data.cart
                 return currentCart
             } else {
                 throw new Error("El Usuario no existe")

@@ -32,7 +32,6 @@ async function postHandler(req: NextApiRequest, res: NextApiResponse, token) {
             await validateQueryProduct(req, res)
             await validateBodyProduct(req, res)
             const addItem = await addProductCartById(token.userId, productId, quantity)
-            console.log("add", addItem)
             if (!addItem) {
                 res.status(404).send({ message: `el producto id ${productId} no se encontro en la base de datos` })
             }
@@ -55,7 +54,6 @@ async function deleteHandler(req: NextApiRequest, res: NextApiResponse, token) {
             const deleteItem = await deleteProductCartById(token.userId, productId)
             if (!deleteItem) {
                 res.status(404).send({ message: `el producto id ${productId} no pudo ser eliminado de la base de datos` })
-
             }
             res.status(200).send({ message: `el producto id ${productId} fue eliminado` })
 

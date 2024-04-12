@@ -95,7 +95,6 @@ export async function addProductCartById(userId: string, productId: string, quan
             // console.log("response", addProduct)
             return addProduct
         }
-
     } catch (error) {
         console.error("Error en agregar el producto", error.message)
         return null
@@ -104,13 +103,15 @@ export async function addProductCartById(userId: string, productId: string, quan
 
 export async function deleteProductCartById(userId: string, productId: string) {
     try {
-        console.log("productId", productId)
-        const deleteProduct = await User.deleteProductCart(userId, productId)
-        console.log("delete product", deleteProduct)
-        if (deleteProduct.length > 1) {
-            return deleteProduct
-        } else {
-            throw new Error("No se pudo eliminar el producto")
+        const currentCart = await User.getMyCart(userId)
+        for (const findId of currentCart) {
+            if (findId.id === productId) {
+                const deleteProduct = await User.deleteProductCart(userId, productId)
+                console.log("delete product", deleteProduct)
+                return deleteProduct
+            } else {
+                throw new Error("No se pudo eliminar el producto")
+            }
         }
     } catch (error) {
         console.error("Error en eliminar el producto", error.message)

@@ -105,7 +105,7 @@ async function getTotalPrice(userId: string) {
     const products = await getCartById(userId);
     if (products) {
         const totalPrice = products.reduce((total, product) => {
-            return total + product.totalPrice;
+            return total + (product.price)*product.quantity;
         }, 0);
         console.log(totalPrice)
         return totalPrice;

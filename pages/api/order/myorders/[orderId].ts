@@ -11,6 +11,9 @@ async function getHandler(req: NextApiRequest, res: NextApiResponse) {
         // console.log("endpoint", orderId)
         await validateQueryFindOrder(req, res)
         const orderFound = await getOrderDataById(orderId)
+       if(!orderFound){
+        res.status(404).send({ data:`No hay ningun orden con el id:${orderId}` })
+       }
         res.status(200).send({ data: orderFound })
     } catch (error) {
         res.status(400).send({ message: "Error al obtener la data" })

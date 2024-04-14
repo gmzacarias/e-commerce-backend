@@ -124,6 +124,7 @@ export async function createOrder(userId: string, additionalInfo?: string): Prom
         const productIds = await getProductsIds(userId)
         const totalPrice = await getTotalPrice(userId)
         const order = await Order.createNewOrder({
+            id:"",
             userId: userId,
             products: productIds,
             status: "pending",
@@ -155,7 +156,7 @@ export async function createOrder(userId: string, additionalInfo?: string): Prom
         })
 
         const orderUrl = pref.init_point
-        const setUrl = await Order.setOrderUrl(order.id, orderUrl)
+        const setUrl = await Order.setOrderIdAndUrl(order.id, orderUrl)
         // console.log("newUrl", setUrl)
         await resetCart(userId)
 

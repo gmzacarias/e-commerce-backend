@@ -6,7 +6,8 @@ interface OrderData {
     status: string,
     totalPrice: number,
     additionalInfo: string,
-    url: string
+    url: string,
+    id:string
 }
 
 const collection = firestore.collection("orders")
@@ -72,7 +73,7 @@ export class Order {
         }
     }
 
-    static async setOrderUrl(orderId: string, url: string): Promise<Order> {
+    static async setOrderIdAndUrl(orderId: string, url: string): Promise<Order> {
         try {
             console.log(orderId)
             const order = await collection.doc(orderId).get()
@@ -81,9 +82,9 @@ export class Order {
                 orderFound.data = order.data() as OrderData
                 console.log("mercadopago", url)
                 orderFound.data.url = url
+                orderFound.data.id = orderId
                 await orderFound.push()
-                console.log("url guardada", url)
-
+                // console.log("url guardada", url)
                 return orderFound
             }
 

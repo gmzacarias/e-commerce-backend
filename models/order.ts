@@ -80,7 +80,7 @@ export class Order {
             if (order.exists) {
                 const orderFound = new Order(order.id)
                 orderFound.data = order.data() as OrderData
-                console.log("mercadopago", url)
+                // console.log("mercadopago", url)
                 orderFound.data.url = url
                 orderFound.data.id = orderId
                 await orderFound.push()

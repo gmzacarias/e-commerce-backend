@@ -9,4 +9,6 @@ if(!admin.apps.length){
 }
 
 const firestore = admin.firestore()
-export {firestore }
+const { Timestamp } = admin.firestore;
+
+export {firestore,Timestamp }

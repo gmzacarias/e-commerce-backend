@@ -5,17 +5,14 @@ import { sendCodeAuth } from "lib/sendgrid"
 import { addMinutes } from "date-fns"
 import gen from "random-seed"
 
-//Generar una nueva semilla,cada vez que crea un numero aleatorio
 const seed = new Date().toISOString();
 let random = gen.create(seed)
 
 export async function findCreateAuth(email: string): Promise<Auth> {
-    //borrar espacios y pasarlos minuscula
-    const cleanEmail = email.trim().toLowerCase()
-    const auth = await Auth.findByEmail(cleanEmail)
+    const cleanEmail = Auth.cleanEmail(email)
     try {
+        const auth = await Auth.findByEmail(cleanEmail)
         if (auth) {
-            // console.log("auth encontrado")
             return auth
         } else {
             const newUser = await User.createNewUser({
@@ -34,7 +31,8 @@ export async function findCreateAuth(email: string): Promise<Auth> {
             return newAuth
         }
     } catch (error) {
-        throw new Error("Error al buscar o crear Auth: " + error.message);
+        console.error(`error al buscar o crear Auth:${error.message}`);
+        throw error
     }
 }
 
@@ -48,31 +46,31 @@ export async function sendCode(email: string) {
         auth.data.expire = expirar
         await auth.push()
         await sendCodeAuth(email, code)
-        // console.log("email enviado a " + email + " con codigo:" + auth.data.code)
         return true
     } catch (error) {
-        console.error("Error al enviar el mail:", error.message);
-        return null
+        console.error(`Error al enviar el mail a ${email}: ${error.message}`);
+        throw error
     }
 }
 
 export async function signIn(email: string, code: number) {
+    const cleanEmail = Auth.cleanEmail(email)
     try {
-        const auth = await Auth.findByEmailAndCode(email, code)
+        const auth = await Auth.findByEmailAndCode(cleanEmail, code) as any
         if (!auth) {
             throw new Error("No se pudo autorizar el ingreso")
         } else {
-            const expires = auth.iscodeExpired()
-            if (expires) {
-                console.log("Code expirado")
-                return null
+            const getData = await Auth.getDateExpire(auth.data.email)
+            const isExpires = Auth.checkExpiration(getData)
+            if (isExpires == false) {
+                throw new Error("Codigo Expirado")
+            } else {
+                const token = generate({ userId: auth.data.userId })
+                return token
             }
-            const token = generate({ userId: auth.data.userId })
-            // console.log(token)
-            return token
         }
     } catch (error) {
         console.error("Error al intentar iniciar sesión:", error.message);
-        return null
+        throw error
     }
 }

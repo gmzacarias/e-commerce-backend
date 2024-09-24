@@ -17,7 +17,10 @@ let bodyAuthTokenSchema = yup
     .object()
     .shape({
         email: yup.string().email().required(),
-        code: yup.number().required()
+        code: yup.number()
+            .typeError('Debe ser un número')
+            .test('check length', 'Debe tener exactamente 5 dígitos', val => val && val.toString().length === 5)
+            .required()
     }).noUnknown(true)
 
 export async function validateAuthToken(req: NextApiRequest, res: NextApiResponse) {

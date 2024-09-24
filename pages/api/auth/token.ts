@@ -9,13 +9,13 @@ async function postHandler(req: NextApiRequest, res: NextApiResponse) {
         await validateAuthToken(req, res)
         const { email, code } = req.body
         const token = await signIn(email, code)
-        if (!token) {
-            res.status(401).send({ message: "Acceso no autorizado",token: token })
-        } else {
-            res.status(200).send({ message: "inicio de sesion correcto", token: token })
-        }
+        res.status(200).send({ message: "inicio de sesion correcto", token: token })
     } catch (error) {
-        res.status(500).send({ message: "Error interno del servidor", error: error })
+        if (error.message) {
+            res.status(401).send({ message: error.message })
+        } else {
+            res.status(500).send({ message: "Error interno del servidor", error: error })
+        }
     }
 }
 

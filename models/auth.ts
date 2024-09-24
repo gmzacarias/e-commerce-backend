@@ -1,5 +1,5 @@
-import { firestore } from "../lib/firestore"
-import { isAfter } from "date-fns"
+import { firestore } from "lib/firestore"
+import { differenceInMinutes, isAfter } from "date-fns"
 
 interface AuthData {
     email: string,
@@ -24,63 +24,96 @@ export class Auth {
         this.ref.update(this.data as Record<string, any>)
     }
 
-    iscodeExpired() {
-        const now = new Date()
-        const expires = this.data.expire
-        // console.log({ now, expires })
-        return isAfter(now, expires)
-    }
-
     static cleanEmail(email: string) {
         return email.trim().toLowerCase()
     }
 
-    //el static lo hace un metodo de toda la clase
-    static async findByEmail(email: string) {
-        const cleanEmail = Auth.cleanEmail(email)
-        const results = await collection.where("email", "==", cleanEmail).get()
-        if (results.docs.length) {
-            const first = results.docs[0]
-            const newAuth = new Auth(first.id)
-            newAuth.data = first.data() as AuthData
-            return newAuth
-        } else {
-            return null
+    static checkExpiration(date): Boolean {
+        const currentDate = new Date()
+        const { _nanoseconds, _seconds } = date
+        const expirationDate = new Date(_seconds * 1000 + Math.floor(_nanoseconds / 1000));
+        const result = differenceInMinutes(currentDate, expirationDate)
+        return result <= 0
+    }
+
+    static async getDateExpire(email): Promise<Date | undefined> {
+        try {
+            const result = (await this.findByEmail(email)).data
+            if (result) {
+                const dateExpire = result.expire
+                return dateExpire
+            } else {
+                return
+            }
+        } catch (error) {
+            console.error(`no se pudo obtener la fecha de expiracion:${error.message}`)
+            throw error
         }
     }
 
-    static async createNewAuth(data) {
-        const newUserSnap = await collection.add(data)
-        const newUser = new Auth(newUserSnap.id)
-        newUser.data = data
-        return newUser
-    }
-
-    static async findByEmailAndCode(email: string, code: number) {
-        const cleanEmail = Auth.cleanEmail(email)
-        const result = await collection.where("email", "==", cleanEmail).where("code", "==", code).get()
-        if (result.empty) {
-            // console.error("Email y code no coinciden")
-            return null
-        } else {
-            const doc = result.docs[0]
-            const auth = new Auth(doc.id)
-            auth.data = doc.data() as AuthData
-            return auth
+    static async findByEmail(email: string): Promise<Auth | null> {
+        try {
+            const results = await collection.where("email", "==", email).get()
+            if (results.docs.length) {
+                const first = results.docs[0]
+                const newAuth = new Auth(first.id)
+                newAuth.data = first.data() as AuthData
+                return newAuth
+            } else {
+                return null
+            }
+        } catch (error) {
+            console.error(`no se encontro un usuario asociado al email ${email} `)
+            throw error
         }
     }
 
-    static async updateEmail(userId: string, email: string) {
+    static async createNewAuth(data): Promise<Auth> {
+        try {
+            const newUserSnap = await collection.add(data)
+            const newUser = new Auth(newUserSnap.id)
+            newUser.data = data
+            return newUser
+        } catch (error) {
+            console.error(`no se pudo crear el usuario:${error.message}`)
+            throw error
+        }
+    }
+
+    static async findByEmailAndCode(email: string, code: number): Promise<Auth | null> {
+        try {
+            const result = await collection.where("email", "==", email).where("code", "==", code).get()
+            if (result.empty) {
+                throw new Error("email y contraseña no coinciden")
+            } else {
+                const doc = result.docs[0]
+                const auth = new Auth(doc.id)
+                auth.data = doc.data() as AuthData
+                console.log("return", auth)
+                return auth
+            }
+        } catch (error) {
+            console.error(`no se encontro el user asociado a ${email}:${error.message}`)
+            throw error
+        }
+    }
+
+    static async updateEmail(userId: string, email: string): Promise<Auth | null> {
         const cleanEmail = Auth.cleanEmail(email)
-        const result = await collection.where("userId", "==", userId).get()
-        if (result.empty) {
-            console.error("El user id no existe")
-        } else {
-            const auth = new Auth(result.docs[0].id)
-            auth.data = result.docs[0].data() as AuthData
-            auth.data.email = cleanEmail
-            await auth.push()
-            return auth
+        try {
+            const result = await collection.where("userId", "==", userId).get()
+            if (result.empty) {
+                throw new Error(`El userId ${userId} no existe`)
+            } else {
+                const auth = new Auth(result.docs[0].id)
+                auth.data = result.docs[0].data() as AuthData
+                auth.data.email = cleanEmail
+                await auth.push()
+                return auth
+            }
+        } catch (error) {
+            console.error(`no se pudo actualizar la informacion del userId ${userId}:${error.message}`)
+            throw error
         }
     }
 }

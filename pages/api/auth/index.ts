@@ -7,14 +7,11 @@ import { validateAuth } from "lib/schemaMiddleware"
 async function postHandler(req: NextApiRequest, res: NextApiResponse) {
     try {
         await validateAuth(req, res)
-        if (res.statusCode === 403) {
-            throw new Error("No se envio el mail")
-        }
         const { email } = req.body
         await sendCode(email)
-        res.status(200).send({ message: "Codigo Enviado" })
+        return res.status(200).send({ message: "Codigo Enviado" })
     } catch (error) {
-        res.status(400).send({ message: "Error al enviar el codigo", error: error })
+        return res.status(400).send({ message: "Error al enviar el codigo", error: error })
     }
 }
 

@@ -14,34 +14,33 @@ export async function getDataById(userId: string) {
         if (user) {
             return user.data
         } else {
-            throw new Error("No se pudo obtener la data")
+            throw new Error(`no se pudo obtener la data del user ${userId}`)
         }
     } catch (error) {
-        console.error("Data del usuario", error.message)
-        return null
+        console.error(`error al obtener la data del user ${userId}:${error.message}`)
+        throw error
     }
 }
 
 export async function updateData(userId: string, newData: any) {
     try {
-        const user = await User.updateUserData(userId, newData)
+        const user = await User.updateMyData(userId, newData)
         const updateUserData = user.data
         if (user) {
             await Auth.updateEmail(userId, newData.email)
-            // console.log(userId,newData.email)
             return updateUserData
         } else {
-            throw new Error("No se pudo actualizar la data")
+            throw new Error(`no se pudo actualizar la data del user ${userId}`)
         }
     } catch (error) {
-        console.error("Error con el usuario:", error.message);
-        return null
+        console.error(`error al actualizar la data del user ${userId}:${error.message}`)
+        throw error
     }
 }
 
 export async function updateSpecifiedData(userId: string, newData: any) {
     try {
-        const user = await User.updateUserData(userId, newData)
+        const user = await User.updateMyData(userId, newData)
         const updateUserData = user.data
         if (user) {
             if (newData.email) {
@@ -62,11 +61,11 @@ export async function updateSpecifiedData(userId: string, newData: any) {
             }
             return updateUserData
         } else {
-            throw new Error("No se pudo actualizar la data")
+            throw new Error(`no se pudo actualizar la data del user ${userId}`)
         }
     } catch (error) {
-        console.error("Error con el usuario:", error.message);
-        return null
+        console.error(`error al actualizar la data del user ${userId}:${error.message}`)
+        throw error
     }
 }
 
@@ -77,11 +76,11 @@ export async function getCartById(userId: string) {
         if (user) {
             return user
         } else {
-            throw new Error("No se pudo obtener el carrito")
+            throw new Error(`no existe carrito de compras del user ${userId}`)
         }
     } catch (error) {
-        console.error("Data del carrito", error.message)
-        return null
+        console.error(`error al obtener la data del carrito de compras del user ${userId}:${error.message}`)
+        throw error
     }
 }
 
@@ -89,15 +88,14 @@ export async function addProductCartById(userId: string, productId: string, quan
     try {
         const product = await searchProductById(productId) as any
         if (!product) {
-            throw new Error("No existe el producto en el indie")
+            throw new Error(`no existe el producto ${productId} en el indice`)
         } else {
             const addProduct = await User.addProductCart(userId, product, quantity)
-            // console.log("response", addProduct)
             return addProduct
         }
     } catch (error) {
-        console.error("Error en agregar el producto", error.message)
-        return null
+        console.error(`Error al agregar un producto del carrito de compras del usuario ${userId}:${error.message}`)
+        throw error
     }
 }
 
@@ -107,29 +105,28 @@ export async function deleteProductCartById(userId: string, productId: string) {
         for (const findId of currentCart) {
             if (findId.id === productId) {
                 const deleteProduct = await User.deleteProductCart(userId, productId)
-                console.log("delete product", deleteProduct)
+
                 return deleteProduct
             } else {
-                throw new Error("No se pudo eliminar el producto")
+                throw new Error(`no se pudo eliminar el producto id ${productId}`)
             }
         }
     } catch (error) {
-        console.error("Error en eliminar el producto", error.message)
-        return null
+        console.error(`Error al eliminar un producto del carrito de compras del usuario ${userId}:${error.message}`)
+        throw error
     }
 }
 
 export async function resetCart(userId: string) {
     try {
         const response = await User.resetProductCart(userId)
-        // console.log("controllers reset cart",response)
         if (response) {
             return response
         } else {
-            throw new Error("No se pudo resetear el carrito")
+            throw new Error(`no se pudo resetear el carrito del user ${userId}`)
         }
     } catch (error) {
-        console.error("Error al resetear el carrito de compras", error.message)
-        return null
+        console.error(`Error al resetear el carrito de compras del usuario ${userId}:${error.message}`)
+        throw error
     }
 }

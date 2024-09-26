@@ -7,12 +7,11 @@ export async function saveProductsAlgolia() {
     try {
         const response = await authAirtable()
         if (!response) {
-            throw new Error("no se pudo obtener la base de datos")
+            throw new Error("no se pudo obtener la base de datos de Airtable")
         } else {
             const productsData = await response.map(async (product) => {
                 if (product.photo) {
                     const photoUrl = await uploadCloudinary(product.photo);
-                    // console.log(photoUrl.secure_url)
                     return {
                         objectID: product.id,
                         ...product,
@@ -21,7 +20,7 @@ export async function saveProductsAlgolia() {
                         totalPrice: product.price
                     }
                 } else {
-                    return null
+                    throw new Error(`error al procesar el producto con ID ${product.id}`);
                 }
             })
             const productsPromises = await Promise.all(productsData)
@@ -30,7 +29,7 @@ export async function saveProductsAlgolia() {
             return syncAlgolia
         }
     } catch (error) {
-        console.error("Hubo un problema con la sincronizacion: ", error.message)
+        console.error(`hubo un problema con la sincronizacion : ${error.message}`)
         throw error;
     }
 }
@@ -71,8 +70,13 @@ export async function searchQueryProducts(req) {
 export async function searchProductById(productId: string,) {
     try {
         const results = await productIndex.getObject(productId)
-        return results
+        if (results) {
+            return results
+        } else {
+            throw new Error("no hay resultados")
+        }
     } catch (error) {
         console.error("Error al encontrar el producto:", error.message)
+        throw error
     }
 }

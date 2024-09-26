@@ -11,7 +11,11 @@ async function getHandler(req: NextApiRequest, res: NextApiResponse) {
         const product = await searchProductById(productId)
         res.status(200).send(product)
     } catch (error) {
-        res.status(400).send({ message: "Error al obtener la data" })
+        if (error.message) {
+            res.status(400).send({ message: error.message })
+        } else {
+            res.status(500).send({ message: "Error interno del servidor", error: error })
+        }
     }
 }
 

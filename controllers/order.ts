@@ -1,7 +1,8 @@
 import { Order } from "models/order"
 import { createPreference, getMerchantOrderId } from "lib/mercadopago"
 import { sendPaymentConfirmed, sendSaleConfirmed } from "lib/sendgrid"
-import { getDataById, getCartById, resetCart } from "controllers/user"
+import { getDataById, resetCart } from "controllers/user"
+import { getProductsCart, getProductsIds, getTotalPrice } from "utils/orders"
 
 if (process.env.NODE_ENV == "development") {
     var notificationUrl = "https://webhook.site/115e6d94-141f-43b2-965f-db6fd6e18264";
@@ -59,61 +60,6 @@ type CreateOrderRes = {
     url: string
 }
 
-async function getProductsIds(userId: string) {
-    const dataCart = await getCartById(userId)
-    if (dataCart) {
-        try {
-            const productsIds = dataCart.map(id => {
-                return {
-                    id: id.objectID
-                }
-            })
-            return productsIds
-        } catch (error) {
-            console.error("No se encontraron datos en el carrito ", error.message)
-        }
-    } else {
-        return null
-    }
-}
-
-async function getProductsCart(userId: string) {
-    const dataCart = await getCartById(userId)
-    if (dataCart) {
-        try {
-            const mapProducts = dataCart.map(product => {
-                return {
-                    title: product.model,
-                    description: `${product.brand} ${product.model}`,
-                    picture_url: product.photo,
-                    category_id: "Phones",
-                    quantity: product.quantity,
-                    currency_id: "ARS",
-                    unit_price: product.price
-                };
-            });
-            return mapProducts
-        } catch (error) {
-            console.error("No se encontraron datos en el carrito ", error.message)
-        }
-    } else {
-        return null
-    }
-}
-
-async function getTotalPrice(userId: string) {
-    const products = await getCartById(userId);
-    if (products) {
-        const totalPrice = products.reduce((total, product) => {
-            return total + (product.price)*product.quantity;
-        }, 0);
-        console.log(totalPrice)
-        return totalPrice;
-    } else {
-        return null
-    }
-}
-
 export async function createOrder(userId: string, additionalInfo?: string): Promise<CreateOrderRes> {
     const items = await getProductsCart(userId)
     if (!items) {
@@ -124,7 +70,7 @@ export async function createOrder(userId: string, additionalInfo?: string): Prom
         const productIds = await getProductsIds(userId)
         const totalPrice = await getTotalPrice(userId)
         const order = await Order.createNewOrder({
-            id:"",
+            id: "",
             userId: userId,
             products: productIds,
             status: "pending",

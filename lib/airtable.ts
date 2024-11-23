@@ -16,7 +16,7 @@ export async function authAirtable() {
         }
         )
         const data = await response.json();
-        const dataRecords = data.records.map(record=>record.fields);
+        const dataRecords = data.records.map(record => record.fields);
         if (!dataRecords || dataRecords.length === 0) {
             throw new Error("No hay records disponibles")
         } else {
@@ -25,5 +25,6 @@ export async function authAirtable() {
         return allRecords
     } catch (error) {
         console.error("Hubo un Error al obtener la data", error.message)
+        throw error
     }
 }

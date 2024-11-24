@@ -2,7 +2,7 @@ import { Order } from "models/order"
 import { createPreference, getMerchantOrderId } from "lib/mercadopago"
 import { sendPaymentConfirmed, sendSaleConfirmed } from "lib/sendgrid"
 import { getDataById, resetCart } from "controllers/user"
-import { getProductsCart, getProductsIds, getTotalPrice } from "utils/orders"
+import { getDate, getProductsCart, getProductsIds, getTotalPrice } from "utils/orders"
 
 if (process.env.NODE_ENV == "development") {
     var notificationUrl = "https://webhook.site/115e6d94-141f-43b2-965f-db6fd6e18264";
@@ -76,7 +76,8 @@ export async function createOrder(userId: string, additionalInfo?: string): Prom
             status: "pending",
             totalPrice: totalPrice,
             url: "",
-            additionalInfo
+            additionalInfo,
+            created: getDate()
         })
         const pref = await createPreference({
             body:

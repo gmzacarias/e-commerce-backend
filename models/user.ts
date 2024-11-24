@@ -200,6 +200,33 @@ export class User {
         }
     }
 
+    static async updateQuantityProduct(userId: string, productId: string, quantity: number) {
+        try {
+            const user = await collection.doc(userId).get()
+            if (user.exists) {
+                const dataUser = new User(user.id)
+                dataUser.data = user.data() as UserData
+                const currentData = dataUser.data.cart
+                const product = currentData.find((item) => item.id === productId)
+                if (product) {
+                    product.quantity += quantity
+                    dataUser.data.cart = currentData
+                    await dataUser.push()
+                    return true
+                } else {
+                    return null
+                }
+            } else {
+                throw new Error("el usuario no existe en la base de datos")
+            }
+
+        } catch (error) {
+            console.error(`error al actualizar un producto a mi carrito de compras:${error.message}`)
+            throw error
+        }
+    }
+
+
     static async deleteProductCart(userId: string, productId: string) {
         try {
             const user = await collection.doc(userId).get()

@@ -1,4 +1,5 @@
-import { firestore } from "../lib/firestore"
+
+import { firestore,Timestamp } from "../lib/firestore"
 
 interface OrderData {
     userId: string,
@@ -7,7 +8,8 @@ interface OrderData {
     totalPrice: number,
     additionalInfo: string,
     url: string,
-    id:string
+    id:string,
+    created:Date
 }
 
 const collection = firestore.collection("orders")

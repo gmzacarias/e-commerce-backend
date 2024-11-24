@@ -1,4 +1,12 @@
+import { format } from "date-fns"
+import { es } from "date-fns/locale"
 import { getCartById, getDataById, getOrderById } from "controllers/user"
+
+export function getDate() {
+    const currentDate = new Date()
+    const formatDate = format(currentDate, "dd 'de' MMMM 'de' yyyy", { locale: es })
+    return formatDate
+}
 
 export async function getProductsIds(userId: string) {
     const dataCart = await getCartById(userId)

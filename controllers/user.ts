@@ -1,6 +1,7 @@
 import { User } from "models/user"
 import { Auth } from "models/auth"
 import { searchProductById } from "./products"
+import { checkCart } from "utils/cart"
 
 export async function getOrderById(id: string): Promise<any> {
     const user = new User(id)
@@ -90,6 +91,11 @@ export async function addProductCartById(userId: string, productId: string, quan
         if (!product) {
             throw new Error(`no existe el producto ${productId} en el indice`)
         } else {
+            const verifyCart = await checkCart(userId, productId)
+            if (verifyCart) {
+                const updateProduct = await User.updateQuantityProduct(userId, productId, quantity)
+                return updateProduct
+            }
             const addProduct = await User.addProductCart(userId, product, quantity)
             return addProduct
         }

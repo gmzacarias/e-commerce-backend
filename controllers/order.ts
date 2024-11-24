@@ -1,8 +1,7 @@
-import { Order } from "models/order"
 import { createPreference, getMerchantOrderId } from "lib/mercadopago"
-import { sendPaymentConfirmed, sendSaleConfirmed } from "lib/sendgrid"
+import { Order } from "models/order"
 import { getDataById, resetCart } from "controllers/user"
-import { getDate, getProductsCart, getProductsIds, getTotalPrice } from "utils/orders"
+import { getDate, getProductsCart, getProductsIds, getTotalPrice, purchaseAlert, saleAlert } from "utils/orders"
 
 if (process.env.NODE_ENV == "development") {
     var notificationUrl = "https://webhook.site/115e6d94-141f-43b2-965f-db6fd6e18264";
@@ -115,23 +114,7 @@ export async function createOrder(userId: string, additionalInfo?: string): Prom
     }
 }
 
-async function purchaseAlert(email: string, userName: string, order: string) {
-    try {
-        const data = await sendPaymentConfirmed(email, userName, order)
-        return data
-    } catch (error) {
-        console.error("No se pudo enviar el mail ", error.message)
-    }
-}
 
-async function saleAlert(userId: string, order: string, price: number) {
-    try {
-        const data = await sendSaleConfirmed(userId, order, price)
-        return data
-    } catch (error) {
-        console.error("No se pudo enviar el mail ", error.message)
-    }
-}
 
 export async function updateStatusOrder(topic: string, id: String) {
     if (topic === "merchant_order") {

@@ -1,5 +1,6 @@
 import { format } from "date-fns"
 import { es } from "date-fns/locale"
+import { sendPaymentConfirmed, sendSaleConfirmed } from "lib/sendgrid"
 import { getCartById, getDataById, getOrderById } from "controllers/user"
 
 export function getDate() {
@@ -64,5 +65,24 @@ export async function getTotalPrice(userId: string) {
         return totalPrice;
     } else {
         return null
+    }
+}
+
+
+export async function purchaseAlert(email: string, userName: string, order: string) {
+    try {
+        const data = await sendPaymentConfirmed(email, userName, order)
+        return data
+    } catch (error) {
+        console.error("No se pudo enviar el mail ", error.message)
+    }
+}
+
+export async function saleAlert(userId: string, order: string, price: number) {
+    try {
+        const data = await sendSaleConfirmed(userId, order, price)
+        return data
+    } catch (error) {
+        console.error("No se pudo enviar el mail ", error.message)
     }
 }

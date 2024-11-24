@@ -1,5 +1,5 @@
 import { MercadoPagoConfig, MerchantOrder, Preference } from 'mercadopago';
-import type {MerchantOrderGetData} from "mercadopago/dist/clients/merchantOrder/get/types"
+import type { MerchantOrderGetData } from "mercadopago/dist/clients/merchantOrder/get/types"
 
 const accessToken = process.env.ACCESS_TOKEN
 const client = new MercadoPagoConfig({ accessToken: accessToken, options: { timeout: 5000, idempotencyKey: 'abc' } });
@@ -15,4 +15,3 @@ export async function createPreference(data) {
     const newPreference = await preference.create(data)
     return newPreference
 }
-

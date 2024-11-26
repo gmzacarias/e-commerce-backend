@@ -33,14 +33,12 @@ export async function SaveProductsById(userId: string) {
 
 export async function getProductsCart(userId: string) {
     const dataCart = await getCartById(userId)
-    const pictures = dataCart.map((foto) => foto.photo)
-    console.log("photo", pictures)
     if (dataCart) {
         try {
             const mapProducts = dataCart.map(product => {
                 return {
-                    title: product.model,
-                    description: `${product.brand} ${product.model}`,
+                    title: `${product.brand} ${product.model}`,
+                    description: `smartphone ${product.brand} ${product.model} `,
                     picture_url: product.photo,
                     category_id: "Phones",
                     quantity: product.quantity,

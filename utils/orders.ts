@@ -9,13 +9,17 @@ export function getDate() {
     return formatDate
 }
 
-export async function getProductsIds(userId: string) {
+export async function SaveProductsById(userId: string) {
     const dataCart = await getCartById(userId)
     if (dataCart) {
         try {
-            const productsIds = dataCart.map(id => {
+            const productsIds = dataCart.map(item => {
                 return {
-                    id: id.objectID
+                    productId: item.objectID,
+                    brand: item.brand,
+                    model: item.model,
+                    colour: item.colour,
+                    photo: item.photo,
                 }
             })
             return productsIds

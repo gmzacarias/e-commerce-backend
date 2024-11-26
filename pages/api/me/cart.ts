@@ -39,7 +39,7 @@ async function postHandler(req: NextApiRequest, res: NextApiResponse, token) {
 
 
         } catch (error) {
-            res.status(400).send({ message: "Error al agregar la data", error: error })
+            res.status(400).send({ message: `Error al agregar el producto:${productId}`, error: error })
         }
     }
 }
@@ -58,7 +58,7 @@ async function deleteHandler(req: NextApiRequest, res: NextApiResponse, token) {
             res.status(200).send({ message: `el producto id ${productId} fue eliminado` })
 
         } catch (error) {
-            res.status(400).send({ message: "Error al agregar la data", error: error })
+            res.status(400).send({ message: `Error al eliminar el producto:${productId}`, error: error })
         }
     }
 }

@@ -1,5 +1,5 @@
 
-import { firestore,Timestamp } from "../lib/firestore"
+import { firestore} from "../lib/firestore"
 
 interface OrderData {
     userId: string,

@@ -12,7 +12,6 @@ export function decode(token) {
         let decoded = jwt.verify(token, secret);
         return decoded
     } catch (error) {
-    
         return null
     }
 }

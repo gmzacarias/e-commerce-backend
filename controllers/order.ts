@@ -1,7 +1,7 @@
 import { createPreference, getMerchantOrderId } from "lib/mercadopago"
 import { Order } from "models/order"
 import { getDataById, resetCart } from "controllers/user"
-import { getDate, getProductsCart, getProductsIds, getTotalPrice, purchaseAlert, saleAlert } from "utils/orders"
+import { getDate, getProductsCart, SaveProductsById, getTotalPrice, purchaseAlert, saleAlert } from "utils/orders"
 
 if (process.env.NODE_ENV == "development") {
     var notificationUrl = "https://webhook.site/115e6d94-141f-43b2-965f-db6fd6e18264";
@@ -66,7 +66,7 @@ export async function createOrder(userId: string, additionalInfo?: string): Prom
     }
     try {
         const dataUser = await getDataById(userId)
-        const productIds = await getProductsIds(userId)
+        const productIds = await SaveProductsById(userId)
         const totalPrice = await getTotalPrice(userId)
         const order = await Order.createNewOrder({
             id: "",

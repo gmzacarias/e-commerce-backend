@@ -13,10 +13,9 @@ export async function uploadCloudinary(image) {
       {
         resource_type: "image",
         discard_original_filename: true,
-        witdh: 1000,
-        
+        format: "webp"
       })
-    return response
+      return response
   } catch (error) {
     throw error
   }

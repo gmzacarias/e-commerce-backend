@@ -26,9 +26,13 @@ export async function getDataById(userId: string) {
 export async function updateData(userId: string, newData: any) {
     try {
         const user = await User.updateMyData(userId, newData)
-        const updateUserData = user.data
         if (user) {
-            await Auth.updateEmail(userId, newData.email)
+            if (newData.email) {
+                await Auth.updateEmail(userId, newData.email)
+                const updateUserEmail = user.data
+                return updateUserEmail
+            }
+            const updateUserData = user.data
             return updateUserData
         } else {
             throw new Error(`no se pudo actualizar la data del user ${userId}`)

@@ -19,7 +19,7 @@ let bodyAuthTokenSchema = yup
         email: yup.string().email().required(),
         code: yup.number()
             .typeError('Debe ser un número')
-            .test('check length', 'Debe tener exactamente 5 dígitos', val => val && val.toString().length === 5)
+            .test('check length', 'Debe tener exactamente 5 dígitos', value => value && value.toString().length === 5)
             .required()
     }).noUnknown(true)
 
@@ -98,7 +98,12 @@ export async function validateQueryProduct(req: NextApiRequest, res: NextApiResp
 
 let bodyProductCartSchema = yup
     .object({
-        quantity: yup.number(),
+        quantity: yup.number()
+            .typeError('Debe ser un número')
+            .min(1,"el minimo tiene que ser 1")
+            .test('check length', 'Debe tener 2 dígitos como maximo', value => value && value.toString().length <= 2)
+            .max(10,"el maximo tiene que ser <= 10")
+            .required()
     })
     .noUnknown(true)
 
@@ -107,7 +112,10 @@ export async function validateBodyProduct(req: NextApiRequest, res: NextApiRespo
         await bodyProductCartSchema.validate(req.body, { strict: true })
         console.log(req.body)
     } catch (error) {
-        res.status(403).send({ field: "body", message: error })
+       const {path,type,errors}=error
+       
+        console.log("check",error)
+        res.status(403).send({ field: "body", message: {path,type,errors} })
     }
 }
 

@@ -3,6 +3,7 @@ import * as yup from "yup"
 
 let bodyAuthSchema = yup.object({
     email: yup.string()
+        .typeError("Debe ser una cadena de texto")
         .email()
         .required()
 }).noUnknown(true)
@@ -19,10 +20,13 @@ export async function validateAuth(req: NextApiRequest, res: NextApiResponse) {
 let bodyAuthTokenSchema = yup
     .object()
     .shape({
-        email: yup.string().email().required(),
+        email: yup.string()
+            .typeError("Debe ser una cadena de texto")
+            .email()
+            .required(),
         code: yup.number()
-            .typeError('Debe ser un número')
-            .test('check length', 'Debe tener exactamente 5 dígitos', value => value && value.toString().length === 5)
+            .typeError("Debe ser un numero")
+            .test("check length", "Debe tener exactamente 5 dígitos", value => value && value.toString().length === 5)
             .required()
     }).noUnknown(true)
 
@@ -38,10 +42,15 @@ export async function validateAuthToken(req: NextApiRequest, res: NextApiRespons
 let bodyPatchDataSchema = yup
     .object()
     .shape({
-        email: yup.string().email(),
-        userName: yup.string(),
-        phoneNumber: yup.number(),
+        email: yup.string()
+            .typeError("Debe ser una cadena de texto")
+            .email(),
+        userName: yup.string()
+            .typeError("Debe ser una cadena de texto"),
+        phoneNumber: yup.number()
+            .typeError("Debe ser un numero"),
         address: yup.string()
+            .typeError("Debe ser una cadena de texto")
     }).noUnknown(true)
 
 export async function validatePatchData(req: NextApiRequest, res: NextApiResponse) {
@@ -56,10 +65,15 @@ export async function validatePatchData(req: NextApiRequest, res: NextApiRespons
 let queryPatchDataSchema = yup
     .object()
     .shape({
-        email: yup.string(),
-        userName: yup.string(),
-        phoneNumber: yup.number(),
+        email: yup.string()
+            .typeError("Debe ser una cadena de texto")
+            .email(),
+        userName: yup.string()
+            .typeError("Debe ser una cadena de texto"),
+        phoneNumber: yup.number()
+            .typeError("Debe ser un numero"),
         address: yup.string()
+            .typeError("Debe ser una cadena de texto")
     }).noUnknown(true)
 
 export async function validatePatchSpecifiedData(req: NextApiRequest, res: NextApiResponse) {
@@ -74,9 +88,12 @@ export async function validatePatchSpecifiedData(req: NextApiRequest, res: NextA
 let querySearchProductSchema = yup
     .object()
     .shape({
-        q: yup.string(),
-        offset: yup.string(),
-        limit: yup.string(),
+        q: yup.string()
+            .typeError("Debe ser una cadena de texto"),
+        offset: yup.string()
+            .typeError("Debe ser una cadena de texto"),
+        limit: yup.string()
+            .typeError("Debe ser una cadena de texto"),
     }).noUnknown(true)
 
 export async function validateSearchProduct(req: NextApiRequest, res: NextApiResponse) {
@@ -90,7 +107,8 @@ export async function validateSearchProduct(req: NextApiRequest, res: NextApiRes
 
 let queryProductCartSchema = yup
     .object({
-        productId: yup.string(),
+        productId: yup.string()
+        .typeError("Debe ser una cadena de texto"),
     })
     .noUnknown(true)
 
@@ -129,7 +147,8 @@ export async function validateBodyProduct(req: NextApiRequest, res: NextApiRespo
 
 let bodyCreateOrderSchema = yup
     .object({
-        additionalInfo: yup.string(),
+        additionalInfo: yup.string()
+        .typeError("Debe ser una cadena de texto"),
     })
     .noUnknown(true)
 
@@ -145,7 +164,8 @@ export async function validateBodyCreateOrder(req: NextApiRequest, res: NextApiR
 
 let queryFindOrderSchema = yup
     .object({
-        orderId: yup.string(),
+        orderId: yup.string()
+        .typeError("Debe ser una cadena de texto"),
     })
     .noUnknown(true)
 
@@ -161,7 +181,8 @@ export async function validateQueryFindOrder(req: NextApiRequest, res: NextApiRe
 
 let querySearchProductIdSchema = yup
     .object({
-        productId: yup.string(),
+        productId: yup.string()
+        .typeError("Debe ser una cadena de texto"),
     })
     .noUnknown(true)
 

@@ -2,14 +2,17 @@ import type { NextApiRequest, NextApiResponse } from "next"
 import * as yup from "yup"
 
 let bodyAuthSchema = yup.object({
-    email: yup.string().email().required()
+    email: yup.string()
+        .email()
+        .required()
 }).noUnknown(true)
 
 export async function validateAuth(req: NextApiRequest, res: NextApiResponse) {
     try {
         await bodyAuthSchema.validate(req.body, { strict: true })
     } catch (error) {
-        res.status(403).send({ field: "body", message: error })
+        const { path, type, errors } = error
+        res.status(403).send({ field: "body", message: { path, type, errors } })
     }
 }
 
@@ -27,7 +30,8 @@ export async function validateAuthToken(req: NextApiRequest, res: NextApiRespons
     try {
         await bodyAuthTokenSchema.validate(req.body, { strict: true })
     } catch (error) {
-        res.status(403).send({ field: "body", message: error })
+        const { path, type, errors } = error
+        res.status(403).send({ field: "body", message: { path, type, errors } })
     }
 }
 
@@ -44,7 +48,8 @@ export async function validatePatchData(req: NextApiRequest, res: NextApiRespons
     try {
         await bodyPatchDataSchema.validate(req.body, { strict: true })
     } catch (error) {
-        res.status(403).send({ field: "body", message: error })
+        const { path, type, errors } = error
+        res.status(403).send({ field: "body", message: { path, type, errors } })
     }
 }
 
@@ -61,7 +66,8 @@ export async function validatePatchSpecifiedData(req: NextApiRequest, res: NextA
     try {
         await queryPatchDataSchema.validate(req.query, { strict: true })
     } catch (error) {
-        res.status(403).send({ field: "query", message: error })
+        const { path, type, errors } = error
+        res.status(403).send({ field: "query", message: { path, type, errors } })
     }
 }
 
@@ -77,7 +83,8 @@ export async function validateSearchProduct(req: NextApiRequest, res: NextApiRes
     try {
         await querySearchProductSchema.validate(req.query, { strict: true })
     } catch (error) {
-        res.status(403).send({ field: "query", message: error })
+        const { path, type, errors } = error
+        res.status(403).send({ field: "query", message: { path, type, errors } })
     }
 }
 
@@ -92,7 +99,8 @@ export async function validateQueryProduct(req: NextApiRequest, res: NextApiResp
         await queryProductCartSchema.validate(req.query, { strict: true })
         console.log(req.query)
     } catch (error) {
-        res.status(403).send({ field: "query", message: error })
+        const { path, type, errors } = error
+        res.status(403).send({ field: "query", message: { path, type, errors } })
     }
 }
 
@@ -100,9 +108,9 @@ let bodyProductCartSchema = yup
     .object({
         quantity: yup.number()
             .typeError('Debe ser un número')
-            .min(1,"el minimo tiene que ser 1")
+            .min(1, "el minimo tiene que ser 1")
             .test('check length', 'Debe tener 2 dígitos como maximo', value => value && value.toString().length <= 2)
-            .max(10,"el maximo tiene que ser <= 10")
+            .max(10, "el maximo tiene que ser <= 10")
             .required()
     })
     .noUnknown(true)
@@ -112,10 +120,8 @@ export async function validateBodyProduct(req: NextApiRequest, res: NextApiRespo
         await bodyProductCartSchema.validate(req.body, { strict: true })
         console.log(req.body)
     } catch (error) {
-       const {path,type,errors}=error
-       
-        console.log("check",error)
-        res.status(403).send({ field: "body", message: {path,type,errors} })
+        const { path, type, errors } = error
+        res.status(403).send({ field: "body", message: { path, type, errors } })
     }
 }
 
@@ -132,7 +138,8 @@ export async function validateBodyCreateOrder(req: NextApiRequest, res: NextApiR
         await bodyCreateOrderSchema.validate(req.body, { strict: true })
         // console.log(req.body)
     } catch (error) {
-        res.status(403).send({ field: "body", message: error })
+        const { path, type, errors } = error
+        res.status(403).send({ field: "body", message: { path, type, errors } })
     }
 }
 
@@ -147,7 +154,8 @@ export async function validateQueryFindOrder(req: NextApiRequest, res: NextApiRe
         await queryFindOrderSchema.validate(req.query, { strict: true })
         // console.log(req.query)
     } catch (error) {
-        res.status(403).send({ field: "query", message: error })
+        const { path, type, errors } = error
+        res.status(403).send({ field: "query", message: { path, type, errors } })
     }
 }
 
@@ -160,8 +168,9 @@ let querySearchProductIdSchema = yup
 export async function validateQuerySearchProductId(req: NextApiRequest, res: NextApiResponse) {
     try {
         await querySearchProductIdSchema.validate(req.query, { strict: true })
-        // console.log(req.query)
+
     } catch (error) {
-        res.status(403).send({ field: "query", message: error })
+        const { path, type, errors } = error
+        res.status(403).send({ field: "query", message: { path, type, errors } })
     }
 }

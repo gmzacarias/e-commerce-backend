@@ -26,6 +26,7 @@ export async function saveProductsAlgolia() {
             const productsPromises = await Promise.all(productsData)
             const products = productsPromises
             const syncAlgolia = await productIndex.saveObjects(products)
+
             return syncAlgolia
         }
     } catch (error) {
@@ -72,6 +73,32 @@ export async function searchProductById(productId: string,) {
         const results = await productIndex.getObject(productId)
         if (results) {
             return results
+        } else {
+            throw new Error("no hay resultados")
+        }
+    } catch (error) {
+        console.error("Error al encontrar el producto:", error.message)
+        throw error
+    }
+}
+
+
+export async function GetProducts() {
+    try {
+        const results = await productIndex.search("")
+        if (results) {
+            const data = results.hits as any
+            const filterByBrands = data.map((item) => item.brand)
+            const uniqueBrands = Array.from(new Set(filterByBrands))
+
+            const moreExpensiveProducts = uniqueBrands.map((brand) => {
+                const filtermax = data.filter((item) => item.brand === brand)
+                return filtermax.reduce((max, item) =>
+                    item.price > max.price ? item : max)
+            })
+
+            return moreExpensiveProducts
+
         } else {
             throw new Error("no hay resultados")
         }

@@ -84,6 +84,7 @@ export async function createOrder(userId: string, additionalInfo?: string): Prom
             {
                 external_reference: order.id,
                 notification_url: notificationUrl,
+                statement_descriptor: "MERCADOPAGO-SMARTSHOP",
                 items: items,
                 payer: {
                     "name": dataUser.userName,

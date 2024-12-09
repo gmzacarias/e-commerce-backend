@@ -15,3 +15,4 @@ export async function createPreference(data) {
     const newPreference = await preference.create(data)
     return newPreference
 }
+

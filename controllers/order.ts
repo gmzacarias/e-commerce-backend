@@ -3,6 +3,10 @@ import { Order } from "models/order"
 import { getDataById, resetCart } from "controllers/user"
 import { getDate, getProductsCart, SaveProductsById, getTotalPrice, purchaseAlert, saleAlert } from "utils/orders"
 
+type CreateOrderRes = {
+    url: string
+}
+
 if (process.env.NODE_ENV == "development") {
     var notificationUrl = "https://webhook.site/115e6d94-141f-43b2-965f-db6fd6e18264";
 
@@ -55,9 +59,6 @@ export async function getOrderState(orderId: string) {
     }
 }
 
-type CreateOrderRes = {
-    url: string
-}
 
 export async function createOrder(userId: string, additionalInfo?: string): Promise<CreateOrderRes> {
     const items = await getProductsCart(userId)
@@ -92,9 +93,9 @@ export async function createOrder(userId: string, additionalInfo?: string): Prom
                     }
                 },
                 back_urls: {
-                    success: "http://apx.school",
-                    pending: "http://vercel.com",
-                    failure: "http://github.com"
+                    success:`https://e-commerce-smartshop.vercel.app/success/${order.id}`,
+                    pending: `https://e-commerce-smartshop.vercel.app/pending/${order.id}`,
+                    failure: `https://e-commerce-smartshop.vercel.app/failure/${order.id}`
                 },
                 auto_return: "all",
                 additional_info: additionalInfo,

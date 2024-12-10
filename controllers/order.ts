@@ -89,7 +89,7 @@ export async function createOrder(userId: string, additionalInfo?: string): Prom
                     "name": dataUser.userName,
                     "email": dataUser.email,
                     "phone": {
-                        number: dataUser.phoneNumber
+                        "number": dataUser.phoneNumber.toString()
                     }
                 },
                 back_urls: {

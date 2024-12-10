@@ -37,6 +37,7 @@ export async function getProductsCart(userId: string) {
         try {
             const mapProducts = dataCart.map(product => {
                 return {
+                    id:`${product.id}`,
                     title: `${product.brand} ${product.model}`,
                     description: `smartphone ${product.brand} ${product.model} `,
                     picture_url: product.photo,

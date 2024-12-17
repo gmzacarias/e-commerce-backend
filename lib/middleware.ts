@@ -16,7 +16,6 @@ export function authMiddleware(callback) {
             } else {
                 res.status(401).send({ message: "Token incorrecto" })
             }
-
         } catch (error) {
             console.error("no se pudo verificar el token")
         }

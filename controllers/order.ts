@@ -1,7 +1,9 @@
-import { createPreference, getMerchantOrderId } from "lib/mercadopago"
+import { createPreference, getMerchantOrderId, getPreference ,getPayment} from "lib/mercadopago"
 import { Order } from "models/order"
 import { getDataById, resetCart } from "controllers/user"
 import { getDate, getProductsCart, SaveProductsById, getTotalPrice, purchaseAlert, saleAlert } from "utils/orders"
+import { PreferenceGetData } from "mercadopago/dist/clients/preference/get/types"
+import { PaymentGetData } from 'mercadopago/dist/clients/payment/get/types';
 
 type CreateOrderRes = {
     url: string
@@ -93,7 +95,7 @@ export async function createOrder(userId: string, additionalInfo?: string): Prom
                     }
                 },
                 back_urls: {
-                    success:`https://e-commerce-smartshop.vercel.app/success/${order.id}`,
+                    success: `https://e-commerce-smartshop.vercel.app/success/${order.id}`,
                     pending: `https://e-commerce-smartshop.vercel.app/pending/${order.id}`,
                     failure: `https://e-commerce-smartshop.vercel.app/failure/${order.id}`
                 },
@@ -114,6 +116,33 @@ export async function createOrder(userId: string, additionalInfo?: string): Prom
     } catch (error) {
         console.error("No se pudo crear la preferencia: ", error.message)
     }
+}
+
+
+export async function getPreferenceById(id:string) {
+    try {
+        const response = await getPreference({preferenceId:id})
+        if (response) {
+            return response
+        }
+        throw new Error(`No se pudo obtener los datos de la preferencia ${id}`)
+    } catch (error) {
+        console.error("No se pudo obtener la preferencia", error.message)
+        return []
+    }
+}
+
+export async function getPaymentById(id:string){
+try {
+    const response=await getPayment({id:id})
+    if(response){
+        return response
+    }
+    throw new Error(`No se pudo obtener los datos del pago id:${id}`)
+} catch (error) {
+    console.error("No se pudo obtener el pago",error.message)
+    return []
+}
 }
 
 

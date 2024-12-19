@@ -58,7 +58,7 @@ export async function getOrderState(orderId: string) {
 }
 
 
-export async function createOrder({notification,success,pending,failure}:UrlType,userId:string,additionalInfo:string){
+export async function createOrder(userId:string,additionalInfo:string,){
     const items = await getProductsCart(userId)
     if (!items) {
         throw new Error("El producto no existe")
@@ -78,10 +78,10 @@ export async function createOrder({notification,success,pending,failure}:UrlType
             created: getDate()
         })
         
-        let notificationUrl:string=notification
-        let successUrl: string=success
-        let pendingUrl: string=pending
-        let failureUrl: string=failure
+        let notificationUrl:string
+        let successUrl: string
+        let pendingUrl: string
+        let failureUrl: string
 
         if (process.env.NODE_ENV == "development") {
             notificationUrl = "https://webhook.site/115e6d94-141f-43b2-965f-db6fd6e18264";

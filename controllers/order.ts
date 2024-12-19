@@ -95,9 +95,9 @@ export async function createOrder(userId: string, additionalInfo?: string): Prom
                     }
                 },
                 back_urls: {
-                    success: `https://e-commerce-smartshop.vercel.app/success/${order.id}`,
-                    pending: `https://e-commerce-smartshop.vercel.app/pending/${order.id}`,
-                    failure: `https://e-commerce-smartshop.vercel.app/failure/${order.id}`
+                    success: `https://e-commerce-smartshop.vercel.app/checkoutStatus/${order.id}`,
+                    pending: `https://e-commerce-smartshop.vercel.app/checkoutStatus/${order.id}`,
+                    failure: `https://e-commerce-smartshop.vercel.app/checkoutStatus/${order.id}`
                 },
                 auto_return: "all",
                 additional_info: additionalInfo,

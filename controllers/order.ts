@@ -1,19 +1,15 @@
-import { createPreference, getMerchantOrderId, getPreference ,getPayment} from "lib/mercadopago"
+import { createPreference, getMerchantOrderId, getPreference, getPayment } from "lib/mercadopago"
 import { Order } from "models/order"
 import { getDataById, resetCart } from "controllers/user"
 import { getDate, getProductsCart, SaveProductsById, getTotalPrice, purchaseAlert, saleAlert } from "utils/orders"
 import { PreferenceGetData } from "mercadopago/dist/clients/preference/get/types"
 import { PaymentGetData } from 'mercadopago/dist/clients/payment/get/types';
 
-type CreateOrderRes = {
-    url: string
-}
-
-if (process.env.NODE_ENV == "development") {
-    var notificationUrl = "https://webhook.site/115e6d94-141f-43b2-965f-db6fd6e18264";
-
-} else if (process.env.NODE_ENV == "production") {
-    var notificationUrl = "https://e-commerce-backend-lake.vercel.app/api/ipn/mercadopago";
+type UrlType = {
+    notification: string;
+    success: string;
+    pending: string;
+    failure: string;
 }
 
 export async function getMyOrders(userId: string) {
@@ -62,7 +58,7 @@ export async function getOrderState(orderId: string) {
 }
 
 
-export async function createOrder(userId: string, additionalInfo?: string): Promise<CreateOrderRes> {
+export async function createOrder({notification,success,pending,failure}:UrlType,userId:string,additionalInfo:string){
     const items = await getProductsCart(userId)
     if (!items) {
         throw new Error("El producto no existe")
@@ -81,6 +77,24 @@ export async function createOrder(userId: string, additionalInfo?: string): Prom
             additionalInfo,
             created: getDate()
         })
+        
+        let notificationUrl:string=notification
+        let successUrl: string=success
+        let pendingUrl: string=pending
+        let failureUrl: string=failure
+
+        if (process.env.NODE_ENV == "development") {
+            notificationUrl = "https://webhook.site/115e6d94-141f-43b2-965f-db6fd6e18264";
+            successUrl = `http://localhost:3000/checkoutStatus/${order.id}?status=success`;
+            pendingUrl = `http://localhost:3000/checkoutStatus/${order.id}?status=pending`;
+            failureUrl = `http://localhost:3000/checkoutStatus/${order.id}?status=failure`;
+        } else if (process.env.NODE_ENV == "production") {
+            notificationUrl = "https://e-commerce-backend-lake.vercel.app/api/ipn/mercadopago";
+            successUrl = `https://e-commerce-smartshop.vercel.app/checkoutStatus/${order.id}?status=success`;
+            pendingUrl = `https://e-commerce-smartshop.vercel.app/checkoutStatus/${order.id}?status=pending`;
+            failureUrl = `https://e-commerce-smartshop.vercel.app/checkoutStatus/${order.id}?status=failure`;
+        }
+
         const pref = await createPreference({
             body:
             {
@@ -95,9 +109,9 @@ export async function createOrder(userId: string, additionalInfo?: string): Prom
                     }
                 },
                 back_urls: {
-                    success: `https://e-commerce-smartshop.vercel.app/checkoutStatus/${order.id}?status=success`,
-                    pending: `https://e-commerce-smartshop.vercel.app/checkoutStatus/${order.id}?status=pending`,
-                    failure: `https://e-commerce-smartshop.vercel.app/checkoutStatus/${order.id}?status=failure`
+                    success: successUrl,
+                    pending: pendingUrl,
+                    failure: failureUrl
                 },
                 auto_return: "all",
                 additional_info: additionalInfo,
@@ -112,6 +126,7 @@ export async function createOrder(userId: string, additionalInfo?: string): Prom
 
         return {
             url: pref.init_point
+            
         }
     } catch (error) {
         console.error("No se pudo crear la preferencia: ", error.message)
@@ -119,9 +134,9 @@ export async function createOrder(userId: string, additionalInfo?: string): Prom
 }
 
 
-export async function getPreferenceById(id:string) {
+export async function getPreferenceById(id: string) {
     try {
-        const response = await getPreference({preferenceId:id})
+        const response = await getPreference({ preferenceId: id })
         if (response) {
             return response
         }
@@ -132,17 +147,17 @@ export async function getPreferenceById(id:string) {
     }
 }
 
-export async function getPaymentById(id:string){
-try {
-    const response=await getPayment({id:id})
-    if(response){
-        return response
+export async function getPaymentById(id: string) {
+    try {
+        const response = await getPayment({ id: id })
+        if (response) {
+            return response
+        }
+        throw new Error(`No se pudo obtener los datos del pago id:${id}`)
+    } catch (error) {
+        console.error("No se pudo obtener el pago", error.message)
+        return []
     }
-    throw new Error(`No se pudo obtener los datos del pago id:${id}`)
-} catch (error) {
-    console.error("No se pudo obtener el pago",error.message)
-    return []
-}
 }
 
 

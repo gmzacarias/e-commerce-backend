@@ -80,20 +80,22 @@ export class Auth {
         }
     }
 
-    static async findByEmailAndCode(email: string, code: number): Promise<Auth | null> {
+    static async findByEmailAndCode(email: string, code: number): Promise<Auth> {
         try {
+            const checkEmail = await collection.where("email", "==", email).get()
+            if (checkEmail.empty) {
+                throw new Error("no se encontro el email en la base de datos")
+            }
             const result = await collection.where("email", "==", email).where("code", "==", code).get()
             if (result.empty) {
-                throw new Error("email y contraseña no coinciden")
-            } else {
-                const doc = result.docs[0]
-                const auth = new Auth(doc.id)
-                auth.data = doc.data() as AuthData
-                console.log("return", auth)
-                return auth
+                throw new Error("el codigo ingresado es incorrecto")
             }
+            const doc = result.docs[0]
+            const auth = new Auth(doc.id)
+            auth.data = doc.data() as AuthData
+            return auth
         } catch (error) {
-            console.error(`no se encontro el user asociado a ${email}:${error.message}`)
+            console.error(`Error al buscar al usuario asociado al ${email}:${error.message}`)
             throw error
         }
     }

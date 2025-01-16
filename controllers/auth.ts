@@ -57,20 +57,15 @@ export async function signIn(email: string, code: number) {
     const cleanEmail = Auth.cleanEmail(email)
     try {
         const auth = await Auth.findByEmailAndCode(cleanEmail, code) as any
-        if (!auth) {
-            throw new Error("No se pudo autorizar el ingreso")
-        } else {
-            const getData = await Auth.getDateExpire(auth.data.email)
-            const isExpires = Auth.checkExpiration(getData)
-            if (isExpires == false) {
-                throw new Error("Codigo Expirado")
-            } else {
-                const token = generate({ userId: auth.data.userId })
-                return token
-            }
+        const getData = await Auth.getDateExpire(auth.data.email) as any
+        const isExpires = Auth.checkExpiration(getData)
+        if (!isExpires) {
+            throw new Error("el codigo ingresado ha expirado")
         }
+        const token = generate({ userId: auth.data.userId })
+        return token
     } catch (error) {
-        console.error("Error al intentar iniciar sesión:", error.message);
+        console.error("Error al iniciar sesión:", error.message);
         throw error
     }
 }

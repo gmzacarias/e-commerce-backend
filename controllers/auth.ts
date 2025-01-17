@@ -2,7 +2,7 @@ import { User } from "models/user"
 import { Auth } from "models/auth"
 import { generate } from "lib/jwt"
 import { sendCodeAuth } from "lib/sendgrid"
-import { addMinutes } from "date-fns"
+import { addMinutes, isAfter } from "date-fns"
 import gen from "random-seed"
 
 const seed = new Date().toISOString();
@@ -41,9 +41,13 @@ export async function sendCode(email: string) {
         const auth = await findCreateAuth(email)
         const code = random.intBetween(10000, 99999)
         const now = new Date()
-        const expirar = addMinutes(now, 30)
+        if(auth.data.code &&auth.data.expire && isAfter(auth.data.expire,now)){
+            await sendCodeAuth(email, auth.data.code)  
+            return true
+        }
+        const expireDate = addMinutes(now, 30)
         auth.data.code = code
-        auth.data.expire = expirar
+        auth.data.expire = expireDate
         await auth.push()
         await sendCodeAuth(email, code)
         return true

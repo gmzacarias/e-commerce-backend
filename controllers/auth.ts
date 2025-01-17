@@ -40,12 +40,16 @@ export async function sendCode(email: string) {
     try {
         const auth = await findCreateAuth(email)
         const code = random.intBetween(10000, 99999)
-        const now = new Date()
-        if(auth.data.code &&auth.data.expire && isAfter(auth.data.expire,now)){
-            await sendCodeAuth(email, auth.data.code)  
+        const currentCode = auth.data.code
+        const currentExpireDate = auth.data.expire
+        const checkExpired = Auth.checkExpiration(currentExpireDate)
+        if (currentCode && currentExpireDate && checkExpired === false) {
+            await sendCodeAuth(email, currentCode)
+            auth.data.expire=Auth.createExpireDate(30)
+            await auth.push()
             return true
         }
-        const expireDate = addMinutes(now, 30)
+        const expireDate = Auth.createExpireDate(30)
         auth.data.code = code
         auth.data.expire = expireDate
         await auth.push()

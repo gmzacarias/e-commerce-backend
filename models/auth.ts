@@ -1,5 +1,5 @@
 import { firestore } from "lib/firestore"
-import { differenceInMinutes, isAfter } from "date-fns"
+import { addMinutes, isAfter } from "date-fns"
 
 interface AuthData {
     email: string,
@@ -28,15 +28,21 @@ export class Auth {
         return email.trim().toLowerCase()
     }
 
+    static createExpireDate(minutes:number): Date {
+        const now = new Date()
+        const expireDate = addMinutes(now, minutes)
+        return expireDate
+    }
+
     static checkExpiration(date): Boolean {
         const currentDate = new Date()
         const { _nanoseconds, _seconds } = date
         const expirationDate = new Date(_seconds * 1000 + Math.floor(_nanoseconds / 1000));
-        const result = differenceInMinutes(currentDate, expirationDate)
-        return result <= 0
+        const result = isAfter(currentDate,expirationDate)
+        return result
     }
 
-    static async getDateExpire(email): Promise<Date | undefined> {
+    static async getDateExpire(email:string): Promise<Date | undefined> {
         try {
             const result = (await this.findByEmail(email)).data
             if (result) {

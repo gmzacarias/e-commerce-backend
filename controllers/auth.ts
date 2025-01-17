@@ -26,7 +26,7 @@ export async function findCreateAuth(email: string): Promise<Auth> {
                 email: cleanEmail,
                 userId: newUser.id,
                 code: 0,
-                expire: new Date()
+                expire: Auth.createExpireDate(30)
             })
             return newAuth
         }

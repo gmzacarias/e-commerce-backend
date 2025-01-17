@@ -1,6 +1,7 @@
 import { firestore } from "lib/firestore"
 import { addMinutes, isAfter } from "date-fns"
 import gen from "random-seed"
+import { generate } from "lib/jwt"
 
 interface AuthData {
     email: string,
@@ -51,7 +52,10 @@ export class Auth {
         return result
     }
 
-
+    static generateToken(userId:string) {
+        const createToken = generate({userId:userId})
+        return createToken
+    }
 
     static async findByEmail(email: string): Promise<Auth | null> {
         try {

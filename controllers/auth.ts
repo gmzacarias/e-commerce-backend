@@ -1,6 +1,6 @@
 import { User } from "models/user"
 import { Auth } from "models/auth"
-import { generate } from "lib/jwt"
+
 import { sendCodeAuth } from "lib/sendgrid"
 
 export async function findCreateAuth(email: string): Promise<Auth> {
@@ -65,7 +65,8 @@ export async function signIn(email: string, code: number) {
         if (isExpires) {
             throw new Error("el codigo ingresado ha expirado")
         }
-        const token = generate({ userId: auth.data.userId })
+        const userId = auth.data.userId
+        const token = Auth.generateToken(userId)
         return token
     } catch (error) {
         console.error("Error al iniciar sesión:", error.message);

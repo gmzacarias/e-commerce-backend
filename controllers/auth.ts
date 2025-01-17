@@ -34,7 +34,7 @@ export async function findCreateAuth(email: string): Promise<Auth> {
 export async function sendCode(email: string) {
     try {
         const auth = await findCreateAuth(email)
-        const code = await Auth.createCode()
+        const code = await Auth.generateCode()
         const currentCode = auth.data.code
         const currentExpireDate = auth.data.expire
         const checkExpired = Auth.checkExpiration(currentExpireDate)

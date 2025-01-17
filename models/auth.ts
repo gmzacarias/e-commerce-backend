@@ -29,7 +29,7 @@ export class Auth {
         return email.trim().toLowerCase()
     }
 
-    static createCode() {
+    static generateCode() {
         const seed = new Date().toISOString();
         let random = gen.create(seed)
         const code = random.intBetween(10000, 99999)
@@ -50,6 +50,8 @@ export class Auth {
         const result = isAfter(currentDate, expirationDate)
         return result
     }
+
+
 
     static async findByEmail(email: string): Promise<Auth | null> {
         try {

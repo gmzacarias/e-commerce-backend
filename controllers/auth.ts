@@ -2,11 +2,6 @@ import { User } from "models/user"
 import { Auth } from "models/auth"
 import { generate } from "lib/jwt"
 import { sendCodeAuth } from "lib/sendgrid"
-import { addMinutes, isAfter } from "date-fns"
-import gen from "random-seed"
-
-const seed = new Date().toISOString();
-let random = gen.create(seed)
 
 export async function findCreateAuth(email: string): Promise<Auth> {
     const cleanEmail = Auth.cleanEmail(email)
@@ -39,13 +34,13 @@ export async function findCreateAuth(email: string): Promise<Auth> {
 export async function sendCode(email: string) {
     try {
         const auth = await findCreateAuth(email)
-        const code = random.intBetween(10000, 99999)
+        const code = await Auth.createCode()
         const currentCode = auth.data.code
         const currentExpireDate = auth.data.expire
         const checkExpired = Auth.checkExpiration(currentExpireDate)
         if (currentCode && currentExpireDate && checkExpired === false) {
             await sendCodeAuth(email, currentCode)
-            auth.data.expire=Auth.createExpireDate(30)
+            auth.data.expire = Auth.createExpireDate(30)
             await auth.push()
             return true
         }

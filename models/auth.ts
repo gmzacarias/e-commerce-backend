@@ -1,5 +1,6 @@
 import { firestore } from "lib/firestore"
 import { addMinutes, isAfter } from "date-fns"
+import gen from "random-seed"
 
 interface AuthData {
     email: string,
@@ -28,7 +29,15 @@ export class Auth {
         return email.trim().toLowerCase()
     }
 
-    static createExpireDate(minutes:number): Date {
+    static createCode() {
+        const seed = new Date().toISOString();
+        let random = gen.create(seed)
+        const code = random.intBetween(10000, 99999)
+        return code
+    }
+
+
+    static createExpireDate(minutes: number): Date {
         const now = new Date()
         const expireDate = addMinutes(now, minutes)
         return expireDate
@@ -38,7 +47,7 @@ export class Auth {
         const currentDate = new Date()
         const { _nanoseconds, _seconds } = date
         const expirationDate = new Date(_seconds * 1000 + Math.floor(_nanoseconds / 1000));
-        const result = isAfter(currentDate,expirationDate)
+        const result = isAfter(currentDate, expirationDate)
         return result
     }
 

@@ -42,21 +42,6 @@ export class Auth {
         return result
     }
 
-    static async getDateExpire(email:string): Promise<Date | undefined> {
-        try {
-            const result = (await this.findByEmail(email)).data
-            if (result) {
-                const dateExpire = result.expire
-                return dateExpire
-            } else {
-                return
-            }
-        } catch (error) {
-            console.error(`no se pudo obtener la fecha de expiracion:${error.message}`)
-            throw error
-        }
-    }
-
     static async findByEmail(email: string): Promise<Auth | null> {
         try {
             const results = await collection.where("email", "==", email).get()

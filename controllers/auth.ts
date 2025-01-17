@@ -65,9 +65,9 @@ export async function signIn(email: string, code: number) {
     const cleanEmail = Auth.cleanEmail(email)
     try {
         const auth = await Auth.findByEmailAndCode(cleanEmail, code) as any
-        const getData = await Auth.getDateExpire(auth.data.email) as any
+        const getData = auth.data.expire
         const isExpires = Auth.checkExpiration(getData)
-        if (!isExpires) {
+        if (isExpires) {
             throw new Error("el codigo ingresado ha expirado")
         }
         const token = generate({ userId: auth.data.userId })

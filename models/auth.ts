@@ -25,18 +25,48 @@ export class Auth {
         return email.trim().toLowerCase()
     }
 
-    static generateCode() {
+    static async generateCode(userId: string) {
         const seed = new Date().toISOString();
         let random = gen.create(seed)
         const code = random.intBetween(10000, 99999)
-        return code
+        try {
+            const result = await collection.where("userId", "==", userId).get()
+            if (result.empty) {
+                throw new Error(`El userId ${userId} no existe`)
+            } else {
+                const auth = new Auth(result.docs[0].id)
+                auth.data = result.docs[0].data() as AuthData
+                auth.data.code = code
+                const currentExpire = auth.data.expire
+                await auth.push()
+                return { code, currentExpire }
+            }
+        } catch (error) {
+            console.error(`Error al guardar el code asociado al ${userId}:${error.message}`)
+            throw error
+        }
     }
 
 
-    static createExpireDate(minutes: number): Date {
+    static async createExpireDate(minutes: number,userId:string) {
         const now = new Date()
         const expireDate = addMinutes(now, minutes)
-        return expireDate
+        try {
+            const result = await collection.where("userId", "==", userId).get()
+            if (result.empty) {
+                throw new Error(`El userId ${userId} no existe`)
+            } else {
+                const auth = new Auth(result.docs[0].id)
+                auth.data = result.docs[0].data() as AuthData
+                const currentCode = auth.data.code
+                auth.data.expire = expireDate
+                await auth.push()
+                return { currentCode, expireDate }
+            }
+        } catch (error) {
+            console.error(`Error al guardar el code asociado al ${userId}:${error.message}`)
+            throw error
+        }
     }
 
     static checkExpiration(date): Boolean {
@@ -58,7 +88,7 @@ export class Auth {
             if (results.docs.length === 1) {
                 const firstResults = results.docs[0]
                 const newAuth = new Auth(firstResults.id)
-                newAuth.data= firstResults.data() as AuthData
+                newAuth.data = firstResults.data() as AuthData
                 return newAuth
             }
             return null
@@ -68,7 +98,7 @@ export class Auth {
         }
     }
 
-    static async createNewAuth(data:AuthData): Promise<Auth> {
+    static async createNewAuth(data: AuthData): Promise<Auth> {
         try {
             const newUserSnap = await collection.add(data)
             const newUser = new Auth(newUserSnap.id)

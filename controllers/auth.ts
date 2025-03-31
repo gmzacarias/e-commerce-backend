@@ -18,7 +18,7 @@ export async function findCreateAuth(email: string): Promise<Auth> {
                 email: cleanEmail,
                 userId: newUser.id,
                 code: 0,
-                expire: Auth.createExpireDate(30)
+                expire: (await Auth.createExpireDate(30, newUser.id)).expireDate
             })
             return newAuth
         }
@@ -32,21 +32,16 @@ export async function findCreateAuth(email: string): Promise<Auth> {
 export async function sendCode(email: string) {
     try {
         const auth = await findCreateAuth(email)
-        const code = await Auth.generateCode()
-        const currentCode = auth.data.code
-        const currentExpireDate = auth.data.expire
-        const checkExpired = Auth.checkExpiration(currentExpireDate)
-        if (currentCode && currentExpireDate && checkExpired === false) {
-            await sendCodeAuth(email, currentCode)
-            auth.data.expire = Auth.createExpireDate(30)
+        const currentData = await Auth.generateCode(auth.data.userId)
+        const checkExpired = Auth.checkExpiration(currentData.currentExpire)
+        if (currentData.code && currentData.currentExpire && checkExpired === false) {
+            await sendCodeAuth(email, currentData.code)
+            await Auth.createExpireDate(30, auth.data.userId)
             await auth.push()
             return true
         }
-        const expireDate = Auth.createExpireDate(30)
-        auth.data.code = code
-        auth.data.expire = expireDate
-        await auth.push()
-        await sendCodeAuth(email, code)
+        const newExpireDate = await Auth.createExpireDate(30, auth.data.userId)
+        await sendCodeAuth(email, newExpireDate.currentCode)
         return true
     } catch (error) {
         console.error(`Error al enviar el mail a ${email}: ${error.message}`);
@@ -57,14 +52,12 @@ export async function sendCode(email: string) {
 export async function signIn(email: string, code: number) {
     const cleanEmail = Auth.cleanEmail(email)
     try {
-        const auth = await Auth.findByEmailAndCode(cleanEmail, code) as any
-        const getData = auth.data.expire
-        const isExpires = Auth.checkExpiration(getData)
+        const auth = await Auth.findByEmailAndCode(cleanEmail, code)
+        const isExpires = Auth.checkExpiration(auth.data.expire)
         if (isExpires) {
             throw new Error("el codigo ingresado ha expirado")
         }
-        const userId = auth.data.userId
-        const token = Auth.generateToken(userId)
+        const token = Auth.generateToken(auth.data.userId)
         return token
     } catch (error) {
         console.error("Error al iniciar sesión:", error.message);

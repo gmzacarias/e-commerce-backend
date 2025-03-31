@@ -16,7 +16,7 @@ export class Auth {
         const snap = await this.ref.get()
         this.data = snap.data() as AuthData
     }
-    
+
     async push() {
         this.ref.update(this.data as Record<string, any>)
     }
@@ -47,29 +47,28 @@ export class Auth {
         return result
     }
 
-    static generateToken(userId:string) {
-        const createToken = generate({userId:userId})
+    static generateToken(userId: string) {
+        const createToken = generate({ userId: userId })
         return createToken
     }
 
     static async findByEmail(email: string): Promise<Auth | null> {
         try {
             const results = await collection.where("email", "==", email).get()
-            if (results.docs.length) {
-                const first = results.docs[0]
-                const newAuth = new Auth(first.id)
-                newAuth.data = first.data() as AuthData
+            if (results.docs.length === 1) {
+                const firstResults = results.docs[0]
+                const newAuth = new Auth(firstResults.id)
+                newAuth.data= firstResults.data() as AuthData
                 return newAuth
-            } else {
-                return null
             }
-        } catch (error) {
-            console.error(`no se encontro un usuario asociado al email ${email} `)
+            return null
+        } catch (error: any) {
+            console.error(`hubo un problema al buscar el ${email}:`, error.message)
             throw error
         }
     }
 
-    static async createNewAuth(data): Promise<Auth> {
+    static async createNewAuth(data:AuthData): Promise<Auth> {
         try {
             const newUserSnap = await collection.add(data)
             const newUser = new Auth(newUserSnap.id)

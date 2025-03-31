@@ -1,15 +1,12 @@
-import { User } from "models/user"
 import { Auth } from "models/auth"
-
+import { User } from "models/user"
 import { sendCodeAuth } from "lib/sendgrid"
 
 export async function findCreateAuth(email: string): Promise<Auth> {
     const cleanEmail = Auth.cleanEmail(email)
     try {
         const auth = await Auth.findByEmail(cleanEmail)
-        if (auth) {
-            return auth
-        } else {
+        if (!auth) {
             const newUser = await User.createNewUser({
                 email: cleanEmail,
                 userName: "",
@@ -25,8 +22,9 @@ export async function findCreateAuth(email: string): Promise<Auth> {
             })
             return newAuth
         }
+        return auth
     } catch (error) {
-        console.error(`error al buscar o crear Auth:${error.message}`);
+        console.error(`error al buscar el email o crear una nueva Auth:${error.message}`);
         throw error
     }
 }

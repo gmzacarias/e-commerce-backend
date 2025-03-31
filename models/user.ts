@@ -1,30 +1,4 @@
-import { add } from "date-fns"
 import { firestore } from "../lib/firestore"
-
-interface ProductData {
-    objectID: string,
-    model: string,
-    colour: string,
-    photo: string,
-    storage: string,
-    frontCamera: string,
-    brand: string,
-    price: number,
-    id: string,
-    android: string,
-    camera: string,
-    ram: string,
-    quantity: number
-    totalPrice: number
-}
-
-interface UserData {
-    email: string,
-    userName: string,
-    phoneNumber: number,
-    address: string,
-    cart: Array<any> | Array<ProductData>,
-}
 
 const collection = firestore.collection("users")
 

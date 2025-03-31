@@ -3,13 +3,6 @@ import { addMinutes, isAfter } from "date-fns"
 import gen from "random-seed"
 import { generate } from "lib/jwt"
 
-interface AuthData {
-    email: string,
-    userId: string,
-    code: number,
-    expire: Date,
-}
-
 const collection = firestore.collection("auth")
 
 export class Auth {
@@ -18,10 +11,12 @@ export class Auth {
     constructor(id) {
         this.ref = collection.doc(id)
     }
+
     async pull() {
         const snap = await this.ref.get()
         this.data = snap.data() as AuthData
     }
+    
     async push() {
         this.ref.update(this.data as Record<string, any>)
     }

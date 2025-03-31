@@ -21,11 +21,11 @@ export class Auth {
         this.ref.update(this.data as Record<string, any>)
     }
 
-    static cleanEmail(email: string) {
+    static cleanEmail(email: string):string {
         return email.trim().toLowerCase()
     }
 
-    static async generateCode(userId: string) {
+    static async generateCode(userId: string): Promise<{ code: number, currentExpire: Date }> {
         const seed = new Date().toISOString();
         let random = gen.create(seed)
         const code = random.intBetween(10000, 99999)
@@ -48,7 +48,7 @@ export class Auth {
     }
 
 
-    static async createExpireDate(minutes: number,userId:string) {
+    static async createExpireDate(minutes: number, userId: string): Promise<{ currentCode: number, expireDate: Date }> {
         const now = new Date()
         const expireDate = addMinutes(now, minutes)
         try {
@@ -77,7 +77,7 @@ export class Auth {
         return result
     }
 
-    static generateToken(userId: string) {
+    static generateToken(userId: string): string {
         const createToken = generate({ userId: userId })
         return createToken
     }
@@ -130,7 +130,7 @@ export class Auth {
         }
     }
 
-    static async updateEmail(userId: string, email: string): Promise<Auth | null> {
+    static async updateEmail(userId: string, email: string): Promise<Auth> {
         const cleanEmail = Auth.cleanEmail(email)
         try {
             const result = await collection.where("userId", "==", userId).get()

@@ -12,62 +12,51 @@ export async function getOrderById(id: string): Promise<any> {
 export async function getDataById(userId: string) {
     try {
         const user = await User.getMyData(userId)
-        if (user) {
-            return user.data
-        } else {
-            throw new Error(`no se pudo obtener la data del user ${userId}`)
-        }
+        return user.data
     } catch (error) {
         console.error(`error al obtener la data del user ${userId}:${error.message}`)
         throw error
     }
 }
 
-export async function updateData(userId: string, newData: any) {
+export async function updateData(userId: string, newData: UserData) {
     try {
         const user = await User.updateMyData(userId, newData)
-        if (user) {
-            if (newData.email) {
-                await Auth.updateEmail(userId, newData.email)
-                const updateUserEmail = user.data
-                return updateUserEmail
-            }
-            const updateUserData = user.data
-            return updateUserData
-        } else {
-            throw new Error(`no se pudo actualizar la data del user ${userId}`)
+        if (newData.email) {
+            await Auth.updateEmail(userId, newData.email)
+            const updateUserEmail = user.data
+            return updateUserEmail
         }
+        const updateUserData = user.data
+        return updateUserData
     } catch (error) {
         console.error(`error al actualizar la data del user ${userId}:${error.message}`)
         throw error
     }
 }
 
-export async function updateSpecifiedData(userId: string, newData: any) {
+export async function updateSpecifiedData(userId: string, newData: UserData) {
     try {
         const user = await User.updateMyData(userId, newData)
         const updateUserData = user.data
-        if (user) {
-            if (newData.email) {
-                await User.updateEmail(userId, newData.email)
-                await Auth.updateEmail(userId, newData.email);
-            }
 
-            if (newData.userName) {
-                await User.updateUserName(userId, newData.userName)
-            }
-
-            if (newData.phoneNumber) {
-                await User.updatePhoneNumber(userId, newData.phoneNumber)
-            }
-
-            if (newData.address) {
-                await User.updateAddress(userId, newData.address)
-            }
-            return updateUserData
-        } else {
-            throw new Error(`no se pudo actualizar la data del user ${userId}`)
+        if (newData.email) {
+            await User.updateEmail(userId, newData.email)
+            await Auth.updateEmail(userId, newData.email);
         }
+
+        if (newData.userName) {
+            await User.updateUserName(userId, newData.userName)
+        }
+
+        if (newData.phoneNumber) {
+            await User.updatePhoneNumber(userId, newData.phoneNumber)
+        }
+
+        if (newData.address) {
+            await User.updateAddress(userId, newData.address)
+        }
+        return updateUserData
     } catch (error) {
         console.error(`error al actualizar la data del user ${userId}:${error.message}`)
         throw error
@@ -78,11 +67,7 @@ export async function updateSpecifiedData(userId: string, newData: any) {
 export async function getCartById(userId: string) {
     try {
         const user = await User.getMyCart(userId)
-        if (user) {
-            return user
-        } else {
-            throw new Error(`no existe carrito de compras del user ${userId}`)
-        }
+        return user
     } catch (error) {
         console.error(`error al obtener la data del carrito de compras del user ${userId}:${error.message}`)
         throw error
@@ -111,16 +96,8 @@ export async function addProductCartById(userId: string, productId: string, quan
 
 export async function deleteProductCartById(userId: string, productId: string) {
     try {
-        const currentCart = await User.getMyCart(userId)
-        for (const findId of currentCart) {
-            if (findId.id === productId) {
-                const deleteProduct = await User.deleteProductCart(userId, productId)
-
-                return deleteProduct
-            } else {
-                throw new Error(`no se pudo eliminar el producto id ${productId}`)
-            }
-        }
+        const deleteProduct = await User.deleteProductCart(userId, productId)
+        return deleteProduct
     } catch (error) {
         console.error(`Error al eliminar un producto del carrito de compras del usuario ${userId}:${error.message}`)
         throw error
@@ -130,11 +107,7 @@ export async function deleteProductCartById(userId: string, productId: string) {
 export async function resetCart(userId: string) {
     try {
         const response = await User.resetProductCart(userId)
-        if (response) {
-            return response
-        } else {
-            throw new Error(`no se pudo resetear el carrito del user ${userId}`)
-        }
+        return response
     } catch (error) {
         console.error(`Error al resetear el carrito de compras del usuario ${userId}:${error.message}`)
         throw error

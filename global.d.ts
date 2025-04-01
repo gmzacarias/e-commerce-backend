@@ -8,11 +8,11 @@ declare global {
     }
 
     interface UserData {
-        email: string,
-        userName: string,
-        phoneNumber: number,
-        address: string,
-        cart: Array<any> | Array<ProductData>,
+        email?: string,
+        userName?: string,
+        phoneNumber?: number,
+        address?: string,
+        cart?: Array<any> | Array<ProductData>,
     }
 
     interface ProductData {

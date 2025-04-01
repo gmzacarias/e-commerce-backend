@@ -1,7 +1,13 @@
 import "dotenv/config"
-import algoliasearch from "algoliasearch"
+import algoliasearch, { SearchClient, SearchIndex } from "algoliasearch"
 
-const applicationId=process.env.APPLICATION_ID
+const applicationId = process.env.APPLICATION_ID
 const adminApiKey = process.env.ADMIN_API_KEY
-const client = algoliasearch(`${applicationId}`, `${adminApiKey}`);
-export const productIndex = client.initIndex("products");
+
+if (!applicationId || !adminApiKey) {
+    throw new Error("faltan credenciales para iniciar el client")
+}
+const client: SearchClient = algoliasearch(`${applicationId}`, `${adminApiKey}`);
+const productIndex: SearchIndex = client.initIndex("products");
+
+export { productIndex }

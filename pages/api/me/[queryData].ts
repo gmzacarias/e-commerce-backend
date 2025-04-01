@@ -6,24 +6,27 @@ import { updateSpecifiedData } from "controllers/user"
 import { validatePatchData, validatePatchSpecifiedData } from "lib/schemaMiddleware"
 
 
-async function patchHandler(req: NextApiRequest, res: NextApiResponse, token) {
+async function patchHandler(req: NextApiRequest, res: NextApiResponse, token: { userId: string }) {
     const { queryData } = req.query as any
     const data = req.body as any
-    if (!token) {
-        res.status(401).send({ message: "No hay token" })
-    } else {
-        try {
-            await validatePatchSpecifiedData(queryData,res)
-            await validatePatchData(req, res)
-            const dataKeys = Object.keys(data).toString();
-            if (queryData !== dataKeys) {
-                throw `No se permite actualizar el dato: ${queryData}`;
-            } else if (data.email || data.userName || data.phoneNumber || data.address) {
-                const dataUser = await updateSpecifiedData(token.userId, data)
-                res.status(200).send({ data: dataUser })
-            }
-        } catch (error) {
-            res.status(400).send({ message: "Error al obtener la data", error: error })
+    try {
+        if (!token) {
+            throw new Error("no hay token")
+        }
+        await validatePatchSpecifiedData(queryData, res)
+        await validatePatchData(req, res)
+        const dataKeys = Object.keys(data).toString();
+        if (queryData !== dataKeys) {
+            throw `No se permite actualizar el dato: ${queryData}`;
+        } else if (data.email || data.userName || data.phoneNumber || data.address) {
+            const dataUser = await updateSpecifiedData(token.userId, data)
+            res.status(200).send({ data: dataUser })
+        }
+    } catch (error) {
+        if (error.message) {
+            res.status(401).send({ message: error.message })
+        } else {
+            res.status(500).send({ message: "Error interno del servidor", error: error })
         }
     }
 }

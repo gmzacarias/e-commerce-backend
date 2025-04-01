@@ -5,39 +5,48 @@ import { authMiddleware } from "lib/middleware"
 import { getDataById, updateData } from "controllers/user"
 import { validatePatchData } from "lib/schemaMiddleware"
 
-async function getHandler(req: NextApiRequest, res: NextApiResponse, token) {
+async function getHandler(req: NextApiRequest, res: NextApiResponse, token: { userId: string }) {
     try {
         if (!token) {
-            res.status(401).send({ message: "No hay token" })
-        } else {
-            const dataUser = await getDataById(token.userId)
-            res.status(200).send({ data: dataUser })
+            throw new Error("no hay token")
         }
+        const dataUser = await getDataById(token.userId)
+        if (!dataUser) {
+            throw new Error("no se encontro el usuario")
+        }
+        res.status(200).send({ data: dataUser })
     } catch (error) {
-        res.status(400).send({ message: "Error al obtener la data", error: error })
+        if (error.message) {
+            res.status(401).send({ message: error.message })
+        } else {
+            res.status(500).send({ message: "Error interno del servidor", error: error })
+        }
     }
 }
 
-async function patchHandler(req: NextApiRequest, res: NextApiResponse, token) {
+async function putHandler(req: NextApiRequest, res: NextApiResponse,token: { userId: string }) {
     const data = req.body
-    if (!token) {
-        res.status(401).send({ message: "No hay token" })
-    } else {
-        try {
-            await validatePatchData(req, res)
-            if (data.email || data.userName || data.phoneNumber||data.address) {
-                await updateData(token.userId,data)
-                res.status(200).send({ message: "Datos actualizados"})
-            }
-        } catch (error) {
-            res.status(400).send({ message: "Error al obtener la data", error: error })
+    try {
+        if (!token) {
+            throw new Error("no hay token")
+        }
+        await validatePatchData(req, res)
+        if (data.email || data.userName || data.phoneNumber || data.address) {
+            await updateData(token.userId, data)
+            res.status(200).send({ message: "Datos actualizados" })
+        }
+    } catch (error) {
+        if (error.message) {
+            res.status(401).send({ message: error.message })
+        } else {
+            res.status(500).send({ message: "Error interno del servidor", error: error })
         }
     }
 }
 
 const handler = method({
     get: getHandler,
-    patch: patchHandler
+    put: putHandler
 })
 
 const authHandler = authMiddleware(handler)

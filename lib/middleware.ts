@@ -1,8 +1,8 @@
 import type { NextApiRequest, NextApiResponse } from "next"
-import { decode } from "lib/jwt"
 import parseToken from "parse-bearer-token"
+import { decode } from "services/jwt"
 
-export function authMiddleware(callback) {
+export function authMiddleware(callback: (arg0: NextApiRequest, arg1: NextApiResponse, arg2: any) => void) {
     return function (req: NextApiRequest, res: NextApiResponse) {
         const token = parseToken(req)
         if (!token) {
@@ -10,7 +10,6 @@ export function authMiddleware(callback) {
         }
         try {
             const decodedToken = decode(token)
-            console.log(decodedToken)
             if (decodedToken) {
                 callback(req, res, decodedToken)
             } else {

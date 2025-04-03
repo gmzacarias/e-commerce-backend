@@ -1,17 +1,10 @@
 import jwt from "jsonwebtoken";
 
-const secret = process.env.JWT_SECRET as string
-
-export function generate(data) {
-    let token = jwt.sign(data, secret);
-    return token
+if (!process.env.JWT_SECRET) {
+    throw new Error("faltan credenciales de JWT en las variables de entorno")
 }
 
-export function decode(token) {
-    try {
-        let decoded = jwt.verify(token, secret);
-        return decoded
-    } catch (error) {
-        return null
-    }
-}
+const secret = process.env.JWT_SECRET
+
+export { jwt, secret }
+

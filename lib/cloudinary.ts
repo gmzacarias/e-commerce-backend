@@ -1,22 +1,13 @@
 import { v2 as cloudinary } from "cloudinary";
 
+if (!process.env.CLOUDINARY_CLOUD || !process.env.CLOUDINARY_API_KEY || !process.env.CLOUDINARY_API_SECRET) {
+  throw new Error("faltan credenciales de Cloudinary en las variables de entorno")
+}
+
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD,
   api_key: process.env.CLOUDINARY_API_KEY,
   api_secret: process.env.CLOUDINARY_API_SECRET
 });
 
-//Cloudinary
-export async function uploadCloudinary(image) {
-  try {
-    const response = await cloudinary.uploader.upload(image,
-      {
-        resource_type: "image",
-        discard_original_filename: true,
-        format: "webp"
-      })
-      return response
-  } catch (error) {
-    throw error
-  }
-}
+export { cloudinary }

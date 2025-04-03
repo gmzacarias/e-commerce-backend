@@ -31,6 +31,20 @@ declare global {
         quantity: number
         totalPrice: number
     }
+
+    interface AirtableData {
+        id: string,
+        brand: string,
+        model: string,
+        android: string,
+        storage: string,
+        ram: string,
+        camera: string,
+        frontCamera: string,
+        colour: string,
+        price: number,
+        photo: number,
+    }
 }
 
 export { }

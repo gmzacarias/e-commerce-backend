@@ -1,6 +1,6 @@
 import { User } from "models/user"
 import { Auth } from "models/auth"
-import { searchProductById } from "./products"
+import { searchProductById } from "services/algolia"
 import { checkCart } from "utils/cart"
 
 export async function getOrderById(id: string): Promise<any> {

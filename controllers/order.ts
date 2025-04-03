@@ -1,9 +1,7 @@
-import { createPreference, getMerchantOrderId, getPreference, getPayment } from "lib/mercadopago"
 import { Order } from "models/order"
 import { getDataById, resetCart } from "controllers/user"
+import { createPreference, getMerchantOrderId, getPreference, getPayment } from "services/mercadopago"
 import { getDate, getProductsCart, SaveProductsById, getTotalPrice, purchaseAlert, saleAlert } from "utils/orders"
-import { PreferenceGetData } from "mercadopago/dist/clients/preference/get/types"
-import { PaymentGetData } from 'mercadopago/dist/clients/payment/get/types';
 
 type UrlType = {
     notification: string;

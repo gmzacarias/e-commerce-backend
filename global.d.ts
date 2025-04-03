@@ -1,5 +1,5 @@
 declare global {
-    
+
     interface AuthData {
         email: string,
         userId: string,
@@ -31,19 +31,24 @@ declare global {
         quantity: number
         totalPrice: number
     }
-
     interface AirtableData {
-        id: string,
-        brand: string,
-        model: string,
-        android: string,
-        storage: string,
-        ram: string,
-        camera: string,
-        frontCamera: string,
-        colour: string,
-        price: number,
-        photo: number,
+        android: string;
+        brand: string;
+        camera: string;
+        colour: string;
+        frontCamera: string;
+        id: string;
+        model: string;
+        photo: string;
+        price: number;
+        ram: string;
+        storage: string;
+    }
+
+    interface AlgoliaData extends AirtableData {
+        objectID: string,
+        quantity: string,
+        totalPrice: number
     }
 }
 

@@ -8,7 +8,7 @@ async function getHandler(req: NextApiRequest, res: NextApiResponse) {
     const preferenceId = req.query.preferenceId as string
     try {
         const response = await getPreferenceById(preferenceId)
-        res.send(response)
+        res.status(200).send(response)
     } catch (error) {
         if (error.message) {
             res.status(400).send({ message: error.message })

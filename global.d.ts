@@ -4,7 +4,7 @@ declare global {
         email: string,
         userId: string,
         code: number,
-        expire: Date,
+        expire: FirestoreTimestamp | Date,
     }
 
     interface UserData {
@@ -71,15 +71,20 @@ declare global {
         photo: string,
     }
 
-    interface ItemsData{
-        id:string,
-        title:string,
-        description:string,
-        picture_url:string,
-        category_id:string,
-        quantity:number,
-        currency_id:string,
-        unit_price:number
+    interface ItemsData {
+        id: string,
+        title: string,
+        description: string,
+        picture_url: string,
+        category_id: string,
+        quantity: number,
+        currency_id: string,
+        unit_price: number
+    }
+
+    interface FirestoreTimestamp {
+        _nanoseconds: number,
+        _seconds: number
     }
 }
 

@@ -70,12 +70,11 @@ export class Auth {
         }
     }
 
-    static checkExpiration(date: FirebaseTimestamp): Boolean {
+    static checkExpiration(date): Boolean {
         const currentDate = new Date()
         const { _nanoseconds, _seconds } = date
-        const expirationDate = new Date(_seconds * 1000 + Math.floor(_nanoseconds / 1000));
-        const result = isAfter(currentDate, expirationDate)
-        return result
+        const expirationDate = new Date(_seconds * 1000 + Math.floor(_nanoseconds / 1000000))
+        return isAfter(currentDate, expirationDate)
     }
 
     static generateToken(userId: string): string {

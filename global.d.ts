@@ -81,12 +81,6 @@ declare global {
         currency_id:string,
         unit_price:number
     }
-
-    interface FirebaseTimestamp {
-        _seconds: number;
-        _nanoseconds: number;
-      }
-      
 }
 
 export { }

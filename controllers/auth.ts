@@ -1,6 +1,6 @@
 import { Auth } from "models/auth"
 import { User } from "models/user"
-import { sendCodeAuth } from "lib/sendgrid"
+import { sendCodeAuth } from "services/sendgrid"
 
 export async function findCreateAuth(email: string): Promise<Auth> {
     const cleanEmail = Auth.cleanEmail(email)

@@ -1,7 +1,7 @@
 import { firestore } from "lib/firestore"
-import { generate } from "services/jwt"
 import gen from "random-seed"
 import { addMinutes, isAfter } from "date-fns"
+import { generate } from "services/jwt"
 
 const collection = firestore.collection("auth")
 
@@ -26,52 +26,25 @@ export class Auth {
         return email.trim().toLowerCase()
     }
 
-    static async generateCode(userId: string): Promise<{ code: number, currentExpire: Date }> {
+    static generateCode(): number {
         const seed = new Date().toISOString();
         let random = gen.create(seed)
         const code = random.intBetween(10000, 99999)
-        try {
-            const result = await collection.where("userId", "==", userId).get()
-            if (result.empty) {
-                throw new Error(`El userId ${userId} no existe`)
-            } else {
-                const auth = new Auth(result.docs[0].id)
-                auth.data = result.docs[0].data() as AuthData
-                auth.data.code = code
-                const currentExpire = auth.data.expire
-                await auth.push()
-                return { code, currentExpire }
-            }
-        } catch (error) {
-            console.error(`Error al guardar el code asociado al ${userId}:${error.message}`)
-            throw error
-        }
+        return code
     }
 
 
-    static async createExpireDate(minutes: number, userId: string): Promise<{ currentCode: number, expireDate: Date }> {
+    static createExpireDate(minutes: number): Date {
         const now = new Date()
         const expireDate = addMinutes(now, minutes)
-        try {
-            const result = await collection.where("userId", "==", userId).get()
-            if (result.empty) {
-                throw new Error(`El userId ${userId} no existe`)
-            } else {
-                const auth = new Auth(result.docs[0].id)
-                auth.data = result.docs[0].data() as AuthData
-                const currentCode = auth.data.code
-                auth.data.expire = expireDate
-                await auth.push()
-                return { currentCode, expireDate }
-            }
-        } catch (error) {
-            console.error(`Error al guardar el code asociado al ${userId}:${error.message}`)
-            throw error
-        }
+        return expireDate
     }
 
-    static checkExpiration(date): Boolean {
+    static checkExpiration(date: FirestoreTimestamp | Date): Boolean {
         const currentDate = new Date()
+        if (date instanceof Date) {
+            return isAfter(currentDate, date)
+        }
         const { _nanoseconds, _seconds } = date
         const expirationDate = new Date(_seconds * 1000 + Math.floor(_nanoseconds / 1000000))
         return isAfter(currentDate, expirationDate)
@@ -82,15 +55,15 @@ export class Auth {
         return createToken
     }
 
-    static async findByEmail(email: string): Promise<Auth> {
+    static async findByEmail(email: string): Promise<Auth | null> {
         try {
-            const checkEmail = await collection.where("email", "==", email).get()
-            if (checkEmail.empty) {
-                throw new Error(`el ${email} no existe`)
+            const querySnapshot = await collection.where("email", "==", email).get()
+            if (querySnapshot.docs.length !== 1) {
+                return null
             }
-            const firstResults = checkEmail.docs[0]
-            const newAuth = new Auth(firstResults.id)
-            newAuth.data = firstResults.data() as AuthData
+            const doc = querySnapshot.docs[0]
+            const newAuth = new Auth(doc.id)
+            newAuth.data = doc.data() as AuthData
             return newAuth
         } catch (error) {
             console.error(`hubo un problema al buscar el ${email}:`, error.message)
@@ -112,15 +85,11 @@ export class Auth {
 
     static async findByEmailAndCode(email: string, code: number): Promise<Auth> {
         try {
-            const checkEmail = await collection.where("email", "==", email).get()
-            if (checkEmail.empty) {
-                throw new Error(`el ${email} no existe`)
-            }
-            const checkEmailAndCode = await collection.where("email", "==", email).where("code", "==", code).get()
-            if (checkEmailAndCode.empty) {
+            const querySnapshot = await collection.where("email", "==", email).where("code", "==", code).get()
+            if (querySnapshot.empty) {
                 throw new Error("el codigo ingresado es incorrecto")
             }
-            const doc = checkEmailAndCode.docs[0]
+            const doc = querySnapshot.docs[0]
             const auth = new Auth(doc.id)
             auth.data = doc.data() as AuthData
             return auth
@@ -147,4 +116,26 @@ export class Auth {
             throw error
         }
     }
+
+    static async updateCodeAndExpire(userId: string, code?: number, expire?: Date) {
+        try {
+            const querySnapshot = await collection.where("userId", "==", userId).get()
+            if (querySnapshot.docs.length !== 1) {
+                return null
+            }
+            const doc = querySnapshot.docs[0]
+            const auth = new Auth(doc.id)
+            auth.data = doc.data() as AuthData
+            auth.data.code = code
+            auth.data.expire = expire
+            await auth.push()
+            return auth
+        } catch (error) {
+            console.error(`no se pudo actualizar el code y/o expire:${error.message}`)
+            throw error
+        }
+    }
 }
+
+
+

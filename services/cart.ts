@@ -1,6 +1,6 @@
 import { getCartById } from "controllers/user";
 
-export async function getCartTotalPrice(userId: string) {
+export async function getCartTotalPrice(userId: string):Promise<number> {
     try {
         const products = await getCartById(userId);
         const totalPrice = products.reduce((total, product) => {

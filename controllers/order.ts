@@ -1,70 +1,34 @@
 import { Order } from "models/order"
 import { getDataById, resetCart } from "controllers/user"
 import { createPreference, getMerchantOrderId, getPreference, getPayment } from "services/mercadopago"
-import { getDate, getProductsCart, SaveProductsById, getTotalPrice, purchaseAlert, saleAlert } from "utils/orders"
+import { getDate } from "utils/getDate"
+import { createItemsCart, getCartTotalPrice, prepareProductsToCart } from "services/cart"
+import { purchaseAlert, saleAlert } from "services/sendgrid"
 
-type UrlType = {
-    notification: string;
-    success: string;
-    pending: string;
-    failure: string;
-}
-
-export async function getMyOrders(userId: string) {
+export async function getMyOrders(userId: string): Promise<Order[]> {
     try {
         const orders = await Order.getOrders(userId)
-        // console.log(orders)
-        if (orders) {
-            return orders
-        } else {
-            throw new Error("No se pudo obtener las ordenes")
-        }
+        return orders
     } catch (error) {
-        console.error("Ordenes del usuario", error.message)
-        return null
+        console.error(`error al obtener la order del user ${userId}:${error.message}`)
+        throw error
     }
 }
 
-export async function getOrderDataById(orderId: string) {
+export async function getOrderDataById(orderId: string): Promise<Order> {
     try {
         const order = await Order.getOrderById(orderId)
-        // console.log(orders)
-        if (order) {
-            return order
-        } else {
-            throw new Error("No se pudo obtener las ordenes")
-        }
+        return order
     } catch (error) {
-        console.error("Ordenes del usuario", error.message)
-        return null
+        console.error(`error al obtener la order ${orderId}:${error.message}`)
+        throw error
     }
 }
 
-export async function getOrderState(orderId: string) {
+export async function createOrder(userId: string, additionalInfo: string,): Promise<{ url: string }> {
     try {
-        const orders = await Order.getOrderById(orderId)
-        // console.log(orders)
-        if (orders) {
-            return orders
-        } else {
-            throw new Error("No se pudo obtener las ordenes")
-        }
-    } catch (error) {
-        console.error("Ordenes del usuario", error.message)
-        return null
-    }
-}
-
-
-export async function createOrder(userId:string,additionalInfo:string,){
-    const items = await getProductsCart(userId)
-    if (!items) {
-        throw new Error("El producto no existe")
-    }
-    try {
-        const dataUser = await getDataById(userId)
-        const productIds = await SaveProductsById(userId)
-        const totalPrice = await getTotalPrice(userId)
+        const productIds = await prepareProductsToCart(userId)
+        const totalPrice = await getCartTotalPrice(userId)
         const order = await Order.createNewOrder({
             id: "",
             userId: userId,
@@ -75,8 +39,8 @@ export async function createOrder(userId:string,additionalInfo:string,){
             additionalInfo,
             created: getDate()
         })
-        
-        let notificationUrl:string
+
+        let notificationUrl: string
         let successUrl: string
         let pendingUrl: string
         let failureUrl: string
@@ -92,7 +56,10 @@ export async function createOrder(userId:string,additionalInfo:string,){
             pendingUrl = `https://e-commerce-smartshop.vercel.app/checkoutStatus/${order.id}?status=pending`;
             failureUrl = `https://e-commerce-smartshop.vercel.app/checkoutStatus/${order.id}?status=failure`;
         }
-
+        const [items, dataUser] = await Promise.all([
+            createItemsCart(userId),
+            getDataById(userId),
+        ])
         const pref = await createPreference({
             body:
             {
@@ -118,16 +85,36 @@ export async function createOrder(userId:string,additionalInfo:string,){
         })
 
         const orderUrl = pref.init_point
-        const setUrl = await Order.setOrderIdAndUrl(order.id, orderUrl)
-        // console.log("newUrl", setUrl)
+        await Order.setOrderIdAndUrl(order.id, orderUrl)
         await resetCart(userId)
 
         return {
             url: pref.init_point
-            
+
         }
     } catch (error) {
         console.error("No se pudo crear la preferencia: ", error.message)
+    }
+}
+
+export async function handlePaidMerchantOrder(topic: string, id: String): Promise<OrderData> {
+    if (topic === "merchant_order") return
+    try {
+        const { order_status, external_reference } = await getMerchantOrderId({ merchantOrderId: id as string })
+        if (order_status !== "paid") return
+        const myOrder = await Order.updateStatusOrder(external_reference)
+        const { userId, totalPrice } = myOrder.data
+        const user = await getDataById(userId)
+        const { email, userName } = user
+        await Promise.all([
+            purchaseAlert(email, userName, external_reference),
+            saleAlert(userId, external_reference, totalPrice),
+            resetCart(userId),
+        ])
+        return myOrder.data
+    } catch (error) {
+        console.error("No se pudo obtener el estado de la orden: ", error.message)
+        throw error
     }
 }
 
@@ -155,36 +142,5 @@ export async function getPaymentById(id: string) {
     } catch (error) {
         console.error("No se pudo obtener el pago", error.message)
         return []
-    }
-}
-
-
-
-export async function updateStatusOrder(topic: string, id: String) {
-    if (topic === "merchant_order") {
-        const order = await getMerchantOrderId({ merchantOrderId: id as string })
-        // console.log("order", order.order_status)
-        // console.log("status", order.order_status === "paid")
-        const orderStatus = order.order_status
-        if (orderStatus === "paid") {
-            try {
-                const orderId = order.external_reference
-                const myOrder = new Order(orderId)
-                await myOrder.pull()
-                const userId = myOrder.data.userId
-                // console.log(myOrder.data.status)
-                myOrder.data.status = "closed"
-                await myOrder.push()
-                // console.log(myOrder.data.status)
-                const user = await getDataById(userId)
-                await purchaseAlert(user.email, user.userName, orderId)
-                await saleAlert(userId, orderId, myOrder.data.totalPrice)
-                await resetCart(userId)
-                return myOrder.data
-            } catch (error) {
-                console.error("No se pudo obtener el estado de la orden: ", error.message)
-            }
-            return
-        }
     }
 }

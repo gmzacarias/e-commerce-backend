@@ -12,7 +12,18 @@ declare global {
         userName?: string,
         phoneNumber?: number,
         address?: string,
-        cart?: Array<any> | Array<ProductData>,
+        cart?: ProductData[],
+    }
+
+    interface OrderData {
+        userId: string,
+        products: ProductsCart[],
+        status: string,
+        totalPrice: number,
+        additionalInfo: string,
+        url: string,
+        id: string,
+        created: string,
     }
 
     interface ProductData {
@@ -31,6 +42,7 @@ declare global {
         quantity: number
         totalPrice: number
     }
+
     interface AirtableData {
         android: string;
         brand: string;
@@ -50,6 +62,26 @@ declare global {
         quantity: string,
         totalPrice: number
     }
+
+    interface ProductsCart {
+        productId: string,
+        brand: string,
+        model: string,
+        colour: string,
+        photo: string,
+    }
+
+    interface ItemsData{
+        id:string,
+        title:string,
+        description:string,
+        picture_url:string,
+        category_id:string,
+        quantity:number,
+        currency_id:string,
+        unit_price:number
+    }
+
 }
 
 export { }

@@ -66,8 +66,12 @@ export class Order {
         }
     }
 
-    static async getOrderById(orderId: string): Promise<Order> {
+    static async getOrderById(userId: string, orderId: string): Promise<Order> {
         try {
+            const checkUserId = await collection.where('userId', '==', userId).get();
+            if (checkUserId.empty) {
+                throw new Error("No existen órdenes para este usuario");
+            }
             const { id, data } = await this.getOrderDoc(orderId)
             const orderFound = new Order(id)
             orderFound.data = data
@@ -78,8 +82,12 @@ export class Order {
         }
     }
 
-    static async setOrderIdAndUrl(orderId: string, url: string): Promise<Order> {
+    static async setOrderIdAndUrl(userId:string,orderId: string, url: string): Promise<Order> {
         try {
+            const checkUserId = await collection.where('userId', '==', userId).get();
+            if (checkUserId.empty) {
+                throw new Error("No existen órdenes para este usuario");
+            }
             const { id, data } = await this.getOrderDoc(orderId)
             const orderFound = new Order(id)
             orderFound.data = data
@@ -93,8 +101,12 @@ export class Order {
         }
     }
 
-    static async updateStatusOrder(orderId: string):Promise<Order>{
+    static async updateStatusOrder(userId:string,orderId: string): Promise<Order> {
         try {
+            const checkUserId = await collection.where('userId', '==', userId).get();
+            if (checkUserId.empty) {
+                throw new Error("No existen órdenes para este usuario");
+            }
             const myOrder = new Order(orderId)
             await myOrder.pull()
             if (!myOrder.data) {

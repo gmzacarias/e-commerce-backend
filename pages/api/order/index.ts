@@ -8,12 +8,15 @@ import { validateBodyCreateOrder } from "lib/schemaMiddleware"
 async function postHandler(req: NextApiRequest, res: NextApiResponse, token) {
     const { additionalInfo } = req.body
     try {
-        // console.log(additionalInfo)
         await validateBodyCreateOrder(req, res)
         const response = await createOrder(token.userId, additionalInfo)
         res.send(response)
     } catch (error) {
-        res.status(400).send({ message: error })
+        if (error.message) {
+            res.status(400).send({ message: error.message })
+        } else {
+            res.status(500).send({ message: "Error interno del servidor", error: error })
+        }
     }
 }
 

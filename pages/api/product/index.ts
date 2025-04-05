@@ -1,13 +1,12 @@
 import type { NextApiRequest, NextApiResponse } from "next"
 import method from "micro-method-router"
 import { handlerCORS } from "lib/corsMiddleware"
-import { GetProducts} from "controllers/products"
+import { GetMoreExpensiveProducts} from "services/algolia"
 
 
 async function getHandler(req: NextApiRequest, res: NextApiResponse) {
-
     try {
-        const response = await GetProducts()
+        const response = await GetMoreExpensiveProducts()
         res.status(200).send(response)
     } catch (error) {
         if (error.message) {

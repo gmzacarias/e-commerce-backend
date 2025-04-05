@@ -1,17 +1,14 @@
 import type { NextApiRequest, NextApiResponse } from "next"
-import method from "micro-method-router" 
+import method from "micro-method-router"
 import { handlerCORS } from "lib/corsMiddleware"
 import { authMiddleware } from "lib/middleware"
-import {  getPaymentById} from "controllers/order"
-import { validateBodyCreateOrder } from "lib/schemaMiddleware"
+import { getPaymentById } from "controllers/order"
 
 async function getHandler(req: NextApiRequest, res: NextApiResponse) {
-    const { paymentId } = req.query as any
+    const paymentId = req.query.paymentId as string
     try {
-       console.log("paymentid",paymentId)
-        // await validateBodyCreateOrder(req, res)
         const response = await getPaymentById(paymentId)
-        res.send(response)
+        res.status(200).send({ data: response })
     } catch (error) {
         if (error.message) {
             res.status(400).send({ message: error.message })

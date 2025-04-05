@@ -1,16 +1,20 @@
 import type { NextApiRequest, NextApiResponse } from "next"
 import method from "micro-method-router"
 import { handlerCORS } from "lib/corsMiddleware"
-import { updateStatusOrder } from "controllers/order"
+import { handlePaidMerchantOrder } from "controllers/order"
 
 async function postHandler(req: NextApiRequest, res: NextApiResponse) {
-    const { topic, id } = req.query as any
+    const topic = req.query.topic as string
+    const id = req.query.id as string
     try {
-        await updateStatusOrder(topic, id)
+        await handlePaidMerchantOrder(topic, id)
         res.send({ message: "Compra exitosa" })
-    }
-    catch (error) {
-        res.status(400).send({ message: error })
+    } catch (error) {
+        if (error.message) {
+            res.status(400).send({ message: error.message })
+        } else {
+            res.status(500).send({ message: "Error interno del servidor", error: error })
+        }
     }
 }
 

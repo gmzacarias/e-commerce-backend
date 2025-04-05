@@ -1,11 +1,11 @@
 import type { NextApiRequest, NextApiResponse } from "next"
 import method from "micro-method-router"
 import { handlerCORS } from "lib/corsMiddleware"
-import { searchProductById } from "controllers/products"
 import { validateQuerySearchProductId } from "lib/schemaMiddleware"
+import { searchProductById } from "services/algolia"
 
 async function getHandler(req: NextApiRequest, res: NextApiResponse) {
-    const { productId } = req.query as any
+    const productId = req.query.productId as string
     try {
         await validateQuerySearchProductId(req, res)
         const product = await searchProductById(productId)

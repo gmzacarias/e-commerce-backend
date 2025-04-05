@@ -1,15 +1,15 @@
 import { firestore } from "lib/firestore"
-import { addMinutes, isAfter } from "date-fns"
+import { generate } from "services/jwt"
 import gen from "random-seed"
-import { generate } from "lib/jwt"
+import { addMinutes, isAfter } from "date-fns"
 
 const collection = firestore.collection("auth")
 
 export class Auth {
     ref: FirebaseFirestore.DocumentReference
     data: AuthData
-    id:string
-    constructor(id:string) {
+    id: string
+    constructor(id: string) {
         this.ref = collection.doc(id)
     }
 
@@ -22,7 +22,7 @@ export class Auth {
         this.ref.update(this.data as Record<string, any>)
     }
 
-    static cleanEmail(email: string):string {
+    static cleanEmail(email: string): string {
         return email.trim().toLowerCase()
     }
 
@@ -70,7 +70,7 @@ export class Auth {
         }
     }
 
-    static checkExpiration(date): Boolean {
+    static checkExpiration(date: FirebaseTimestamp): Boolean {
         const currentDate = new Date()
         const { _nanoseconds, _seconds } = date
         const expirationDate = new Date(_seconds * 1000 + Math.floor(_nanoseconds / 1000));
@@ -83,17 +83,17 @@ export class Auth {
         return createToken
     }
 
-    static async findByEmail(email: string): Promise<Auth | null> {
+    static async findByEmail(email: string): Promise<Auth> {
         try {
-            const results = await collection.where("email", "==", email).get()
-            if (results.docs.length === 1) {
-                const firstResults = results.docs[0]
-                const newAuth = new Auth(firstResults.id)
-                newAuth.data = firstResults.data() as AuthData
-                return newAuth
+            const checkEmail = await collection.where("email", "==", email).get()
+            if (checkEmail.empty) {
+                throw new Error(`el ${email} no existe`)
             }
-            return null
-        } catch (error: any) {
+            const firstResults = checkEmail.docs[0]
+            const newAuth = new Auth(firstResults.id)
+            newAuth.data = firstResults.data() as AuthData
+            return newAuth
+        } catch (error) {
             console.error(`hubo un problema al buscar el ${email}:`, error.message)
             throw error
         }
@@ -115,13 +115,13 @@ export class Auth {
         try {
             const checkEmail = await collection.where("email", "==", email).get()
             if (checkEmail.empty) {
-                throw new Error("no se encontro el email en la base de datos")
+                throw new Error(`el ${email} no existe`)
             }
-            const result = await collection.where("email", "==", email).where("code", "==", code).get()
-            if (result.empty) {
+            const checkEmailAndCode = await collection.where("email", "==", email).where("code", "==", code).get()
+            if (checkEmailAndCode.empty) {
                 throw new Error("el codigo ingresado es incorrecto")
             }
-            const doc = result.docs[0]
+            const doc = checkEmailAndCode.docs[0]
             const auth = new Auth(doc.id)
             auth.data = doc.data() as AuthData
             return auth
@@ -137,13 +137,12 @@ export class Auth {
             const result = await collection.where("userId", "==", userId).get()
             if (result.empty) {
                 throw new Error(`El userId ${userId} no existe`)
-            } else {
-                const auth = new Auth(result.docs[0].id)
-                auth.data = result.docs[0].data() as AuthData
-                auth.data.email = cleanEmail
-                await auth.push()
-                return auth
             }
+            const auth = new Auth(result.docs[0].id)
+            auth.data = result.docs[0].data() as AuthData
+            auth.data.email = cleanEmail
+            await auth.push()
+            return auth
         } catch (error) {
             console.error(`no se pudo actualizar la informacion del userId ${userId}:${error.message}`)
             throw error

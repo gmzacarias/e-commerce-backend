@@ -9,8 +9,8 @@ async function getHandler(req: NextApiRequest, res: NextApiResponse, token: { us
         if (!token) {
             res.status(401).send({ message: "No hay token" })
         }
-        const ordersUser = await getMyOrders(token.userId)
-        res.status(200).send({ data: ordersUser })
+        const ordersData = await getMyOrders(token.userId)
+        res.status(200).send({data:ordersData})
     } catch (error) {
         if (error.message) {
             res.status(400).send({ message: error.message })

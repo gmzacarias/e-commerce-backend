@@ -48,7 +48,7 @@ export class Order {
         }
     }
 
-    static async getOrders(userId: string): Promise<Array<Order>> {
+    static async getOrders(userId: string): Promise<Array<OrderData>> {
         try {
             const ordersSnap = await collection.where('userId', '==', userId).get();
             if (ordersSnap.empty) {
@@ -57,7 +57,7 @@ export class Order {
             const ordersData = ordersSnap.docs.map(doc => {
                 const order = new Order(doc.id)
                 order.data = doc.data() as OrderData
-                return order
+                return order.data
             })
             return ordersData
         } catch (error) {

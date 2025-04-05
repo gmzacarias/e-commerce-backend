@@ -66,7 +66,7 @@ export class Order {
         }
     }
 
-    static async getOrderById(userId: string, orderId: string): Promise<Order> {
+    static async getOrderById(userId: string, orderId: string): Promise<OrderData> {
         try {
             const checkUserId = await collection.where('userId', '==', userId).get();
             if (checkUserId.empty) {
@@ -75,14 +75,14 @@ export class Order {
             const { id, data } = await this.getOrderDoc(orderId)
             const orderFound = new Order(id)
             orderFound.data = data
-            return orderFound
+            return orderFound.data
         } catch (error) {
             console.error("Error al obtener orderes del usuario:", error.message)
             throw error
         }
     }
 
-    static async setOrderIdAndUrl(userId:string,orderId: string, url: string): Promise<Order> {
+    static async setOrderIdAndUrl(userId: string, orderId: string, url: string): Promise<Order> {
         try {
             const checkUserId = await collection.where('userId', '==', userId).get();
             if (checkUserId.empty) {
@@ -101,7 +101,7 @@ export class Order {
         }
     }
 
-    static async updateStatusOrder(userId:string,orderId: string): Promise<Order> {
+    static async updateStatusOrder(userId: string, orderId: string): Promise<Order> {
         try {
             const checkUserId = await collection.where('userId', '==', userId).get();
             if (checkUserId.empty) {

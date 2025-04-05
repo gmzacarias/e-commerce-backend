@@ -1,15 +1,8 @@
 import { User } from "models/user"
 import { Auth } from "models/auth"
 import { searchProductById } from "services/algolia"
-import { checkCart } from "utils/cart"
 
-export async function getOrderById(id: string): Promise<any> {
-    const user = new User(id)
-    await user.pull()
-    return user.data
-}
-
-export async function getDataById(userId: string) {
+export async function getDataById(userId: string): Promise<UserData> {
     try {
         const user = await User.getMyData(userId)
         return user.data
@@ -19,7 +12,7 @@ export async function getDataById(userId: string) {
     }
 }
 
-export async function updateData(userId: string, newData: UserData) {
+export async function updateData(userId: string, newData: UserData): Promise<UserData> {
     try {
         const user = await User.updateMyData(userId, newData)
         if (newData.email) {
@@ -35,7 +28,7 @@ export async function updateData(userId: string, newData: UserData) {
     }
 }
 
-export async function updateSpecifiedData(userId: string, newData: UserData) {
+export async function updateSpecifiedData(userId: string, newData: UserData): Promise<UserData> {
     try {
         const user = await User.updateMyData(userId, newData)
         const updateUserData = user.data
@@ -63,38 +56,44 @@ export async function updateSpecifiedData(userId: string, newData: UserData) {
     }
 }
 
-
-export async function getCartById(userId: string) {
+export async function getCartById(userId: string): Promise<ProductData[]> {
     try {
-        const user = await User.getMyCart(userId)
-        return user
+        const cartData = await User.getMyCart(userId)
+        return cartData
     } catch (error) {
         console.error(`error al obtener la data del carrito de compras del user ${userId}:${error.message}`)
         throw error
     }
 }
 
-export async function addProductCartById(userId: string, productId: string, quantity: number) {
+export async function checkCart(userId: string, productId?: string): Promise<boolean> {
+    try {
+        const cart = await User.getMyCart(userId)
+        const checkId = cart.some(item => item.id === productId)
+        return checkId
+    } catch (error) {
+        console.error(`error al obtener la data del carrito de compras del user ${userId}:${error.message}`)
+        throw error
+    }
+}
+
+export async function addProductCartById(userId: string, productId: string, quantity: number): Promise<boolean> {
     try {
         const product = await searchProductById(productId) as any
-        if (!product) {
-            throw new Error(`no existe el producto ${productId} en el indice`)
-        } else {
-            const verifyCart = await checkCart(userId, productId)
-            if (verifyCart) {
-                const updateProduct = await User.updateQuantityProduct(userId, productId, quantity)
-                return updateProduct
-            }
-            const addProduct = await User.addProductCart(userId, product, quantity)
-            return addProduct
+        const verifyCart = await checkCart(userId, productId)
+        if (verifyCart) {
+            const updateProduct = await User.updateQuantityProduct(userId, productId, quantity)
+            return updateProduct
         }
+        const addProduct = await User.addProductCart(userId, product, quantity)
+        return addProduct
     } catch (error) {
         console.error(`Error al agregar un producto del carrito de compras del usuario ${userId}:${error.message}`)
         throw error
     }
 }
 
-export async function deleteProductCartById(userId: string, productId: string) {
+export async function deleteProductCartById(userId: string, productId: string): Promise<boolean> {
     try {
         const deleteProduct = await User.deleteProductCart(userId, productId)
         return deleteProduct
@@ -104,7 +103,7 @@ export async function deleteProductCartById(userId: string, productId: string) {
     }
 }
 
-export async function resetCart(userId: string) {
+export async function resetCart(userId: string): Promise<Array<any>> {
     try {
         const response = await User.resetProductCart(userId)
         return response
@@ -113,3 +112,6 @@ export async function resetCart(userId: string) {
         throw error
     }
 }
+
+
+

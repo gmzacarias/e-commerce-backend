@@ -31,7 +31,7 @@ export class User {
             };
         } catch (error) {
             console.error(`No se pudo obtener el documento: ${error.message}`);
-            throw error;
+            throw error
         }
     }
 
@@ -131,20 +131,19 @@ export class User {
         }
     }
 
-    static async getMyCart(userId: string): Promise<Array<any> | null> {
+    static async getMyCart(userId: string): Promise<ProductData[]> {
         try {
             const { id, data } = await this.getUserDoc(userId)
             const dataUser = new User(id)
-            dataUser.data = data;
-            return dataUser.data.cart
+            dataUser.data = data
+            return dataUser.data.cart ?? null
         } catch (error) {
             console.error(`error al obtener mi carrito de compras:${error.message}`)
             throw error
         }
     }
 
-
-    static async addProductCart(userId: string, product: ProductData, quantity: number) {
+    static async addProductCart(userId: string, product: ProductData, quantity: number):Promise<boolean> {
         try {
             const { id, data } = await this.getUserDoc(userId)
             const dataUser = new User(id)

@@ -93,4 +93,28 @@ export class Order {
         }
     }
 
+    static async updateStatusOrder(orderId: string):Promise<Order>{
+        try {
+            const myOrder = new Order(orderId)
+            await myOrder.pull()
+            if (!myOrder.data) {
+                throw new Error(`no se encontró la orden:${orderId}`);
+            }
+
+            if (!myOrder.data.userId) {
+                throw new Error(`la orden ${orderId} no contiene userId`)
+            }
+
+            if (myOrder.data.status === "closed") {
+                return myOrder
+            }
+
+            myOrder.data.status = "closed"
+            await myOrder.push()
+            return myOrder
+        } catch (error) {
+            console.error(`no se pudo actualizar el status de la orden:${orderId}`, error.message)
+            throw error
+        }
+    }
 }

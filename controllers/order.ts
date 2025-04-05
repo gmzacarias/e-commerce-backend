@@ -15,9 +15,9 @@ export async function getMyOrders(userId: string): Promise<Order[]> {
     }
 }
 
-export async function getOrderDataById(orderId: string): Promise<Order> {
+export async function getOrderDataById(userId: string, orderId: string): Promise<Order> {
     try {
-        const order = await Order.getOrderById(orderId)
+        const order = await Order.getOrderById(userId, orderId)
         return order
     } catch (error) {
         console.error(`error al obtener la order ${orderId}:${error.message}`)
@@ -85,7 +85,7 @@ export async function createOrder(userId: string, additionalInfo: string,): Prom
         })
 
         const orderUrl = pref.init_point
-        await Order.setOrderIdAndUrl(order.id, orderUrl)
+        await Order.setOrderIdAndUrl(userId,order.id, orderUrl)
         await resetCart(userId)
 
         return {
@@ -97,12 +97,12 @@ export async function createOrder(userId: string, additionalInfo: string,): Prom
     }
 }
 
-export async function handlePaidMerchantOrder(topic: string, id: String): Promise<OrderData> {
+export async function handlePaidMerchantOrder(userIdDB:string,topic: string, id: String): Promise<OrderData> {
     if (topic === "merchant_order") return
     try {
         const { order_status, external_reference } = await getMerchantOrderId({ merchantOrderId: id as string })
         if (order_status !== "paid") return
-        const myOrder = await Order.updateStatusOrder(external_reference)
+        const myOrder = await Order.updateStatusOrder(userIdDB,external_reference)
         const { userId, totalPrice } = myOrder.data
         const user = await getDataById(userId)
         const { email, userName } = user

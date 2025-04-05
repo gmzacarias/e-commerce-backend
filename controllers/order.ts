@@ -5,7 +5,7 @@ import { getDate } from "utils/getDate"
 import { createItemsCart, getCartTotalPrice, prepareProductsToCart } from "services/cart"
 import { purchaseAlert, saleAlert } from "services/sendgrid"
 
-export async function getMyOrders(userId: string): Promise<Order[]> {
+export async function getMyOrders(userId: string): Promise<OrderData[]> {
     try {
         const orders = await Order.getOrders(userId)
         return orders
@@ -15,7 +15,7 @@ export async function getMyOrders(userId: string): Promise<Order[]> {
     }
 }
 
-export async function getOrderDataById(userId: string, orderId: string): Promise<Order> {
+export async function getOrderDataById(userId: string, orderId: string): Promise<OrderData> {
     try {
         const order = await Order.getOrderById(userId, orderId)
         return order
@@ -94,6 +94,7 @@ export async function createOrder(userId: string, additionalInfo: string,): Prom
         }
     } catch (error) {
         console.error("No se pudo crear la preferencia: ", error.message)
+        throw error
     }
 }
 

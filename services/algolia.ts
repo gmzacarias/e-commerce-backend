@@ -5,7 +5,7 @@ import { authAirtable } from "services/airtable"
 import { uploadCloudinary } from "services/cloudinary"
 import { getOffsetAndLimit } from "utils/pagination";
 
-async function mapAirtableToAlgolia(records: AlgoliaData[]){
+async function mapAirtableToAlgolia(records: AlgoliaData[]) {
     return Promise.all(
         records.map(async (record) => {
             if (!record.photo) {
@@ -23,7 +23,7 @@ async function mapAirtableToAlgolia(records: AlgoliaData[]){
     )
 }
 
-export async function getProducts(){
+export async function getProducts() {
     try {
         const response = await authAirtable()
         const productsData = await mapAirtableToAlgolia(response)
@@ -58,9 +58,9 @@ export async function searchProductById(productId: string,) {
 }
 
 
-export async function searchProductsByQuery(req: NextRequest) {
+export async function searchProductsByQuery(req: NextApiRequest) {
     const { offset, limit } = getOffsetAndLimit(req)
-    const q = req.nextUrl.searchParams.get("q") ?? ""
+    const q = req.query.q as string
     try {
         const results = await productIndex.search<AlgoliaData>(q, {
             hitsPerPage: limit,

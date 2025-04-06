@@ -129,13 +129,17 @@ export class Order {
         }
     }
 
-    static async deleteOrder(orderId: string):Promise<boolean> {
+    static async deleteOrder(userId:string,orderId: string):Promise<boolean> {
         try {
+            const {data}= await this.getOrderDoc(orderId)
+            if (data.userId !== userId){
+                throw new Error(`no tenes los permisos para eliminar esta orden`)
+            }
             const checkOrderId = await collection.where('id', '==', orderId).get();
             if (checkOrderId.empty) {
-                throw new Error(`no existe esta orderId:${orderId}`);
+                throw new Error(`no existe esta orderId:${orderId}`)
             }
-            await collection.doc(orderId).delete();
+            await collection.doc(data.id).delete();
             return true
         } catch (error) {
             console.error(`no se pudo eliminar la orden:${orderId}`, error.message)

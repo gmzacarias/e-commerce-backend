@@ -85,7 +85,7 @@ export async function createOrder(userId: string, additionalInfo: string,): Prom
         })
 
         const orderUrl = pref.init_point
-        await Order.setOrderIdAndUrl(userId,order.id, orderUrl)
+        await Order.setOrderIdAndUrl(userId, order.id, orderUrl)
         await resetCart(userId)
 
         return {
@@ -98,12 +98,22 @@ export async function createOrder(userId: string, additionalInfo: string,): Prom
     }
 }
 
-export async function handlePaidMerchantOrder(userIdDB:string,topic: string, id: String): Promise<OrderData> {
+export async function deleteOrderById(orderId: string): Promise<boolean> {
+    try {
+        const deleteDocumentById = await Order.deleteOrder(orderId)
+        return deleteDocumentById
+    } catch (error) {
+        console.error("no se pudo eliminar el documento:", error.message)
+        throw error
+    }
+}
+
+export async function handlePaidMerchantOrder(userIdDB: string, topic: string, id: String): Promise<OrderData> {
     if (topic === "merchant_order") return
     try {
         const { order_status, external_reference } = await getMerchantOrderId({ merchantOrderId: id as string })
         if (order_status !== "paid") return
-        const myOrder = await Order.updateStatusOrder(userIdDB,external_reference)
+        const myOrder = await Order.updateStatusOrder(userIdDB, external_reference)
         const { userId, totalPrice } = myOrder.data
         const user = await getDataById(userId)
         const { email, userName } = user
@@ -144,4 +154,8 @@ export async function getPaymentById(id: string) {
         console.error("No se pudo obtener el pago", error.message)
         return []
     }
+}
+
+function deleteOrder(orderId: string) {
+    throw new Error("Function not implemented.")
 }

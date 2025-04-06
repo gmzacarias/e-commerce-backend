@@ -120,7 +120,6 @@ export class Order {
             if (myOrder.data.status === "closed") {
                 return myOrder
             }
-
             myOrder.data.status = "closed"
             await myOrder.push()
             return myOrder
@@ -129,4 +128,19 @@ export class Order {
             throw error
         }
     }
+
+    static async deleteOrder(orderId: string):Promise<boolean> {
+        try {
+            const checkOrderId = await collection.where('id', '==', orderId).get();
+            if (checkOrderId.empty) {
+                throw new Error(`no existe esta orderId:${orderId}`);
+            }
+            await collection.doc(orderId).delete();
+            return true
+        } catch (error) {
+            console.error(`no se pudo eliminar la orden:${orderId}`, error.message)
+            throw error
+        }
+    }
+
 }

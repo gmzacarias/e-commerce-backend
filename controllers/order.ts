@@ -98,9 +98,9 @@ export async function createOrder(userId: string, additionalInfo: string,): Prom
     }
 }
 
-export async function deleteOrderById(orderId: string): Promise<boolean> {
+export async function deleteOrderById(userId: string, orderId: string): Promise<boolean> {
     try {
-        const deleteDocumentById = await Order.deleteOrder(orderId)
+        const deleteDocumentById = await Order.deleteOrder(userId, orderId)
         return deleteDocumentById
     } catch (error) {
         console.error("no se pudo eliminar el documento:", error.message)

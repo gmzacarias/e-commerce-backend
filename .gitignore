@@ -3,3 +3,6 @@
 .env.test
 .env.local
 node_modules
+.yarn/*
+!.yarn/releases
+!.yarn/plugins

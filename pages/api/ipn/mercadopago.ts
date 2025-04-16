@@ -4,15 +4,15 @@ import { handlerCORS } from "lib/corsMiddleware"
 import { handlePaidMerchantOrder } from "controllers/order"
 import { authMiddleware } from "lib/middleware"
 
-async function postHandler(req: NextApiRequest, res: NextApiResponse,token:{userId:string}) {
+async function postHandler(req: NextApiRequest, res: NextApiResponse, token: { userId: string }) {
     const topic = req.query.topic as string
     const id = req.query.id as string
     try {
         if (!token) {
             throw new Error("no hay token")
         }
-        await handlePaidMerchantOrder(token.userId,topic, id)
-        res.send({ message: "Compra exitosa" })
+        await handlePaidMerchantOrder(token.userId, topic, id)
+        res.status(200).send({ message: "Compra exitosa" })
     } catch (error) {
         if (error.message) {
             res.status(400).send({ message: error.message })

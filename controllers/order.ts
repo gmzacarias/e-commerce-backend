@@ -4,6 +4,7 @@ import { createPreference, getMerchantOrderId, getPreference, getPayment } from 
 import { getDate } from "utils/getDate"
 import { createItemsCart, getCartTotalPrice, prepareProductsToCart } from "services/cart"
 import { purchaseAlert, saleAlert } from "services/sendgrid"
+import { getNgrokUrl } from "services/ngrok"
 
 export async function getMyOrders(userId: string): Promise<OrderData[]> {
     try {
@@ -39,14 +40,14 @@ export async function createOrder(userId: string, additionalInfo: string,): Prom
             additionalInfo,
             created: getDate()
         })
-
+        const currentNgrokUrl = await getNgrokUrl()
         let notificationUrl: string
         let successUrl: string
         let pendingUrl: string
         let failureUrl: string
 
         if (process.env.NODE_ENV == "development") {
-            notificationUrl = "https://webhook.site/115e6d94-141f-43b2-965f-db6fd6e18264";
+            notificationUrl = `${currentNgrokUrl}/api/ipn/mercadopago`;
             successUrl = `http://localhost:3000/checkoutStatus/${order.id}?status=success`;
             pendingUrl = `http://localhost:3000/checkoutStatus/${order.id}?status=pending`;
             failureUrl = `http://localhost:3000/checkoutStatus/${order.id}?status=failure`;
@@ -109,7 +110,7 @@ export async function deleteOrderById(userId: string, orderId: string): Promise<
 }
 
 export async function handlePaidMerchantOrder(userIdDB: string, topic: string, id: String): Promise<OrderData> {
-    if (topic === "merchant_order") return
+    if (topic !== "merchant_order") return null
     try {
         const { order_status, external_reference } = await getMerchantOrderId({ merchantOrderId: id as string })
         if (order_status !== "paid") return
@@ -156,6 +157,3 @@ export async function getPaymentById(id: string) {
     }
 }
 
-function deleteOrder(orderId: string) {
-    throw new Error("Function not implemented.")
-}

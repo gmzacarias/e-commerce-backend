@@ -23,6 +23,7 @@ export async function prepareProductsToCart(userId: string): Promise<ProductsCar
                 model: item.model,
                 colour: item.colour,
                 photo: item.photo,
+                quantity:item.quantity
             }
         })
         return productsIds

@@ -31,7 +31,7 @@ export async function createOrder(userId: string, additionalInfo: string,): Prom
         const productIds = await prepareProductsToCart(userId)
         const totalPrice = await getCartTotalPrice(userId)
         const order = await Order.createNewOrder({
-            id: "",
+            orderId: "",
             userId: userId,
             products: productIds,
             status: "pending",

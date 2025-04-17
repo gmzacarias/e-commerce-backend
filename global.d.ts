@@ -22,7 +22,7 @@ declare global {
         totalPrice: number,
         additionalInfo: string,
         url: string,
-        id: string,
+        orderId: string,
         created: string,
     }
 
@@ -69,6 +69,7 @@ declare global {
         model: string,
         colour: string,
         photo: string,
+        quantity:number
     }
 
     interface ItemsData {

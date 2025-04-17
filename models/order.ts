@@ -92,7 +92,7 @@ export class Order {
             const orderFound = new Order(id)
             orderFound.data = data
             orderFound.data.url = url
-            orderFound.data.id = orderId
+            orderFound.data.orderId = orderId
             await orderFound.push()
             return orderFound
         } catch (error) {
@@ -129,22 +129,17 @@ export class Order {
         }
     }
 
-    static async deleteOrder(userId:string,orderId: string):Promise<boolean> {
+    static async deleteOrder(userId: string, orderId: string): Promise<boolean> {
         try {
-            const {data}= await this.getOrderDoc(orderId)
-            if (data.userId !== userId){
+            const { id, data } = await this.getOrderDoc(orderId)
+            if (data.userId !== userId) {
                 throw new Error(`no tenes los permisos para eliminar esta orden`)
             }
-            const checkOrderId = await collection.where('id', '==', orderId).get();
-            if (checkOrderId.empty) {
-                throw new Error(`no existe esta orderId:${orderId}`)
-            }
-            await collection.doc(data.id).delete();
+            await collection.doc(id).delete();
             return true
         } catch (error) {
             console.error(`no se pudo eliminar la orden:${orderId}`, error.message)
             throw error
         }
     }
-
 }

@@ -4,11 +4,14 @@ import { handlerCORS } from "lib/corsMiddleware"
 import { authMiddleware } from "lib/middleware"
 import { getPaymentById } from "controllers/order"
 
-async function getHandler(req: NextApiRequest, res: NextApiResponse) {
+async function getHandler(req: NextApiRequest, res: NextApiResponse, token: { userId: string }) {
     const paymentId = req.query.paymentId as string
     try {
-        const response = await getPaymentById(paymentId)
-        res.status(200).send({ data: response })
+        if (!token) {
+            res.status(401).send({ message: "No hay token" })
+        }
+        const paymentData = await getPaymentById(paymentId)
+        res.status(200).send({ data: paymentData })
     } catch (error) {
         if (error.message) {
             res.status(400).send({ message: error.message })
@@ -22,6 +25,8 @@ const handler = method({
     get: getHandler
 })
 
-export default handlerCORS(handler)
+const authHandler = authMiddleware(handler)
+
+export default handlerCORS(authHandler)
 
 

@@ -24,6 +24,8 @@ declare global {
         url: string,
         orderId: string,
         created: string,
+        payment: PaymentData[],
+        expire: Boolean,
     }
 
     interface ProductData {
@@ -69,7 +71,7 @@ declare global {
         model: string,
         colour: string,
         photo: string,
-        quantity:number
+        quantity: number
     }
 
     interface ItemsData {
@@ -81,6 +83,21 @@ declare global {
         quantity: number,
         currency_id: string,
         unit_price: number
+    }
+
+    interface PaymentData {
+        paymentId: number,
+        paymentCreated: string,
+        currencyId: string,
+        status: string,
+        statusDetail: string,
+        installments: number,
+        paymentMethodId: string,
+        paymentTypeId: string,
+        transactionAmount: number,
+        transactionInstallmentAmout: number,
+        transactionTotalAmount: number,
+        fourDigitsCard: string
     }
 
     interface FirestoreTimestamp {

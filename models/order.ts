@@ -129,6 +129,29 @@ export class Order {
         }
     }
 
+    static async updatePaymentOrder(userId: string, orderId: string, paymentData: PaymentData) {
+        try {
+            const checkUserId = await collection.where('userId', '==', userId).get();
+            if (checkUserId.empty) {
+                throw new Error("No existen órdenes para este usuario");
+            }
+            const myOrder = new Order(orderId)
+            await myOrder.pull()
+            if (!myOrder.data) {
+                throw new Error(`no se encontró la orden:${orderId}`);
+            }
+            if (!paymentData) {
+                throw new Error(`no hay datos de un pago asociado a la orden:${orderId}`);
+            }
+            myOrder.data.payment = [paymentData]
+            await myOrder.push()
+            return paymentData
+        } catch (error) {
+            console.error(`no se pudo actualizar la orden:${orderId}`, error.message)
+            throw error
+        }
+    }
+
     static async deleteOrder(userId: string, orderId: string): Promise<boolean> {
         try {
             const { id, data } = await this.getOrderDoc(orderId)

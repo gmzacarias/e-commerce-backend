@@ -2,6 +2,7 @@ import { Order } from "models/order"
 import { getDataById, resetCart } from "controllers/user"
 import { createPreference, getMerchantOrderId, getPreference, getPayment } from "services/mercadopago"
 import { getDate } from "utils/getDate"
+import { expirePreference } from "utils/expireDate"
 import { createItemsCart, getCartTotalPrice, prepareProductsToCart } from "services/cart"
 import { purchaseAlert, saleAlert } from "services/sendgrid"
 import { getNgrokUrl } from "services/ngrok"
@@ -38,7 +39,9 @@ export async function createOrder(userId: string, additionalInfo: string,): Prom
             totalPrice: totalPrice,
             url: "",
             additionalInfo,
-            created: getDate()
+            created: getDate(),
+            payment: [],
+            expire: false,
         })
         const currentNgrokUrl = await getNgrokUrl()
         let notificationUrl: string
@@ -61,6 +64,7 @@ export async function createOrder(userId: string, additionalInfo: string,): Prom
             createItemsCart(userId),
             getDataById(userId),
         ])
+        const expireDatePreference = expirePreference()
         const pref = await createPreference({
             body:
             {
@@ -82,6 +86,7 @@ export async function createOrder(userId: string, additionalInfo: string,): Prom
                 auto_return: "all",
                 additional_info: additionalInfo,
                 statement_descriptor: "MERCADOPAGO-SMARTSHOP",
+                expiration_date_to: expireDatePreference,
             }
         })
 
@@ -91,7 +96,6 @@ export async function createOrder(userId: string, additionalInfo: string,): Prom
 
         return {
             url: pref.init_point
-
         }
     } catch (error) {
         console.error("No se pudo crear la preferencia: ", error.message)
@@ -112,15 +116,15 @@ export async function deleteOrderById(userId: string, orderId: string): Promise<
 export async function handlePaidMerchantOrder(userIdDB: string, topic: string, id: String): Promise<OrderData> {
     if (topic !== "merchant_order") return null
     try {
-        const { order_status, external_reference } = await getMerchantOrderId({ merchantOrderId: id as string })
+        const { order_status, external_reference: orderId } = await getMerchantOrderId({ merchantOrderId: id as string })
         if (order_status !== "paid") return
-        const myOrder = await Order.updateStatusOrder(userIdDB, external_reference)
+        const myOrder = await Order.updateStatusOrder(userIdDB, orderId)
         const { userId, totalPrice } = myOrder.data
         const user = await getDataById(userId)
         const { email, userName } = user
         await Promise.all([
-            purchaseAlert(email, userName, external_reference),
-            saleAlert(userId, external_reference, totalPrice),
+            purchaseAlert(email, userName, orderId),
+            saleAlert(userId, orderId, totalPrice),
             resetCart(userId),
         ])
         return myOrder.data
@@ -129,7 +133,6 @@ export async function handlePaidMerchantOrder(userIdDB: string, topic: string, i
         throw error
     }
 }
-
 
 export async function getPreferenceById(id: string) {
     try {
@@ -144,16 +147,32 @@ export async function getPreferenceById(id: string) {
     }
 }
 
-export async function getPaymentById(id: string) {
+export async function getPaymentById(userId: string, id: string) {
     try {
-        const response = await getPayment({ id: id })
-        if (response) {
-            return response
+        const data = await getPayment({ id: id })
+        if (!data) {
+            throw new Error(`No se pudo obtener los datos del pago id:${id}`)
         }
-        throw new Error(`No se pudo obtener los datos del pago id:${id}`)
+        const orderId = data.external_reference
+        const paymentData = {
+            paymentId: data.id,//id
+            paymentCreated: data.date_created,//fecha de pago
+            currencyId: data.currency_id,//moneda de pago
+            status: data.status,//status
+            statusDetail: data.status_detail,//status detalles
+            installments: data.installments,//cuotas
+            paymentMethodId: data.payment_method_id,//metodo de pago
+            paymentTypeId: data.payment_type_id,//tipo de metodo de pago
+            transactionAmount: data.transaction_amount,//monto de la compra
+            transactionInstallmentAmout: data.transaction_details.installment_amount,//monto de cuota
+            transactionTotalAmount: data.transaction_details.total_paid_amount,//total de monto + financiacion
+            fourDigitsCard: data.card.last_four_digits,//ultimos 4 digitos
+        }
+        const updateOrder = await Order.updatePaymentOrder(userId, orderId, paymentData)
+        return updateOrder
     } catch (error) {
         console.error("No se pudo obtener el pago", error.message)
-        return []
+        throw error
     }
 }
 

@@ -6,6 +6,7 @@ import { expirePreference } from "utils/expireDate"
 import { createItemsCart, getCartTotalPrice, prepareProductsToCart } from "services/cart"
 import { purchaseAlert, saleAlert } from "services/sendgrid"
 import { getNgrokUrl } from "services/ngrok"
+import { base } from "airtable"
 
 export async function getMyOrders(userId: string): Promise<OrderData[]> {
     try {
@@ -44,22 +45,12 @@ export async function createOrder(userId: string, additionalInfo: string,): Prom
             expire: false,
         })
         const currentNgrokUrl = await getNgrokUrl()
-        let notificationUrl: string
-        let successUrl: string
-        let pendingUrl: string
-        let failureUrl: string
-
-        if (process.env.NODE_ENV == "development") {
-            notificationUrl = `${currentNgrokUrl}/api/ipn/mercadopago`;
-            successUrl = `http://localhost:3000/checkoutStatus/${order.id}?status=success`;
-            pendingUrl = `http://localhost:3000/checkoutStatus/${order.id}?status=pending`;
-            failureUrl = `http://localhost:3000/checkoutStatus/${order.id}?status=failure`;
-        } else if (process.env.NODE_ENV == "production") {
-            notificationUrl = "https://e-commerce-backend-lake.vercel.app/api/ipn/mercadopago";
-            successUrl = `https://e-commerce-smartshop.vercel.app/checkoutStatus/${order.id}?status=success`;
-            pendingUrl = `https://e-commerce-smartshop.vercel.app/checkoutStatus/${order.id}?status=pending`;
-            failureUrl = `https://e-commerce-smartshop.vercel.app/checkoutStatus/${order.id}?status=failure`;
-        }
+        const isDev = process.env.NODE_ENV === "development"
+        const notificationUrl = isDev ? `${currentNgrokUrl}/api/ipn/mercadopago` : "https://e-commerce-backend-lake.vercel.app/api/ipn/mercadopago"
+        const baseFrontEndUrl = isDev ? `${currentNgrokUrl}` : "https://e-commerce-smartshop.vercel.app"
+        const successUrl = `${baseFrontEndUrl}/checkoutStatus/${order.id}?status=success`
+        const pendingUrl = `${baseFrontEndUrl}/checkoutStatus/${order.id}?status=pending`
+        const failureUrl = `${baseFrontEndUrl}/checkoutStatus/${order.id}?status=failure`
         const [items, dataUser] = await Promise.all([
             createItemsCart(userId),
             getDataById(userId),
@@ -72,33 +63,34 @@ export async function createOrder(userId: string, additionalInfo: string,): Prom
                 notification_url: notificationUrl,
                 items: items,
                 payer: {
-                    "name": dataUser.userName,
-                    "email": dataUser.email,
-                    "phone": {
-                        "number": dataUser.phoneNumber.toString()
+                    name: dataUser.userName,
+                    email: dataUser.email,
+                    phone: {
+                        number: dataUser.phoneNumber.toString()
                     }
                 },
                 back_urls: {
                     success: successUrl,
-                    pending: pendingUrl,
-                    failure: failureUrl
+                    failure: failureUrl,
+                    pending: pendingUrl
                 },
+                expires: true,
                 auto_return: "all",
                 additional_info: additionalInfo,
                 statement_descriptor: "MERCADOPAGO-SMARTSHOP",
                 expiration_date_to: expireDatePreference,
             }
         })
-
         const orderUrl = pref.init_point
-        await Order.setOrderIdAndUrl(userId, order.id, orderUrl)
-        await resetCart(userId)
-
+        await Promise.all([
+            await Order.setOrderIdAndUrl(userId, order.id, orderUrl),
+            await resetCart(userId)
+        ])
         return {
-            url: pref.init_point
+            url: orderUrl
         }
     } catch (error) {
-        console.error("No se pudo crear la preferencia: ", error.message)
+        console.error("No se pudo crear la orden: ", error.message)
         throw error
     }
 }

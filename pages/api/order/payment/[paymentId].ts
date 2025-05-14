@@ -10,7 +10,7 @@ async function getHandler(req: NextApiRequest, res: NextApiResponse, token: { us
         if (!token) {
             res.status(401).send({ message: "No hay token" })
         }
-        const paymentData = await getPaymentById(paymentId)
+        const paymentData = await getPaymentById(token.userId, paymentId)
         res.status(200).send({ data: paymentData })
     } catch (error) {
         if (error.message) {

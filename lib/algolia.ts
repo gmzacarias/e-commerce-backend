@@ -10,5 +10,7 @@ const applicationId = process.env.APPLICATION_ID
 const adminApiKey = process.env.ADMIN_API_KEY
 const client: SearchClient = algoliasearch(`${applicationId}`, `${adminApiKey}`);
 const productIndex: SearchIndex = client.initIndex("products");
+const productsAscIndex: SearchIndex = client.initIndex("products_price_asc");
+const productsDescIndex: SearchIndex = client.initIndex("products_price_desc");
 
-export { productIndex }
+export { productIndex, productsAscIndex, productsDescIndex }

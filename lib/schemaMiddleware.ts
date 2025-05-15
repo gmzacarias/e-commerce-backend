@@ -94,6 +94,8 @@ let querySearchProductSchema = yup
             .typeError("Debe ser una cadena de texto"),
         limit: yup.string()
             .typeError("Debe ser una cadena de texto"),
+        sort: yup.string()
+            .typeError("Debe ser una cadena de texto"),
     }).noUnknown(true)
 
 export async function validateSearchProduct(req: NextApiRequest, res: NextApiResponse) {
@@ -108,7 +110,7 @@ export async function validateSearchProduct(req: NextApiRequest, res: NextApiRes
 let queryProductCartSchema = yup
     .object({
         productId: yup.string()
-        .typeError("Debe ser una cadena de texto"),
+            .typeError("Debe ser una cadena de texto"),
     })
     .noUnknown(true)
 
@@ -148,7 +150,7 @@ export async function validateBodyProduct(req: NextApiRequest, res: NextApiRespo
 let bodyCreateOrderSchema = yup
     .object({
         additionalInfo: yup.string()
-        .typeError("Debe ser una cadena de texto"),
+            .typeError("Debe ser una cadena de texto"),
     })
     .noUnknown(true)
 
@@ -165,7 +167,7 @@ export async function validateBodyCreateOrder(req: NextApiRequest, res: NextApiR
 let queryFindOrderSchema = yup
     .object({
         orderId: yup.string()
-        .typeError("Debe ser una cadena de texto"),
+            .typeError("Debe ser una cadena de texto"),
     })
     .noUnknown(true)
 
@@ -182,7 +184,7 @@ export async function validateQueryFindOrder(req: NextApiRequest, res: NextApiRe
 let querySearchProductIdSchema = yup
     .object({
         productId: yup.string()
-        .typeError("Debe ser una cadena de texto"),
+            .typeError("Debe ser una cadena de texto"),
     })
     .noUnknown(true)
 

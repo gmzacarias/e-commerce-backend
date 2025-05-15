@@ -1,4 +1,5 @@
-import { productIndex } from "lib/algolia"
+import { SearchIndex } from "algoliasearch";
+import { productIndex, productsAscIndex, productsDescIndex } from "lib/algolia"
 import { NextApiRequest } from "next";
 import { NextRequest } from "next/server";
 import { authAirtable } from "services/airtable"
@@ -58,13 +59,24 @@ export async function searchProductById(productId: string,) {
 }
 
 
+function checkIndexAlgolia(sort: string) {
+    const sortToIndexMap: Record<string, SearchIndex> = {
+        "price_asc": productsAscIndex,
+        "price_desc": productsDescIndex
+    }
+    const currentIndex = sort ? sortToIndexMap[sort] : productIndex
+    return currentIndex
+}
+
 export async function searchProductsByQuery(req: NextApiRequest) {
     const { offset, limit } = getOffsetAndLimit(req)
     const q = req.query.q as string
+    const sort = req.query.sort as string
     try {
-        const results = await productIndex.search<AlgoliaData>(q, {
+        const currentIndex = checkIndexAlgolia(sort)
+        const results = await currentIndex.search<AlgoliaData>(q, {
             hitsPerPage: limit,
-            page: offset > 1 ? Math.floor(offset / limit) : 0
+            page: offset > 1 ? Math.floor(offset / limit) : 0,
         })
         if (results.nbHits !== 0) {
             return {

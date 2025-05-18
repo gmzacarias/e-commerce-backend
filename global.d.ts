@@ -8,16 +8,25 @@ declare global {
     }
 
     interface UserData {
-        email?: string,
-        userName?: string,
-        phoneNumber?: number,
-        address?: string,
-        cart?: ProductData[],
+        email: string,
+        userName: string,
+        phoneNumber: number,
+        address: AddressData,
+        cart: ProductData[],
+    }
+
+    interface AddressData {
+        street: string
+        locality: string
+        city: string
+        state: string
+        postalCode: string
+        country: string
     }
 
     interface OrderData {
         userId: string,
-        products: ProductsCart[],
+        products: ProductsOrder[],
         status: string,
         totalPrice: number,
         additionalInfo: string,
@@ -65,7 +74,7 @@ declare global {
         totalPrice: number
     }
 
-    interface ProductsCart {
+    interface ProductsOrder {
         productId: string,
         brand: string,
         model: string,

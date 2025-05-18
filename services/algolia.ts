@@ -48,10 +48,11 @@ export async function saveProductsAlgolia() {
     }
 }
 
-export async function searchProductById(productId: string,) {
+export async function searchProductById(productId: string): Promise<ProductData> {
     try {
-        const results = await productIndex.getObject(productId)
-        return results
+        const products = await getProducts()
+        const filterProduct = products.find(item => item.id === productId)
+        return filterProduct
     } catch (error) {
         console.error("Error al encontrar el producto:", error.message)
         throw error

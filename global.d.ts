@@ -33,7 +33,7 @@ declare global {
         url: string,
         orderId: string,
         created: string,
-        payment: PaymentData[],
+        payment: PaymentData,
         expire: Boolean,
     }
 

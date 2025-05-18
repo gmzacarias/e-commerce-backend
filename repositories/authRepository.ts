@@ -4,6 +4,23 @@ import { Auth } from "models/auth"
 export class AuthRepository {
     private authCollection = firestore.collection("auth")
 
+    private async getAuthDoc(userId: string, authId: string): Promise<Auth> {
+        try {
+            const doc = await this.authCollection.doc(authId).get()
+            if (!doc.exists) {
+                throw new Error("no existe un documento asociado a esta orden")
+            }
+            const data = doc.data() as AuthData
+            if (data.userId !== userId) {
+                throw new Error("el usuario no tiene acceso a esta orden")
+            }
+            return new Auth(doc.id, data)
+        } catch (error) {
+            console.error("no se pudo obtener la orden:", error.message)
+            throw error
+        }
+    }
+
     async createAuth(data: AuthData): Promise<Auth> {
         try {
             const snap = await this.authCollection.add(data)
@@ -42,8 +59,14 @@ export class AuthRepository {
         }
     }
 
-    async save(auth: Auth) {
-        await this.authCollection.doc(auth.id).update(auth.data as Record<string, any>)
+    async save(data: Auth): Promise<boolean> {
+        try {
+            const auth = await this.getAuthDoc(data.data.userId, data.id)
+            await this.authCollection.doc(auth.id).update(auth.data as Record<string, any>)
+            return true
+        } catch (error) {
+            console.error("no se pudo actualizar el documento:", error.message)
+            throw error
+        }
     }
-
 }

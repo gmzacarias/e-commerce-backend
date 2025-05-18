@@ -1,8 +1,11 @@
 import { jwt, secret } from "lib/jwt"
 
-export function generate(data: string | object | Buffer) {
+export function generateToken(data: string | object | Buffer): string | jwt.JwtPayload {
     try {
-        const token = jwt.sign(data, secret);
+        if (!data || !secret) {
+            throw new Error("faltan parametros para poder generar el token")
+        }
+        const token = jwt.sign(data, secret)
         return token
     } catch (error) {
         console.error("Error en JWT:", error.message)
@@ -10,9 +13,12 @@ export function generate(data: string | object | Buffer) {
     }
 }
 
-export function decode(token: string) {
+export function decodeToken(token: string): string | jwt.JwtPayload {
     try {
-        const decoded = jwt.verify(token, secret);
+        if (!token || !secret) {
+            throw new Error("faltan parametros para poder decodificar el token")
+        }
+        const decoded = jwt.verify(token, secret)
         return decoded
     } catch (error) {
         console.error("Error en JWT:", error.message)

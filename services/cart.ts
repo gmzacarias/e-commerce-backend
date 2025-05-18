@@ -1,56 +1,60 @@
-import { getCartById } from "controllers/user";
+import { Cart } from "models/cart"
+import { UserRepository } from "repositories/userRepository"
+import { searchProductById } from "./algolia"
 
-export async function getCartTotalPrice(userId: string):Promise<number> {
-    try {
-        const products = await getCartById(userId);
-        const totalPrice = products.reduce((total, product) => {
-            return total + (product.price) * product.quantity
-        }, 0)
-        return totalPrice
-    } catch (error) {
-        console.error("no se encontraron datos en el carrito ", error.message)
-        throw error
+export class CartService {
+    constructor(private repo: UserRepository) { }
+
+    async getCartData(userId: string): Promise<ProductData[]> {
+        try {
+            const cartData = await this.repo.getCart(userId)
+            return cartData
+        } catch (error) {
+            console.error(error.message)
+            throw error
+        }
     }
-}
 
-export async function prepareProductsToCart(userId: string): Promise<ProductsCart[]> {
-    try {
-        const dataCart = await getCartById(userId)
-        const productsIds = dataCart.map(item => {
-            return {
-                productId: item.objectID,
-                brand: item.brand,
-                model: item.model,
-                colour: item.colour,
-                photo: item.photo,
-                quantity:item.quantity
-            }
-        })
-        return productsIds
-    } catch (error) {
-        console.error("error al guardar los datos de los productos", error.message)
-        throw error
+    async addProduct(userId: string, productId: string, quantity: number): Promise<boolean> {
+        try {
+            const user = await this.repo.getUser(userId)
+            const product = await searchProductById(productId)
+            const cart = new Cart(user.data.cart)
+            cart.add(product, quantity)
+            user.updateCart(cart.items)
+            await this.repo.save(user)
+            return true
+        } catch (error) {
+            console.error(error.message)
+            throw error
+        }
     }
-}
 
-export async function createItemsCart(userId: string): Promise<ItemsData[]> {
-    try {
-        const dataCart = await getCartById(userId)
-        const mapProducts = dataCart.map(product => {
-            return {
-                id: `${product.id}`,
-                title: `${product.brand} ${product.model}`,
-                description: `smartphone ${product.brand} ${product.model} `,
-                picture_url: product.photo,
-                category_id: "Phones",
-                quantity: product.quantity,
-                currency_id: "ARS",
-                unit_price: product.price
-            }
-        })
-        return mapProducts
-    } catch (error) {
-        console.error("no se encontraron datos en el carrito ", error.message)
-        throw error
+    async deleteProduct(userId: string, productId: string): Promise<boolean> {
+        try {
+            const user = await this.repo.getUser(userId)
+            const cart = new Cart(user.data.cart)
+            cart.remove(productId)
+            user.updateCart(cart.items)
+            await this.repo.save(user)
+            return true
+        } catch (error) {
+            console.error(error.message)
+            throw error
+        }
+    }
+
+    async reset(userId: string): Promise<ProductData[]> {
+        try {
+            const user = await this.repo.getUser(userId)
+            const cart = new Cart()
+            cart.clear()
+            user.updateCart(cart.items)
+            await this.repo.save(user)
+            return cart.items
+        } catch (error) {
+            console.error(error.message)
+            throw error
+        }
     }
 }

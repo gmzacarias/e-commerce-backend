@@ -4,7 +4,7 @@ import { User } from "models/user"
 export class UserRepository {
     private userCollection = firestore.collection("users")
 
-    private async getUserDoc(userId: string) {
+    private async getUserDoc(userId: string): Promise<User> {
         try {
             const doc = await this.userCollection.doc(userId).get()
             if (!doc.exists) {
@@ -48,10 +48,16 @@ export class UserRepository {
         }
     }
 
-    async save(user: User) {
-        await this.userCollection.doc(user.id).update(user.data as Record<string, any>)
+    async save(data: User): Promise<boolean> {
+        try {
+            const user = await this.getUserDoc(data.id)
+            await this.userCollection.doc(user.id).update(user.data as Record<string, any>)
+            return true
+        } catch (error) {
+            console.error("no se pudo actualizar el documento:", error.message)
+            throw error
+        }
     }
-
 }
 
 

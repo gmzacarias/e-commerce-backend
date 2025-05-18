@@ -4,7 +4,24 @@ import { Order } from "models/order"
 export class OrderRepository {
     private orderCollection = firestore.collection("orders")
 
-    async createOrder(data: OrderData) {
+    async getOrderDoc(userId: string, orderId: string) {
+        try {
+            const doc = await this.orderCollection.doc(orderId).get()
+            if (!doc.exists) {
+                throw new Error("no existe un documento asociado a esta orden")
+            }
+            const data = doc.data() as OrderData
+            if (data.userId !== userId) {
+                throw new Error("el usuario no tiene acceso a esta orden")
+            }
+            return new Order(doc.id, data)
+        } catch (error) {
+            console.error("no se pudo obtener la orden:", error.message)
+            throw error
+        }
+    }
+
+    async createOrder(data: OrderData): Promise<Order> {
         try {
             const snap = await this.orderCollection.add(data)
             return new Order(snap.id, data)
@@ -31,23 +48,6 @@ export class OrderRepository {
         }
     }
 
-    async getOrderDoc(userId: string, orderId: string) {
-        try {
-            const doc = await this.orderCollection.doc(orderId).get()
-            if (!doc.exists) {
-                throw new Error("no existe un documento asociado a esta orden")
-            }
-            const data = doc.data() as OrderData
-            if (data.userId !== userId) {
-                throw new Error("el usuario no tiene acceso a esta orden")
-            }
-            return new Order(doc.id, data)
-        } catch (error) {
-            console.error("no se pudo obtener la orden:", error.message)
-            throw error
-        }
-    }
-
     async save(data: Order): Promise<boolean> {
         try {
             const order = await this.getOrderDoc(data.data.userId, data.data.orderId)
@@ -61,7 +61,7 @@ export class OrderRepository {
 
     async delete(data: Order): Promise<boolean> {
         try {
-            const order = await this.getOrderDoc(data.data.userId, data.data.orderId)
+            const order = await this.getOrderDoc(data.data.userId, data.id)
             await this.orderCollection.doc(order.id).delete()
             return true
         } catch (error) {

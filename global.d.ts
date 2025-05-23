@@ -33,7 +33,7 @@ declare global {
         url: string,
         orderId: string,
         created: string,
-        payment: PaymentData,
+        payment: PaymentData | null,
         expire: Boolean,
     }
 
@@ -109,6 +109,12 @@ declare global {
         fourDigitsCard: string
     }
 
+    interface UrlData {
+        notificationUrl: string,
+        successUrl: string,
+        pendingUrl: string,
+        failureUrl: string
+    }
     interface FirestoreTimestamp {
         _nanoseconds: number,
         _seconds: number

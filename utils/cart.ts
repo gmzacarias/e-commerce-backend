@@ -39,7 +39,7 @@ export function formatProductsForOrder(data: ProductData[]): ProductsOrder[] {
     }
 }
 
-export async function formatItemsForPreference(data: ProductData[]): Promise<ItemsData[]> {
+export function formatItemsForPreference(data: ProductData[]): ItemsData[] {
     try {
         if (!hasProducts(data)) {
             throw new Error("no hay productos")

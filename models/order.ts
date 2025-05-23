@@ -16,6 +16,10 @@ export class Order {
     }
 
     updateStatus(status: string) {
+        if (status !== "paid") {
+            this.data.status = "failure"
+            return
+        }
         this.data.status = "closed"
     }
 }

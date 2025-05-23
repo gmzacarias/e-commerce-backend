@@ -4,7 +4,7 @@ import { Order } from "models/order"
 export class OrderRepository {
     private orderCollection = firestore.collection("orders")
 
-    async getOrderDoc(userId: string, orderId: string) {
+    async getOrderDoc(userId: string, orderId: string): Promise<Order> {
         try {
             const doc = await this.orderCollection.doc(orderId).get()
             if (!doc.exists) {
@@ -21,7 +21,7 @@ export class OrderRepository {
         }
     }
 
-    async createOrder(data: OrderData): Promise<Order> {
+    async newOrder(data: OrderData): Promise<Order> {
         try {
             const snap = await this.orderCollection.add(data)
             return new Order(snap.id, data)
@@ -59,9 +59,9 @@ export class OrderRepository {
         }
     }
 
-    async delete(data: Order): Promise<boolean> {
+    async delete(userId: string, orderId: string): Promise<boolean> {
         try {
-            const order = await this.getOrderDoc(data.data.userId, data.id)
+            const order = await this.getOrderDoc(userId, orderId)
             await this.orderCollection.doc(order.id).delete()
             return true
         } catch (error) {

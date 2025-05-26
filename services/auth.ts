@@ -27,7 +27,7 @@ export class AuthService {
                         locality: "",
                         city: "",
                         state: "",
-                        postalCode: "",
+                        postalCode: 0,
                         country: "",
                     },
                     cart: []

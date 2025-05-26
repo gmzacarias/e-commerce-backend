@@ -31,12 +31,11 @@ export class AuthRepository {
         }
     }
 
-
-    async findByEmail(email: string): Promise<Auth> {
+    async findByEmail(email: string): Promise<Auth | null> {
         try {
             const snap = await this.authCollection.where("email", "==", email).get()
             if (snap.empty) {
-                throw new Error("el email ingresado no coincide con los registrados de la db")
+                return null
             }
             const doc = snap.docs[0]
             return new Auth(doc.id, doc.data() as AuthData)

@@ -6,6 +6,7 @@ import { generateRandomCode } from "./randomSeed"
 import { checkExpiration, createExpireDate } from "./dateFns"
 import { generateToken } from "./jwt"
 import { sendCodeAuth } from "./sendgrid"
+import { JwtPayload } from "jsonwebtoken"
 
 export class AuthService {
     constructor(private repo: AuthRepository, private userRepo: UserRepository) { }
@@ -68,7 +69,7 @@ export class AuthService {
         }
     }
 
-    async Authenticate(email: string, code: number): Promise<string> {
+    async Authenticate(email: string, code: number): Promise<string | JwtPayload> {
         const formatEmail = cleanEmail(email)
         try {
             await this.repo.findByEmail(formatEmail)

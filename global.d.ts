@@ -20,7 +20,7 @@ declare global {
         locality: string
         city: string
         state: string
-        postalCode: string
+        postalCode: number
         country: string
     }
 

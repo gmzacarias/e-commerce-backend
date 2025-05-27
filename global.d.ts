@@ -10,7 +10,7 @@ declare global {
     interface UserData {
         email: string,
         userName: string,
-        phoneNumber: number,
+        phoneNumber: string,
         address: AddressData,
         cart: ProductData[],
     }

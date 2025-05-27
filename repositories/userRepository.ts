@@ -41,6 +41,9 @@ export class UserRepository {
         try {
             const user = await this.getUserDoc(userId)
             const cartData = user.data.cart
+            if (cartData.length < 1) {
+                throw new Error("no se agregaron productos")
+            }
             return cartData
         } catch (error) {
             console.error("no se pudo obtener los datos del carrito del usuario:", error.message)

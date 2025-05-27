@@ -21,7 +21,7 @@ export class AuthService {
                 const newUser = await this.userRepo.createUser({
                     email: formatEmail,
                     userName: "",
-                    phoneNumber: 0,
+                    phoneNumber: "",
                     address: {
                         street: "",
                         locality: "",
@@ -59,7 +59,7 @@ export class AuthService {
                 auth.updateCode(newCode)
                 auth.updateExpire(newExpireDate)
                 await this.repo.save(auth)
-                codeToSend = newCode
+                codeToSend = newCode  
             }
             await sendCodeAuth(formatEmail, codeToSend)
             return true

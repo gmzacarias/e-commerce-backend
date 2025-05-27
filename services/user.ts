@@ -1,7 +1,5 @@
-import { Cart } from "models/cart"
 import { UserRepository } from "repositories/userRepository"
 import { AuthRepository } from "repositories/authRepository"
-import { searchProductById } from "./algolia"
 
 export class UserService {
     constructor(private repo: UserRepository, private authRepo: AuthRepository) { }
@@ -19,24 +17,18 @@ export class UserService {
     async updateUserData(userId: string, data: Partial<UserData>): Promise<UserData> {
         try {
             const user = await this.repo.getUser(userId)
-            const auth = await this.authRepo.findByEmail(user.data.email)
+            const auth = await this.authRepo.getAuth(userId)
+            if (data.userName) user.updateUserName(data.userName)
+            if (data.phoneNumber) user.updatePhoneNumber(data.phoneNumber)
             if (data.email) {
-                user.updateEmail(data.email)
                 auth.updateEmail(data.email)
+                user.updateEmail(data.email)
             }
-
-            if (data.userName) {
-                user.updateUserName(data.userName)
-            }
-
             if (data.address) {
-                user.updateAddress(data.address)
+                const currentAddress = user.data.address
+                const updateAddress = { ...currentAddress, ...data.address }
+                user.updateAddress(updateAddress)
             }
-
-            if (data.phoneNumber) {
-                user.updatePhoneNumber(data.phoneNumber)
-            }
-
             await this.repo.save(user)
             await this.authRepo.save(auth)
             return user.data

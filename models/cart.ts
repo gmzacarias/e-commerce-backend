@@ -21,7 +21,7 @@ export class Cart {
         }
     }
 
-    updateQuantity(productId: string, quantity: number) {
+    private updateQuantity(productId: string, quantity: number) {
         this.validateQuantity(quantity)
         const item = this.items.find(p => p.id === productId)
         if (!item) {

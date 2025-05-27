@@ -6,7 +6,7 @@ import { generateRandomCode } from "./randomSeed"
 import { checkExpiration, createExpireDate } from "./dateFns"
 import { generateToken } from "./jwt"
 import { sendCodeAuth } from "./sendgrid"
-import { JwtPayload } from "jsonwebtoken"
+import type { JwtPayload } from "jsonwebtoken"
 
 export class AuthService {
     constructor(private repo: AuthRepository, private userRepo: UserRepository) { }

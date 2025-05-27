@@ -1,5 +1,6 @@
 import type { NextApiRequest } from "next"
 import { authSchema, tokenSchema } from "lib/schemas/authSchema"
+import { updateUserSchema } from "lib/schemas/userSchema"
 
 export function validateAuth(req: NextApiRequest) {
     try {
@@ -18,6 +19,20 @@ export function validateAuth(req: NextApiRequest) {
 export function validateAuthToken(req: NextApiRequest) {
     try {
         const result = tokenSchema.safeParse(req)
+        if (!result.success) {
+            const errorMessage = result.error.issues.map((issue) => issue.message).join(";")
+            throw new Error(errorMessage)
+        }
+        return result.data
+    } catch (error) {
+        console.error(error.message)
+        throw error
+    }
+}
+
+export function validateUserUpdate(req: NextApiRequest){
+    try {
+        const result = updateUserSchema.safeParse(req)
         if (!result.success) {
             const errorMessage = result.error.issues.map((issue) => issue.message).join(";")
             throw new Error(errorMessage)

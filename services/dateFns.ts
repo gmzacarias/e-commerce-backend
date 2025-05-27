@@ -1,7 +1,7 @@
 import { addHours, addMinutes, format, isAfter } from "date-fns"
 import { es } from "date-fns/locale/es"
 
-export function getDate() {
+export function getDate():string {
     try {
         const currentDate = new Date()
         const formatDate = format(currentDate, "dd 'de' MMMM 'de' yyyy", { locale: es })

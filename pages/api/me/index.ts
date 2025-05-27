@@ -2,15 +2,15 @@ import type { NextApiRequest, NextApiResponse } from "next"
 import method from "micro-method-router"
 import { handlerCORS } from "lib/corsMiddleware"
 import { authMiddleware } from "lib/middleware"
-import { getDataById, updateData } from "controllers/user"
-import { validatePatchData } from "lib/schemaMiddleware"
+import { getMyUser, updateData } from "controllers/user"
+import { validateUserUpdate } from "services/validators"
 
 async function getHandler(req: NextApiRequest, res: NextApiResponse, token: { userId: string }) {
     try {
-        if (!token) {
-            throw new Error("no hay token")
+        if (!token.userId) {
+            throw new Error("token invalido o no autorizado")
         }
-        const dataUser = await getDataById(token.userId)
+        const dataUser = await getMyUser(token.userId)
         if (!dataUser) {
             throw new Error("no se encontro el usuario")
         }
@@ -24,17 +24,15 @@ async function getHandler(req: NextApiRequest, res: NextApiResponse, token: { us
     }
 }
 
-async function putHandler(req: NextApiRequest, res: NextApiResponse,token: { userId: string }) {
-    const data = req.body
+async function patchHandler(req: NextApiRequest, res: NextApiResponse, token: { userId: string }) {
     try {
-        if (!token) {
-            throw new Error("no hay token")
+        if (!token.userId) {
+            throw new Error("token invalido o no autorizado")
         }
-        await validatePatchData(req, res)
-        if (data.email || data.userName || data.phoneNumber || data.address) {
-            await updateData(token.userId, data)
-            res.status(200).send({ message: "Datos actualizados" })
-        }
+        const userSchema = validateUserUpdate(req.body)
+        await updateData(token.userId, userSchema as UserData)
+        res.status(200).send({ message: "Datos actualizados" })
+
     } catch (error) {
         if (error.message) {
             res.status(401).send({ message: error.message })
@@ -46,7 +44,7 @@ async function putHandler(req: NextApiRequest, res: NextApiResponse,token: { use
 
 const handler = method({
     get: getHandler,
-    put: putHandler
+    patch: patchHandler
 })
 
 const authHandler = authMiddleware(handler)

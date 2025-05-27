@@ -4,19 +4,19 @@ import { Auth } from "models/auth"
 export class AuthRepository {
     private authCollection = firestore.collection("auth")
 
-    private async getAuthDoc(userId: string, authId: string): Promise<Auth> {
+    private async checkAuthDoc(id:string,userId:string): Promise<boolean> {
         try {
-            const doc = await this.authCollection.doc(authId).get()
+            const doc = await this.authCollection.doc(id).get()
             if (!doc.exists) {
-                throw new Error("no existe un documento asociado a esta orden")
+                throw new Error("no existe un documento asociado a este id")
             }
             const data = doc.data() as AuthData
             if (data.userId !== userId) {
-                throw new Error("el usuario no tiene acceso a esta orden")
+                throw new Error("el usuario no tiene acceso")
             }
-            return new Auth(doc.id, data)
+            return true
         } catch (error) {
-            console.error("no se pudo obtener la orden:", error.message)
+            console.error("no se pudo obtener el documento:", error.message)
             throw error
         }
     }
@@ -55,12 +55,14 @@ export class AuthRepository {
             return new Auth(doc.id, doc.data() as AuthData)
         } catch (error) {
             console.error("hubo un error en la busqueda:", error.message)
+            throw error
         }
     }
 
     async save(data: Auth): Promise<boolean> {
         try {
-            const auth = await this.getAuthDoc(data.data.userId, data.id)
+            await this.checkAuthDoc(data.data.userId, data.id)
+            const auth = new Auth(data.id, data.data)
             await this.authCollection.doc(auth.id).update(auth.data as Record<string, any>)
             return true
         } catch (error) {

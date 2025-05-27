@@ -12,7 +12,7 @@ export async function addProductById(userId: string, productId: string, quantity
     return await cartService.addProduct(userId, productId, quantity)
 }
 
-export async function DeleteProductById(userId: string, productId: string): Promise<boolean> {
+export async function deleteProductById(userId: string, productId: string): Promise<boolean> {
     return await cartService.deleteProduct(userId, productId)
 }
 

@@ -50,8 +50,8 @@ export class UserRepository {
 
     async save(data: User): Promise<boolean> {
         try {
-            const user = await this.getUserDoc(data.id)
-            await this.userCollection.doc(user.id).update(user.data as Record<string, any>)
+            await this.getUserDoc(data.id)
+            await this.userCollection.doc(data.id).update(data.data as Record<string, any>)
             return true
         } catch (error) {
             console.error("no se pudo actualizar el documento:", error.message)

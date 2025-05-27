@@ -22,7 +22,7 @@ export class User {
         }
     }
 
-    updatePhoneNumber(phoneNumber: number) {
+    updatePhoneNumber(phoneNumber: string) {
         this.data.phoneNumber = phoneNumber
     }
 

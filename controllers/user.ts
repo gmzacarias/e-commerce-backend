@@ -10,7 +10,7 @@ export async function getMyUser(userId: string): Promise<UserData> {
     return await userService.getUserData(userId)
 }
 
-export async function updateData(userId: string, newData: UserData): Promise<UserData> {
+export async function updateData(userId: string, newData: Partial<UserData>): Promise<UserData> {
     return await userService.updateUserData(userId, newData)
 }
 

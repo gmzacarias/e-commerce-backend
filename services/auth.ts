@@ -11,7 +11,7 @@ import type { JwtPayload } from "jsonwebtoken"
 export class AuthService {
     constructor(private repo: AuthRepository, private userRepo: UserRepository) { }
 
-    async NewAuth(email: string): Promise<Auth> {
+    async newAuth(email: string): Promise<Auth> {
         const formatEmail = cleanEmail(email)
         const code = generateRandomCode()
         const expire = createExpireDate(30)
@@ -47,12 +47,12 @@ export class AuthService {
         }
     }
 
-    async SendCode(email: string): Promise<boolean> {
+    async sendCode(email: string): Promise<boolean> {
         const formatEmail = cleanEmail(email)
         const newCode = generateRandomCode()
         const newExpireDate = createExpireDate(30)
         try {
-            const auth = await this.NewAuth(formatEmail)
+            const auth = await this.newAuth(formatEmail)
             const isExpired = checkExpiration(auth.data.expire)
             let codeToSend = auth.data.code
             if (isExpired) {
@@ -69,7 +69,7 @@ export class AuthService {
         }
     }
 
-    async Authenticate(email: string, code: number): Promise<string | JwtPayload> {
+    async authenticate(email: string, code: number): Promise<string | JwtPayload> {
         const formatEmail = cleanEmail(email)
         try {
             await this.repo.findByEmail(formatEmail)

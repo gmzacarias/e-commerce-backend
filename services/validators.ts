@@ -1,7 +1,7 @@
 import { authSchema, tokenSchema } from "lib/schemas/authSchema"
 import { updateUserSchema } from "lib/schemas/userSchema"
 import { partialCartSchema } from "lib/schemas/cartSchema"
-import { orderSchema } from "lib/schemas/orderSchema"
+import { orderIdSchema, orderSchema } from "lib/schemas/orderSchema"
 import { partialSearchSchema } from "lib/schemas/searchSchema"
 import { productSchema } from "lib/schemas/productSchema"
 
@@ -102,6 +102,20 @@ export function validateCreateOrder(additionalInfo: string): string {
     }
 }
 
+export function validateOrderId(orderId: string): string {
+    try {
+        const result = orderIdSchema.safeParse({ orderId })
+        if (!result.success) {
+            const errorMessage = result.error.issues.map((issue) => issue.message).join(";")
+            throw new Error(errorMessage)
+        }
+        return result.data.orderId
+    } catch (error) {
+        console.error(error.message)
+        throw error
+    }
+}
+
 export function validateSearchByQuery(data: QueryData): Partial<QueryData> {
     try {
         const result = partialSearchSchema.safeParse(data)
@@ -116,7 +130,7 @@ export function validateSearchByQuery(data: QueryData): Partial<QueryData> {
     }
 }
 
-export function validateSearchProduct(productId: string): string {
+export function validateProductId(productId: string): string {
     try {
         const result = productSchema.safeParse({ productId })
         if (!result.success) {

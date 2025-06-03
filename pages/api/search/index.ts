@@ -2,12 +2,12 @@ import type { NextApiRequest, NextApiResponse } from "next"
 import method from "micro-method-router"
 import { handlerCORS } from "lib/corsMiddleware"
 import { searchProductsByQuery } from "services/algolia"
-import { validateSearchProduct } from "lib/schemaMiddleware"
+import { validateSearchByQuery, validateSearchProduct } from "services/validators"
 
 async function getHandler(req: NextApiRequest, res: NextApiResponse) {
     try {
-        await validateSearchProduct(req,res)
-        const response = await searchProductsByQuery(req)
+        const result = validateSearchByQuery(req.query as object as QueryData)
+        const response = await searchProductsByQuery(result as object as QueryData)
         res.status(200).send(response)
     } catch (error) {
         if (error.message) {

@@ -2,6 +2,8 @@ import { authSchema, tokenSchema } from "lib/schemas/authSchema"
 import { updateUserSchema } from "lib/schemas/userSchema"
 import { partialCartSchema } from "lib/schemas/cartSchema"
 import { orderSchema } from "lib/schemas/orderSchema"
+import { partialSearchSchema } from "lib/schemas/searchSchema"
+import { productSchema } from "lib/schemas/productSchema"
 
 export function validateAuth(email: string): { email: string } {
     try {
@@ -86,7 +88,7 @@ export function validateCartBody(quantity: number): number {
 }
 
 export function validateCreateOrder(additionalInfo: string): string {
-    if(!additionalInfo || !additionalInfo.trim()) return null
+    if (!additionalInfo || !additionalInfo.trim()) return null
     try {
         const result = orderSchema.safeParse({ additionalInfo })
         if (!result.success) {
@@ -94,6 +96,34 @@ export function validateCreateOrder(additionalInfo: string): string {
             throw new Error(errorMessage)
         }
         return result.data.additionalInfo
+    } catch (error) {
+        console.error(error.message)
+        throw error
+    }
+}
+
+export function validateSearchByQuery(data: QueryData): Partial<QueryData> {
+    try {
+        const result = partialSearchSchema.safeParse(data)
+        if (!result.success) {
+            const errorMessage = result.error.issues.map((issue) => issue.message).join(";")
+            throw new Error(errorMessage)
+        }
+        return result.data
+    } catch (error) {
+        console.error(error.message)
+        throw error
+    }
+}
+
+export function validateSearchProduct(productId: string): string {
+    try {
+        const result = productSchema.safeParse({ productId })
+        if (!result.success) {
+            const errorMessage = result.error.issues.map((issue) => issue.message).join(";")
+            throw new Error(errorMessage)
+        }
+        return result.data.productId
     } catch (error) {
         console.error(error.message)
         throw error

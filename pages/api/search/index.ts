@@ -6,8 +6,8 @@ import { validateSearchByQuery} from "services/validators"
 
 async function getHandler(req: NextApiRequest, res: NextApiResponse) {
     try {
-        const result = validateSearchByQuery(req.query as object as QueryData)
-        const response = await searchProductsByQuery(result as object as QueryData)
+        const queries = validateSearchByQuery(req.query as object as QueryData)
+        const response = await searchProductsByQuery(queries as object as QueryData)
         res.status(200).send(response)
     } catch (error) {
         if (error.message) {

@@ -2,15 +2,14 @@ import type { NextApiRequest, NextApiResponse } from "next"
 import method from "micro-method-router"
 import { handlerCORS } from "lib/corsMiddleware"
 import { authMiddleware } from "lib/middleware"
-import { getPaymentById } from "controllers/order"
+import { setPaymentOrder } from "controllers/order"
 
 async function getHandler(req: NextApiRequest, res: NextApiResponse, token: { userId: string }) {
-    const paymentId = req.query.paymentId as string
     try {
-        if (!token) {
-            res.status(401).send({ message: "No hay token" })
+        if (!token.userId) {
+            throw new Error("token invalido o no autorizado")
         }
-        const paymentData = await getPaymentById(token.userId, paymentId)
+        const paymentData = await setPaymentOrder(token.userId, req.query.paymentId as string)
         res.status(200).send({ data: paymentData })
     } catch (error) {
         if (error.message) {

@@ -1,6 +1,7 @@
 import { authSchema, tokenSchema } from "lib/schemas/authSchema"
 import { updateUserSchema } from "lib/schemas/userSchema"
 import { partialCartSchema } from "lib/schemas/cartSchema"
+import { orderSchema } from "lib/schemas/orderSchema"
 
 export function validateAuth(email: string): { email: string } {
     try {
@@ -56,9 +57,9 @@ export function validateUserUpdate(data: UserData): {
     }
 }
 
-export function validateCartQuery(productId:string): string {
+export function validateCartQuery(productId: string): string {
     try {
-        const result = partialCartSchema.safeParse({productId})
+        const result = partialCartSchema.safeParse({ productId })
         if (!result.success) {
             const errorMessage = result.error.issues.map((issue) => issue.message).join(";")
             throw new Error(errorMessage)
@@ -72,12 +73,27 @@ export function validateCartQuery(productId:string): string {
 
 export function validateCartBody(quantity: number): number {
     try {
-        const result = partialCartSchema.safeParse({quantity})
+        const result = partialCartSchema.safeParse({ quantity })
         if (!result.success) {
             const errorMessage = result.error.issues.map((issue) => issue.message).join(";")
             throw new Error(errorMessage)
         }
         return result.data.quantity
+    } catch (error) {
+        console.error(error.message)
+        throw error
+    }
+}
+
+export function validateCreateOrder(additionalInfo: string): string {
+    if(!additionalInfo || !additionalInfo.trim()) return null
+    try {
+        const result = orderSchema.safeParse({ additionalInfo })
+        if (!result.success) {
+            const errorMessage = result.error.issues.map((issue) => issue.message).join(";")
+            throw new Error(errorMessage)
+        }
+        return result.data.additionalInfo
     } catch (error) {
         console.error(error.message)
         throw error

@@ -50,8 +50,8 @@ export class OrderRepository {
 
     async save(data: Order): Promise<boolean> {
         try {
-            const order = await this.getOrderDoc(data.data.userId, data.data.orderId)
-            await this.orderCollection.doc(order.id).update(order.data as Record<string, any>)
+            await this.getOrderDoc(data.data.userId, data.data.orderId)
+            const result = await this.orderCollection.doc(data.id).update(data.data as Record<string, any>)
             return true
         } catch (error) {
             console.error("no se pudo actualizar el documento:", error.message)

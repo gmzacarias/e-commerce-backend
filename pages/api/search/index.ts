@@ -2,7 +2,7 @@ import type { NextApiRequest, NextApiResponse } from "next"
 import method from "micro-method-router"
 import { handlerCORS } from "lib/corsMiddleware"
 import { searchProductsByQuery } from "services/algolia"
-import { validateSearchByQuery, validateSearchProduct } from "services/validators"
+import { validateSearchByQuery} from "services/validators"
 
 async function getHandler(req: NextApiRequest, res: NextApiResponse) {
     try {

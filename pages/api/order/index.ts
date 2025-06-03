@@ -1,16 +1,18 @@
 import type { NextApiRequest, NextApiResponse } from "next"
-import method from "micro-method-router" 
+import method from "micro-method-router"
 import { handlerCORS } from "lib/corsMiddleware"
 import { authMiddleware } from "lib/middleware"
 import { createOrder } from "controllers/order"
-import { validateBodyCreateOrder } from "lib/schemaMiddleware"
+import { validateCreateOrder } from "services/validators"
 
-async function postHandler(req: NextApiRequest, res: NextApiResponse, token) {
-    const { additionalInfo } = req.body
+async function postHandler(req: NextApiRequest, res: NextApiResponse, token: { userId: string }) {
     try {
-        await validateBodyCreateOrder(req, res)
-        const response = await createOrder(token.userId, additionalInfo)
-        res.status(200).send(response)
+        if (!token.userId) {
+            throw new Error("token invalido o no autorizado")
+        }
+        const orderSchema = validateCreateOrder(req.body.additionalInfo as string)
+        const dataUrl = await createOrder(token.userId, orderSchema)
+        res.status(200).send(dataUrl)
     } catch (error) {
         if (error.message) {
             res.status(400).send({ message: error.message })

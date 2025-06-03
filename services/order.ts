@@ -4,7 +4,7 @@ import { UserRepository } from "repositories/userRepository"
 import { CartService } from "./cart"
 import { formatProductsForOrder, calcTotalPrice, formatItemsForPreference } from "utils/cart"
 import { getDate, formatExpireDateForPreference } from "./dateFns"
-import { createPreference, getMerchantOrderId, getPayment } from "./mercadoPago"
+import { createPreference, getMerchantOrderId, getPayment } from "services/mercadoPago"
 import { saleAlert, purchaseAlert } from "./sendgrid"
 import { getBaseUrl } from "utils/getBaseUrl"
 

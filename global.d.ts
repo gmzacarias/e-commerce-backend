@@ -115,6 +115,14 @@ declare global {
         pendingUrl: string,
         failureUrl: string
     }
+
+    interface QueryData {
+        q: string,
+        offset: string,
+        limit: string,
+        sort: string
+    }
+
     interface FirestoreTimestamp {
         _nanoseconds: number,
         _seconds: number

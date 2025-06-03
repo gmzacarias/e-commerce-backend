@@ -104,18 +104,18 @@ export async function searchProductsByQuery(req: NextApiRequest) {
     }
 }
 
-export async function GetMoreExpensiveProducts() {
+export async function GetFeaturedProducts(): Promise<AlgoliaData[]> {
     try {
         const results = await productIndex.search<AlgoliaData>("")
         const data = results.hits
         const filterByBrands = data.map((item) => item.brand)
         const uniqueBrands = Array.from(new Set(filterByBrands))
-        const moreExpensiveProducts = uniqueBrands.map((brand) => {
+        const featuredProducts = uniqueBrands.map((brand) => {
             const filtermax = data.filter((item) => item.brand === brand)
             return filtermax.reduce((max, item) =>
                 item.price > max.price ? item : max)
         })
-        return moreExpensiveProducts
+        return featuredProducts
     } catch (error) {
         console.error("Error al encontrar el producto:", error.message)
         throw error

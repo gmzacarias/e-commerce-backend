@@ -4,9 +4,10 @@ import { UserRepository } from "repositories/userRepository"
 import { CartService } from "./cart"
 import { formatProductsForOrder, calcTotalPrice, formatItemsForPreference } from "utils/cart"
 import { getDate, formatExpireDateForPreference } from "./dateFns"
-import { createPreference, getMerchantOrderId, getPayment } from "services/mercadoPago"
+import { createPreference, getMerchantOrderId, getPayment } from "./mercadopago"
 import { saleAlert, purchaseAlert } from "./sendgrid"
 import { getBaseUrl } from "utils/getBaseUrl"
+
 
 export class OrderService {
     cart = new CartService(this.userRepo)
@@ -40,7 +41,7 @@ export class OrderService {
             const products = formatProductsForOrder(cartData)
             const totalPrice = calcTotalPrice(cartData)
             const order = await this.repo.newOrder({
-                orderId:null,
+                orderId: null,
                 userId: getUserId,
                 products: products,
                 status: "pending",

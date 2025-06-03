@@ -69,15 +69,16 @@ function checkIndexAlgolia(sort: string) {
     return currentIndex
 }
 
-export async function searchProductsByQuery(req: NextApiRequest) {
-    const { offset, limit } = getOffsetAndLimit(req)
-    const q = req.query.q as string
-    const sort = req.query.sort as string
+export async function searchProductsByQuery(data: QueryData) {
+    const { offset, limit } = getOffsetAndLimit(data.offset, data.limit)
+    const q = data.q
+    const sort = data.sort
     try {
         const currentIndex = checkIndexAlgolia(sort)
         const results = await currentIndex.search<AlgoliaData>(q, {
             hitsPerPage: limit,
             page: offset > 1 ? Math.floor(offset / limit) : 0,
+            attributesToHighlight: []
         })
         if (results.nbHits !== 0) {
             return {
@@ -104,9 +105,11 @@ export async function searchProductsByQuery(req: NextApiRequest) {
     }
 }
 
-export async function GetFeaturedProducts(): Promise<AlgoliaData[]> {
+export async function getFeaturedProducts(): Promise<AlgoliaData[]> {
     try {
-        const results = await productIndex.search<AlgoliaData>("")
+        const results = await productIndex.search<AlgoliaData>("", {
+            attributesToHighlight: []
+        })
         const data = results.hits
         const filterByBrands = data.map((item) => item.brand)
         const uniqueBrands = Array.from(new Set(filterByBrands))

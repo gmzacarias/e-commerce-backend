@@ -3,7 +3,7 @@ import method from "micro-method-router"
 import { handlerCORS } from "lib/corsMiddleware"
 import { authMiddleware } from "lib/middleware"
 import { validateQueryFindOrder } from "lib/schemaMiddleware"
-import { deleteOrderById, getOrderDataById } from "controllers/order"
+import { deleteOrder, getOrderDataById } from "controllers/order"
 
 async function getHandler(req: NextApiRequest, res: NextApiResponse, token: { userId: string }) {
     const orderId = req.query.orderId as string
@@ -30,7 +30,7 @@ async function deleteHandler(req: NextApiRequest, res: NextApiResponse, token: {
             res.status(401).send({ message: "No hay token" })
         }
         await validateQueryFindOrder(req, res)
-        const deleteDocumentOrder = await deleteOrderById(token.userId, orderId)
+        const deleteDocumentOrder = await deleteOrder(token.userId, orderId)
         res.status(200).send({ message: `orden ${orderId} eliminada correctamente`, delete: deleteDocumentOrder })
     } catch (error) {
         if (error.message) {

@@ -4,8 +4,9 @@ import { UserRepository } from "repositories/userRepository"
 import { CartService } from "./cart"
 import { formatProductsForOrder, calcTotalPrice, formatItemsForPreference } from "utils/cart"
 import { getDate, formatExpireDateForPreference } from "./dateFns"
-import { createPreference, getMerchantOrderId, getPayment } from "./mercadopago"
+import { createPreference, getMerchantOrderId, getPayment } from "./mercadoPago"
 import { saleAlert, purchaseAlert } from "./sendgrid"
+import { getBaseUrl } from "utils/getBaseUrl"
 
 export class OrderService {
     cart = new CartService(this.userRepo)
@@ -39,13 +40,13 @@ export class OrderService {
             const products = formatProductsForOrder(cartData)
             const totalPrice = calcTotalPrice(cartData)
             const order = await this.repo.newOrder({
-                orderId: "",
+                orderId:null,
                 userId: getUserId,
                 products: products,
                 status: "pending",
                 totalPrice: totalPrice,
-                url: "",
-                additionalInfo,
+                url: null,
+                additionalInfo: additionalInfo || null,
                 created: getDate(),
                 payment: null,
                 expire: false,
@@ -57,15 +58,15 @@ export class OrderService {
         }
     }
 
-    async createPreference(userId: string): Promise<{ url: string }> {
+    async createPreference(userId: string, additionalInfo: string): Promise<{ url: string }> {
         try {
-            const order = await this.createOrder(userId)
+            const order = await this.createOrder(userId, additionalInfo)
             const { id, data } = order
             const cartData = await this.cart.getCartData(userId)
             const items = formatItemsForPreference(cartData)
             const userData = await this.userRepo.getUser(userId)
             const expireDatePreference = formatExpireDateForPreference()
-            const urlData = await getBaseUrl(id)
+            const urlData = getBaseUrl()
             const newPreference = await createPreference({
                 body:
                 {
@@ -104,19 +105,19 @@ export class OrderService {
         }
     }
 
-    async UpdateOrder(userId: string, orderId: string, topic: string, id: string): Promise<Order> {
+    async UpdateOrder(userId: string, topic: string, id: string): Promise<Order> {
         if (topic !== "merchant_order") return null
         try {
-            const { order_status } = await getMerchantOrderId({ merchantOrderId: id as string })
+            const { order_status, external_reference } = await getMerchantOrderId({ merchantOrderId: id as string })
             if (order_status !== "paid") return
-            const order = await this.repo.getOrderDoc(userId, orderId)
+            const order = await this.repo.getOrderDoc(userId, external_reference)
             const user = await this.userRepo.getUser(userId)
             order.updateStatus(order_status)
             await Promise.all([
                 this.repo.save(order),
                 this.cart.reset(userId),
-                purchaseAlert(user.data.email, user.data.userName, orderId),
-                saleAlert(userId, orderId, order.data.totalPrice)
+                purchaseAlert(user.data.email, user.data.userName, external_reference),
+                saleAlert(userId, external_reference, order.data.totalPrice)
             ])
             return order
         } catch (error) {

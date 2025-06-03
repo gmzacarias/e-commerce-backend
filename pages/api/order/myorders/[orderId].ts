@@ -2,16 +2,15 @@ import type { NextApiRequest, NextApiResponse } from "next"
 import method from "micro-method-router"
 import { handlerCORS } from "lib/corsMiddleware"
 import { authMiddleware } from "lib/middleware"
-import { validateQueryFindOrder } from "lib/schemaMiddleware"
 import { deleteOrder, getOrderDataById } from "controllers/order"
+import { validateOrderId } from "services/validators"
 
 async function getHandler(req: NextApiRequest, res: NextApiResponse, token: { userId: string }) {
-    const orderId = req.query.orderId as string
     try {
-        if (!token) {
-            res.status(401).send({ message: "No hay token" })
+        if (!token.userId) {
+            throw new Error("token invalido o no autorizado")
         }
-        await validateQueryFindOrder(req, res)
+        const orderId = validateOrderId(req.query.orderId as string)
         const orderFound = await getOrderDataById(token.userId, orderId)
         res.status(200).send({ data: orderFound })
     } catch (error) {
@@ -24,12 +23,11 @@ async function getHandler(req: NextApiRequest, res: NextApiResponse, token: { us
 }
 
 async function deleteHandler(req: NextApiRequest, res: NextApiResponse, token: { userId: string }) {
-    const orderId = req.query.orderId as string
     try {
-        if (!token) {
-            res.status(401).send({ message: "No hay token" })
+        if (!token.userId) {
+            throw new Error("token invalido o no autorizado")
         }
-        await validateQueryFindOrder(req, res)
+        const orderId = validateOrderId(req.query.orderId as string)
         const deleteDocumentOrder = await deleteOrder(token.userId, orderId)
         res.status(200).send({ message: `orden ${orderId} eliminada correctamente`, delete: deleteDocumentOrder })
     } catch (error) {

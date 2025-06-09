@@ -2,7 +2,7 @@ import { airTableConfig } from "lib/airtable"
 
 const { baseId, tableName, token } = airTableConfig
 
-export async function authAirtable() {
+export async function authAirtable():Promise <AirtableData[]> {
     try {
         const response = await fetch(`https://api.airtable.com/v0/${baseId}/${tableName}/listRecords`, {
             method: "POST",
@@ -16,7 +16,7 @@ export async function authAirtable() {
             throw new Error("hubo un error al obtener los datos")
         }
         const data = await response.json();
-        const dataRecords = data.records.map((record: { fields: AirtableData }) => record.fields);
+        const dataRecords= data.records.map((record: { fields: AirtableData }) => record.fields);
         if (!dataRecords || dataRecords.length === 0) {
             throw new Error("No hay records disponibles")
         }

@@ -39,39 +39,53 @@ declare global {
 
     interface ProductData {
         objectID: string,
+        productId: string,
+        system: string,
+        version: number,
+        brand: string
+        familyModel: string,
         model: string,
         colour: string,
-        photo: string,
-        storage: string,
+        rearCamera: string,
+        rearCameraVakue: number,
         frontCamera: string,
-        brand: string,
+        frontCameraValue: number,
+        ram: strimg,
+        ramValue: number,
+        storage: string,
+        storageValue: number,
         price: number,
-        id: string,
-        android: string,
-        camera: string,
-        ram: string,
-        quantity: number
-        totalPrice: number
+        totalPrice: number,
+        quantity: number,
+        stock: number,
+        photo: string,
     }
 
     interface AirtableData {
-        android: string;
-        brand: string;
-        camera: string;
-        colour: string;
-        frontCamera: string;
-        id: string;
-        model: string;
-        photo: string;
-        price: number;
-        ram: string;
-        storage: string;
+        productId: string,
+        system: string,
+        version: number,
+        brand: string
+        familyModel: string,
+        model: string,
+        colour: string,
+        rearCamera: string,
+        rearCameraVakue: number,
+        frontCamera: string,
+        frontCameraValue: number,
+        ram: strimg,
+        ramValue: number,
+        storage: string,
+        storageValue: number,
+        price: number,
+        totalPrice: number,
+        quantity: number,
+        stock: number,
+        photo: string,
     }
 
     interface AlgoliaData extends AirtableData {
         objectID: string,
-        quantity: string,
-        totalPrice: number
     }
 
     interface ProductsOrder {

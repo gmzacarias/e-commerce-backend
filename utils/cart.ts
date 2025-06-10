@@ -46,7 +46,7 @@ export function formatItemsForPreference(data: ProductData[]): ItemsData[] {
         }
         const items = data.map(item => {
             return {
-                id: `${item.id}`,
+                id: `${item.productId}`,
                 title: `${item.brand} ${item.model}`,
                 description: `smartphone ${item.brand} ${item.model} `,
                 picture_url: item.photo,

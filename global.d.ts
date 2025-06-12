@@ -67,7 +67,7 @@ declare global {
         colour: string,
         rearCamera: string,
         frontCamera: string,
-        ram: strimg, 
+        ram: strimg,
         storage: string,
         price: number,
         totalPrice: number,
@@ -126,7 +126,16 @@ declare global {
         q: string,
         offset: string,
         limit: string,
-        sort: string
+        sort: string,
+        brand: string|string[],
+        familyModel: string|string[],
+        model: string|string[],
+        colour: string|string[],
+        rearCamera: string|string[],
+        frontCamera: string|string[],
+        system: string|string[],
+        priceMin: number,
+        priceMax: number
     }
 
     interface FirestoreTimestamp {

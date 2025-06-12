@@ -2,6 +2,7 @@ import { SearchIndex } from "algoliasearch";
 import { productIndex, productsAscIndex, productsDescIndex } from "lib/algolia"
 import { authAirtable } from "services/airtable"
 import { uploadCloudinary } from "services/cloudinary"
+import { getFilters } from "utils/filters";
 import { getOffsetAndLimit } from "utils/pagination";
 
 async function mapAirtableToAlgolia(records: AirtableData[]): Promise<AlgoliaData[]> {
@@ -34,6 +35,22 @@ export async function getProducts(): Promise<AlgoliaData[]> {
     }
 }
 
+export async function getPrices() {
+    try {
+        const results = await productIndex.search('', {
+            facets: ['price'],
+            maxValuesPerFacet: 1
+        })
+        const prices = results.facets_stats.price
+        const minPriceValue = prices.min
+        const maxPriceValue = prices.max
+        return { minPriceValue, maxPriceValue }
+    } catch (error) {
+        console.error(error.message)
+        throw error
+    }
+}
+
 export async function saveProductsAlgolia() {
     try {
         const productsData = await getProducts()
@@ -59,7 +76,7 @@ export async function searchProductById(productId: string): Promise<ProductData>
 }
 
 
-function checkIndexAlgolia(sort: string){
+function checkIndexAlgolia(sort: string) {
     const sortToIndexMap: Record<string, SearchIndex> = {
         "price_asc": productsAscIndex,
         "price_desc": productsDescIndex
@@ -72,12 +89,15 @@ export async function searchProductsByQuery(data: QueryData) {
     const { offset, limit } = getOffsetAndLimit(data.offset, data.limit)
     const q = data.q
     const sort = data.sort
+    const getPricesData = await getPrices()
+    const filters = getFilters(data, getPricesData)
     try {
         const currentIndex = checkIndexAlgolia(sort)
         const results = await currentIndex.search<AlgoliaData>(q, {
             hitsPerPage: limit,
             page: offset > 1 ? Math.floor(offset / limit) : 0,
-            attributesToHighlight: []
+            attributesToHighlight: [],
+            filters: filters
         })
         if (results.nbHits !== 0) {
             return {

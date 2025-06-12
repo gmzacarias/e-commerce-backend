@@ -2,7 +2,7 @@ export class Cart {
     constructor(public items: ProductData[] = []) { }
 
     private hasProduct(productId: string): boolean {
-        return this.items.some(product => product.id === productId)
+        return this.items.some(product => product.productId === productId)
     }
 
     private validateQuantity(quantity: number) {
@@ -13,17 +13,17 @@ export class Cart {
 
     add(product: ProductData, quantity: number) {
         this.validateQuantity(quantity)
-        const exists = this.hasProduct(product.id)
+        const exists = this.hasProduct(product.productId)
         if (!exists) {
             this.items.push({ ...product, quantity })
         } else {
-            this.updateQuantity(product.id, quantity)
+            this.updateQuantity(product.productId, quantity)
         }
     }
 
     private updateQuantity(productId: string, quantity: number) {
         this.validateQuantity(quantity)
-        const item = this.items.find(p => p.id === productId)
+        const item = this.items.find(p => p.productId === productId)
         if (!item) {
             throw new Error("producto no encontrado")
         }
@@ -35,7 +35,7 @@ export class Cart {
         if (!exists) {
             throw new Error("el producto no existe")
         }
-        this.items = this.items.filter(product => product.id !== productId)
+        this.items = this.items.filter(product => product.productId !== productId)
     }
 
     clear() {

@@ -5,7 +5,6 @@ import { validateProductId } from "services/validators"
 import { searchProductById } from "services/algolia"
 
 async function getHandler(req: NextApiRequest, res: NextApiResponse) {
-
     try {
         const productId = validateProductId(req.query.productId as string)
         const product = await searchProductById(productId)

@@ -42,7 +42,7 @@ export class UserRepository {
             const user = await this.getUserDoc(userId)
             const cartData = user.data.cart
             if (cartData.length < 1) {
-                throw new Error("no se agregaron productos")
+                return []
             }
             return cartData
         } catch (error) {

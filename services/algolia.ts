@@ -1,5 +1,6 @@
 import { SearchIndex } from "algoliasearch";
 import { productIndex, productsAscIndex, productsDescIndex } from "lib/algolia"
+import type { ObjectWithObjectID } from "@algolia/client-search/dist/client-search"
 import { authAirtable } from "services/airtable"
 import { uploadCloudinary } from "services/cloudinary"
 import { getFilters } from "utils/filters";
@@ -55,26 +56,22 @@ export async function saveProductsAlgolia() {
     try {
         const productsData = await getProducts()
         const syncAlgolia = await productIndex.saveObjects(productsData)
-
         return await Promise.all(syncAlgolia.taskIDs.map(taskId => productIndex.waitTask(taskId)))
-
     } catch (error) {
         console.error(`hubo un problema con la sincronizacion en Algolia : ${error.message}`)
         throw error;
     }
 }
 
-export async function searchProductById(productId: string): Promise<ProductData> {
+export async function searchProductById(productId: string): Promise<ObjectWithObjectID> {
     try {
-        const products = await getProducts()
-        const filterProduct = products.find(item => item.productId === productId)
-        return filterProduct
+        const getProductById = await productIndex.getObject(productId)
+        return getProductById
     } catch (error) {
         console.error("Error al encontrar el producto:", error.message)
         throw error
     }
 }
-
 
 function checkIndexAlgolia(sort: string) {
     const sortToIndexMap: Record<string, SearchIndex> = {
@@ -143,3 +140,23 @@ export async function getFeaturedProducts(): Promise<AlgoliaData[]> {
         throw error
     }
 }
+
+export async function updateStockProducts(data: ProductData[]) {
+    try {
+        const formatData = data.map(item => {
+            return {
+                objectID: item.objectID,
+                stock: item.stock
+            }
+        })
+        console.log("data algolia", formatData)
+        const response = await productIndex.partialUpdateObjects(formatData)
+        console.log("algolia", response)
+        return response
+    } catch (error) {
+        console.error("error al actualizar el stock:", error.message)
+        throw error
+    }
+}
+
+

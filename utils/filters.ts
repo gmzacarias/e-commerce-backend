@@ -15,7 +15,7 @@ export function getFilters(data: Partial<QueryData>, prices: { minPriceValue: nu
         const stringFilters = ["brand", "familyModel", "system", "colour", "model", "rearCamera", "frontCamera"]
         for (const key of stringFilters) {
             const value = parsedData[key as keyof typeof data]
-            console.log("check", Array.isArray(value))
+            
             if (Array.isArray(value)) {
                 const orFilters = value.map((val) => `${key}:"${val}"`).join(" OR ")
                 if (orFilters) queryFilters.push(`(${orFilters})`)

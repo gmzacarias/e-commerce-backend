@@ -2,8 +2,9 @@ import { Order } from "models/order"
 import { OrderRepository } from "repositories/orderRepository"
 import { UserRepository } from "repositories/userRepository"
 import { CartService } from "./cart"
-import { formatProductsForOrder, calcTotalPrice, formatItemsForPreference } from "utils/cart"
+import { formatProductsForOrder, calcTotalPrice, formatItemsForPreference, hasStock } from "utils/cart"
 import { getDate, formatExpireDateForPreference } from "./dateFns"
+import { updateStockProducts } from "./algolia"
 import { createPreference, getMerchantOrderId, getPayment } from "./mercadopago"
 import { saleAlert, purchaseAlert } from "./sendgrid"
 import { getBaseUrl } from "utils/getBaseUrl"
@@ -35,9 +36,9 @@ export class OrderService {
 
     async createOrder(userId: string, additionalInfo?: string): Promise<Order> {
         try {
-
             const getUserId = (await this.userRepo.getUser(userId)).id
             const cartData = await this.cart.getCartData(getUserId)
+            const stockData = hasStock(cartData)
             const products = formatProductsForOrder(cartData)
             const totalPrice = calcTotalPrice(cartData)
             const order = await this.repo.newOrder({
@@ -52,6 +53,7 @@ export class OrderService {
                 payment: null,
                 expire: false,
             })
+            await updateStockProducts(stockData)
             return order
         } catch (error) {
             console.error(error.message)

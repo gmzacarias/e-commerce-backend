@@ -22,4 +22,8 @@ export class Order {
         }
         this.data.status = "closed"
     }
+
+    updateExpire(expired:boolean){
+        this.data.expire=expired
+    }
 }

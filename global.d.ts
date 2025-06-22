@@ -32,7 +32,7 @@ declare global {
         additionalInfo: string,
         url: string,
         orderId: string,
-        created: string,
+        created: Date,
         payment: PaymentData | null,
         expire: Boolean,
     }

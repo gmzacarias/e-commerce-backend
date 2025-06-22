@@ -1,13 +1,12 @@
-import { addHours, addMinutes, format, isAfter } from "date-fns"
-import { es } from "date-fns/locale/es"
+import { addHours, addMinutes, format, isAfter, differenceInDays } from "date-fns"
 
-export function getDate():string {
+function formatDateFirebase(date: FirestoreTimestamp): Date {
     try {
-        const currentDate = new Date()
-        const formatDate = format(currentDate, "dd 'de' MMMM 'de' yyyy", { locale: es })
-        return formatDate
+        const { _nanoseconds, _seconds } = date
+        const newDate = new Date(_seconds * 1000 + Math.floor(_nanoseconds / 1000000))
+        return newDate
     } catch (error) {
-        console.error("no se pudo formatear la fecha:", error.message)
+        console.error("no se pudo formatear la fecha :", error.message)
         throw error
     }
 }
@@ -29,11 +28,26 @@ export function checkExpiration(date: FirestoreTimestamp | Date): Boolean {
         if (date instanceof Date) {
             return isAfter(currentDate, date)
         }
-        const { _nanoseconds, _seconds } = date
-        const expirationDate = new Date(_seconds * 1000 + Math.floor(_nanoseconds / 1000000))
+        const expirationDate = formatDateFirebase(date)
         return isAfter(currentDate, expirationDate)
     } catch (error) {
         console.error("no se pudo chequear la fecha de expiracion:", error.message)
+        throw error
+    }
+}
+
+export function checkExpirationPayments(date: FirestoreTimestamp | Date) {
+    try {
+        const currentDate = new Date()
+        if (date instanceof Date) {
+            const result = differenceInDays(currentDate, date)
+            return result
+        }
+        const expirationPayment = formatDateFirebase(date)
+        const result = differenceInDays(currentDate, expirationPayment)
+        return result
+    } catch (error) {
+        console.error("no se pudo chequear la fecha de expiracion de los pagos:", error.message)
         throw error
     }
 }

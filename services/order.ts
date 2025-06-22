@@ -3,12 +3,11 @@ import { OrderRepository } from "repositories/orderRepository"
 import { UserRepository } from "repositories/userRepository"
 import { CartService } from "./cart"
 import { formatProductsForOrder, calcTotalPrice, formatItemsForPreference, hasStock } from "utils/cart"
-import { getDate, formatExpireDateForPreference } from "./dateFns"
+import { checkExpirationPayments, formatExpireDateForPreference } from "./dateFns"
 import { updateStockProducts } from "./algolia"
 import { createPreference, getMerchantOrderId, getPayment } from "./mercadopago"
 import { saleAlert, purchaseAlert } from "./sendgrid"
 import { getBaseUrl } from "utils/getBaseUrl"
-
 
 export class OrderService {
     cart = new CartService(this.userRepo)
@@ -17,7 +16,26 @@ export class OrderService {
     async getMyOrders(userId: string): Promise<OrderData[]> {
         try {
             const myOrders = await this.repo.getOrders(userId)
+            await this.checkExpirationOrders(myOrders)
             return myOrders
+        } catch (error) {
+            console.error(error.message)
+            throw error
+        }
+    }
+
+    async checkExpirationOrders(orders: OrderData[]): Promise<boolean> {
+        try {
+            for (const item of orders) {
+                const result = checkExpirationPayments(item.created)
+                console.log("resultados",result)
+                if (result >= 2 || item.status === "closed") {
+                    const order = await this.repo.getOrderDoc(item.userId, item.orderId)
+                    const update = order.updateExpire(true)
+                    await this.repo.save(order)
+                }
+            }
+            return true
         } catch (error) {
             console.error(error.message)
             throw error
@@ -49,7 +67,7 @@ export class OrderService {
                 totalPrice: totalPrice,
                 url: null,
                 additionalInfo: additionalInfo || null,
-                created: getDate(),
+                created: new Date(),
                 payment: null,
                 expire: false,
             })

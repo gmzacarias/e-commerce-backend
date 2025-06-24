@@ -127,13 +127,13 @@ declare global {
         offset: string,
         limit: string,
         sort: string,
-        brand: string|string[],
-        familyModel: string|string[],
-        model: string|string[],
-        colour: string|string[],
-        rearCamera: string|string[],
-        frontCamera: string|string[],
-        system: string|string[],
+        brand: string | string[],
+        familyModel: string | string[],
+        model: string | string[],
+        colour: string | string[],
+        rearCamera: string | string[],
+        frontCamera: string | string[],
+        system: string | string[],
         priceMin: number,
         priceMax: number
     }
@@ -141,6 +141,21 @@ declare global {
     interface FirestoreTimestamp {
         _nanoseconds: number,
         _seconds: number
+    }
+
+    type codeProps = {
+        code: number
+    }
+
+    type paymentProps = {
+        userName?: string,
+        order: string
+    }
+
+    type saleProps = {
+        userId: string,
+        order: string,
+        price: number,
     }
 }
 

@@ -1,13 +1,15 @@
 import { render } from "@react-email/render";
-import { CodeMail, PaymentMail, SaleMail } from "components/mails";
+import { sendCodeMail } from "components/sendCodeMail";
+import { paymentMail } from "components/paymentMail";
+import { saleMail } from "components/saleMail";
 import { sender, sgMail, adminEmail } from "lib/sendgrid";
 
 export async function sendCodeAuth(email: string, code: number) {
-    const mailHtml = render(CodeMail({ code: code }))
+    const mailHtml = render(sendCodeMail({ code: code }))
     const msg = {
         to: email,
         from: sender, // Use the email address or domain you verified above
-        subject: 'Codigo Inicio de sesion',
+        subject: '🔐 Código de verificación para iniciar sesión en Smartshop',
         html: mailHtml,
     };
     try {
@@ -18,7 +20,7 @@ export async function sendCodeAuth(email: string, code: number) {
 }
 
 async function sendPaymentConfirmed(email: string, userName: string, order: string) {
-    const mailHtml = render(PaymentMail({ userName: userName, order: order }))
+    const mailHtml = render(paymentMail({ userName: userName, order: order }))
     const msg = {
         to: email,
         from: sender, // Use the email address or domain you verified above
@@ -33,7 +35,7 @@ async function sendPaymentConfirmed(email: string, userName: string, order: stri
 }
 
 async function sendSaleConfirmed(userId: string, order: string, price: number) {
-    const mailHtml = render(SaleMail({ userId: userId, order: order, price: price }))
+    const mailHtml = render(saleMail({ userId: userId, order: order, price: price }))
     const msg = {
         to: adminEmail,
         from: sender, // Use the email address or domain you verified above

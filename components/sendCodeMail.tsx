@@ -70,7 +70,7 @@ export function sendCodeMail({ code }: codeProps) {
                 <Container style={container}>
                     <Section style={imageSection}>
                         <Img
-                            src="https://res.cloudinary.com/dkwjm2ocu/image/upload/v1750733308/ukudm8olr7crts5seziv.png"
+                            src="https://res.cloudinary.com/dkwjm2ocu/ukudm8olr7crts5seziv.png"
                             width="178"
                             height="68"
                             alt="Smartshop logo"

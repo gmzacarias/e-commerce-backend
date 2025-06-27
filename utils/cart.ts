@@ -26,10 +26,12 @@ export function formatProductsForOrder(data: ProductData[]): ProductsOrder[] {
             return {
                 productId: item.objectID,
                 brand: item.brand,
+                familyModel:item.familyModel,
                 model: item.model,
                 colour: item.colour,
                 photo: item.photo,
-                quantity: item.quantity
+                quantity: item.quantity,
+                price:item.price
             }
         })
         return products

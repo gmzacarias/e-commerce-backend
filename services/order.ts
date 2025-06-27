@@ -137,8 +137,8 @@ export class OrderService {
             await Promise.all([
                 this.repo.save(order),
                 this.cart.reset(userId),
-                purchaseAlert(user.data.email, user.data.userName, external_reference),
-                saleAlert(userId, external_reference, order.data.totalPrice)
+                purchaseAlert(user.data.email, user.data.userName, order.data),
+                saleAlert(user.data,order.data)
             ])
             return order
         } catch (error) {

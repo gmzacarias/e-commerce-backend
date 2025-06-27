@@ -32,7 +32,7 @@ declare global {
         additionalInfo: string,
         url: string,
         orderId: string,
-        created: Date,
+        created: Date |FirestoreTimestamp,
         payment: PaymentData | null,
         expire: Boolean,
     }
@@ -83,10 +83,12 @@ declare global {
     interface ProductsOrder {
         productId: string,
         brand: string,
+        familyModel: string,
         model: string,
         colour: string,
         photo: string,
         quantity: number
+        price: number
     }
 
     interface ItemsData {
@@ -148,14 +150,14 @@ declare global {
     }
 
     type paymentProps = {
-        userName?: string,
-        order: string
+        userName: string,
+        order: OrderData
     }
 
     type saleProps = {
-        userId: string,
-        order: string,
-        price: number,
+        user: UserData,
+        order: OrderData,
+       
     }
 }
 

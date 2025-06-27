@@ -19,12 +19,12 @@ export async function sendCodeAuth(email: string, code: number) {
     }
 }
 
-async function sendPaymentConfirmed(email: string, userName: string, order: string) {
-    const mailHtml = render(paymentMail({ userName: userName, order: order }))
+async function sendPaymentConfirmed(email: string, userName: string, order: OrderData) {
+    const mailHtml = render(paymentMail({ userName, order }))
     const msg = {
         to: email,
         from: sender, // Use the email address or domain you verified above
-        subject: 'Notificacion de compra confirmada',
+        subject: `✅ Confirmación de tu compra en Smartshop - Orden #${order.orderId}`,
         html: mailHtml,
     };
     try {
@@ -34,12 +34,12 @@ async function sendPaymentConfirmed(email: string, userName: string, order: stri
     }
 }
 
-async function sendSaleConfirmed(userId: string, order: string, price: number) {
-    const mailHtml = render(saleMail({ userId: userId, order: order, price: price }))
+async function sendSaleConfirmed(user:UserData, order:OrderData) {
+    const mailHtml = render(saleMail({ user,order }))
     const msg = {
         to: adminEmail,
         from: sender, // Use the email address or domain you verified above
-        subject: 'Notificacion de compra confirmada',
+        subject:`✅ Confirmación de venta en Smartshop - Orden #${order.orderId}`,
         html: mailHtml,
     };
     try {
@@ -49,7 +49,7 @@ async function sendSaleConfirmed(userId: string, order: string, price: number) {
     }
 }
 
-export async function purchaseAlert(email: string, userName: string, order: string) {
+export async function purchaseAlert(email: string, userName: string, order: OrderData) {
     try {
         const data = await sendPaymentConfirmed(email, userName, order)
         return data
@@ -58,9 +58,9 @@ export async function purchaseAlert(email: string, userName: string, order: stri
     }
 }
 
-export async function saleAlert(userId: string, order: string, price: number) {
+export async function saleAlert(user:UserData,order:OrderData) {
     try {
-        const data = await sendSaleConfirmed(userId, order, price)
+        const data = await sendSaleConfirmed(user, order)
         return data
     } catch (error) {
         console.error("No se pudo enviar el mail ", error.message)

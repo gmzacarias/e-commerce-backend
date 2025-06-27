@@ -46,11 +46,6 @@ const footerSection = {
     paddingTop: "10px",
 };
 
-const mainText = {
-    ...text,
-    fontSize: "18px",
-};
-
 const codeText = {
     ...text,
     fontSize: "32px",
@@ -78,7 +73,7 @@ export function sendCodeMail({ code }: codeProps) {
                         />
                     </Section>
                     <Section>
-                        <Text style={mainText}>
+                        <Text style={text}>
                             Hola 👋 <br /><br />
                             Recibimos una solicitud para iniciar sesión en tu cuenta de
                             Smartshop. <br />

@@ -1,5 +1,3 @@
-import { maxHeaderSize } from "http"
-
 export function getFilters(data: Partial<QueryData>, prices: { minPriceValue: number, maxPriceValue: number }): string {
     try {
         if (!data) return ""
@@ -17,7 +15,6 @@ export function getFilters(data: Partial<QueryData>, prices: { minPriceValue: nu
         const stringFilters = ["brand", "familyModel", "system", "colour", "model", "rearCamera", "frontCamera"]
         for (const key of stringFilters) {
             const value = parsedData[key as keyof typeof data]
-            
             if (Array.isArray(value)) {
                 const orFilters = value.map((val) => `${key}:"${val}"`).join(" OR ")
                 if (orFilters) queryFilters.push(`(${orFilters})`)
@@ -26,8 +23,8 @@ export function getFilters(data: Partial<QueryData>, prices: { minPriceValue: nu
             }
         }
         if (data.priceMin && data.priceMax) {
-            const min = data.priceMin > minPriceValue ? data.priceMin:minPriceValue
-            const max = data.priceMax < maxPriceValue ? data.priceMax:maxPriceValue
+            const min = data.priceMin > minPriceValue ? data.priceMin : minPriceValue
+            const max = data.priceMax < maxPriceValue ? data.priceMax : maxPriceValue
             queryFilters.push(`price >= ${min} AND price <= ${max} `)
         }
         return queryFilters.join(" AND ")

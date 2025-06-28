@@ -63,7 +63,7 @@ export async function saveProductsAlgolia() {
     }
 }
 
-export async function searchProductById(productId: string):Promise<ProductData> {
+export async function searchProductById(productId: string): Promise<ProductData> {
     try {
         const getProductById = await productIndex.getObject(productId)
         return getProductById as ProductData
@@ -124,7 +124,7 @@ export async function searchProductsByQuery(data: QueryData) {
 export async function getFeaturedProducts(): Promise<AlgoliaData[]> {
     try {
         const results = await productIndex.search<AlgoliaData>("", {
-            attributesToHighlight: []
+            attributesToHighlight: [],
         })
         const data = results.hits
         const filterByBrands = data.map((item) => item.brand)
@@ -136,7 +136,7 @@ export async function getFeaturedProducts(): Promise<AlgoliaData[]> {
         })
         return featuredProducts
     } catch (error) {
-        console.error("Error al encontrar el producto:", error.message)
+        console.error("Error al obtener los productos destacados:", error.message)
         throw error
     }
 }

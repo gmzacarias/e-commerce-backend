@@ -60,40 +60,81 @@ NODE_ENV="development"
 NODE_ENV="production"
 
 # Firebase
-FIREBASE_CONNECTION=
+FIREBASE_CONNECTION="value"
 
 # JWT token
-JWT_SECRET=
+JWT_SECRET="value"
 
 # Mercado Pago
-ACCESS_TOKEN=
+ACCESS_TOKEN="value"
 
 # Sendgrid
-SENDGRID_API_KEY=
-SENDGRID_SENDER=
-ADMIN_EMAIL=
+SENDGRID_API_KEY="value"
+SENDGRID_SENDER="value"
+ADMIN_EMAIL="value"
 
 # Algolia
-APPLICATION_ID=
-ADMIN_API_KEY=
+APPLICATION_ID="value"
+ADMIN_API_KEY="value"
 
 # Airtable
-AIRTABLE_BASEID=
-AIRTABLE_TABLENAME=
-AIRTABLE_TOKEN=
+AIRTABLE_BASEID="value"
+AIRTABLE_TABLENAME="value"
+AIRTABLE_TOKEN="value"
 
 # Cloudinary
-CLOUDINARY_CLOUD=
-CLOUDINARY_API_KEY=
-CLOUDINARY_API_SECRET=
+CLOUDINARY_CLOUD="value"
+CLOUDINARY_API_KEY="value"
+CLOUDINARY_API_SECRET="value"
 
 # Hookdeck
-HOOKDECK_URL=
+HOOKDECK_URL="value"
 
 # Vercel
-VERCEL_URL=
+VERCEL_URL="value"
 ```
 
+#### `.env.test` – Test
+
+```env
+#Environment
+NODE_ENV="development"
+NODE_ENV="production"
+
+# Firebase
+FIREBASE_CONNECTION="value"
+
+# JWT token
+JWT_SECRET="value"
+
+# Mercado Pago
+ACCESS_TOKEN="value"
+
+# Sendgrid
+SENDGRID_API_KEY="value"
+SENDGRID_SENDER="value"
+ADMIN_EMAIL="value"
+
+# Algolia
+APPLICATION_ID="value"
+ADMIN_API_KEY="value"
+
+# Airtable
+AIRTABLE_BASEID="value"
+AIRTABLE_TABLENAME="value"
+AIRTABLE_TOKEN="value"
+
+# Cloudinary
+CLOUDINARY_CLOUD="value"
+CLOUDINARY_API_KEY="value"
+CLOUDINARY_API_SECRET="value"
+
+# Hookdeck
+HOOKDECK_URL="value"
+
+# Vercel
+VERCEL_URL="value"
+```
 > ⚠️ Importante: No subir estos archivos al repositorio (usar `.gitignore`).
 
 ---

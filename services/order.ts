@@ -74,7 +74,7 @@ export class OrderService {
             const formatOrder = {
                 ...order.data,
                 created: formatDateFirebase(order.data.created as FirestoreTimestamp).toLocaleString(),
-                ...(order.data.payment&&{
+                ...(order.data.payment && {
                     payment: {
                         ...order.data.payment,
                         paymentCreated: new Date(order.data.payment.paymentCreated).toLocaleString("es-AR", {
@@ -191,7 +191,7 @@ export class OrderService {
         }
     }
 
-    async setPayment(userId: string, id: string): Promise<Order> {
+    async setPayment(userId: string, id: string): Promise<OrderData> {
         try {
             const data = await getPayment({ id: id })
             const orderId = data.external_reference
@@ -212,7 +212,23 @@ export class OrderService {
             const order = await this.repo.getOrderDoc(userId, orderId)
             order.setPayment(paymentData)
             await this.repo.save(order)
-            return order
+            const formatOrder = {
+                ...order.data,
+                ...(order.data.payment && {
+                    ...order.data.payment,
+                    paymentCreated: new Date(order.data.payment.paymentCreated).toLocaleString("es-AR", {
+                        day: "2-digit",
+                        month: "2-digit",
+                        year: "numeric",
+                        hour: "2-digit",
+                        minute: "2-digit",
+                        second: "2-digit",
+                        hour12: false,
+                    }),
+
+                })
+            }
+            return formatOrder
         } catch (error) {
             console.error(error.message)
             throw error

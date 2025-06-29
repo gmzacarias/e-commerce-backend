@@ -27,7 +27,7 @@ export async function updateStatusOrder(userId: string, topic: string, id: strin
     return await orderService.UpdateOrder(userId, topic, id)
 }
 
-export async function setPaymentOrder(userId: string, id: string): Promise<Order> {
+export async function setPaymentOrder(userId: string, id: string): Promise<OrderData> {
     return await orderService.setPayment(userId, id)
 }
 

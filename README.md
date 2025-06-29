@@ -206,4 +206,4 @@ Para probar distintos estados en las tarjetas de prueba, completá el campo `car
 
 Desarrollado por Gastón Mauro Zacarias  
 📧 Contacto: gastonmzacarias@gmail.com  
-🌐 Portfolio: [https://tuportafolio.com](https://tuportafolio.com)
+🌐 Portfolio: [https://github.com/gmzacarias](https://github.com/gmzacarias)

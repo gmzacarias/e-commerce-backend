@@ -8,7 +8,7 @@ Este es un proyecto completo de eCommerce desarrollado con **Next.js**, que util
 
 - 🔗 **Frontend**: [https://e-commerce-smartshop.vercel.app](https://e-commerce-smartshop.vercel.app)  
 - 🔗 **Backend**: [https://e-commerce-backend-lake.vercel.app](https://e-commerce-backend-lake.vercel.app)  
-- 📬 **Postman Docs**: [https://documenter.getpostman.com/view/23206998/2s9YywgL2L](https://documenter.getpostman.com/view/23206998/2s9YywgL2L)
+- 📬 **API Docs**: [https://e-commerce-smartshop-api-docs.vercel.app/](https://e-commerce-smartshop-api-docs.vercel.app/)
 
 ---
 
@@ -113,8 +113,8 @@ API en: [http://localhost:3000/api](http://localhost:3000/api)
 
 ## 📬 Testeo de la API
 
-Usar la siguiente colección de Postman para probar los endpoints REST:  
-👉 [Postman Collection](https://documenter.getpostman.com/view/23206998/2s9YywgL2L)
+Para testear los endpoints REST, usá directamente la interfaz Swagger acá:  
+👉 [Smartshop API Docs](https://e-commerce-smartshop-api-docs.vercel.app/)
 
 ---
 

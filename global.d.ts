@@ -32,7 +32,7 @@ declare global {
         additionalInfo: string,
         url: string,
         orderId: string,
-        created: Date |FirestoreTimestamp,
+        created: Date | FirestoreTimestamp | string,
         payment: PaymentData | null,
         expire: Boolean,
     }
@@ -157,7 +157,7 @@ declare global {
     type saleProps = {
         user: UserData,
         order: OrderData,
-       
+
     }
 }
 

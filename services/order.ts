@@ -73,7 +73,15 @@ export class OrderService {
             const order = await this.repo.getOrderDoc(userId, orderId)
             const formatOrder = {
                 ...order.data,
-                created: formatDateFirebase(order.data.created as FirestoreTimestamp).toLocaleString(),
+                created: formatDateFirebase(order.data.created as FirestoreTimestamp).toLocaleString("es-AR", {
+                    day: "2-digit",
+                    month: "2-digit",
+                    year: "numeric",
+                    hour: "2-digit",
+                    minute: "2-digit",
+                    second: "2-digit",
+                    hour12: false,
+                }),
                 ...(order.data.payment && {
                     payment: {
                         ...order.data.payment,
@@ -214,6 +222,15 @@ export class OrderService {
             await this.repo.save(order)
             const formatOrder = {
                 ...order.data,
+                created: formatDateFirebase(order.data.created as FirestoreTimestamp).toLocaleString("es-AR", {
+                    day: "2-digit",
+                    month: "2-digit",
+                    year: "numeric",
+                    hour: "2-digit",
+                    minute: "2-digit",
+                    second: "2-digit",
+                    hour12: false,
+                }),
                 ...(order.data.payment && {
                     ...order.data.payment,
                     paymentCreated: new Date(order.data.payment.paymentCreated).toLocaleString("es-AR", {

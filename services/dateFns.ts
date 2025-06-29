@@ -1,6 +1,6 @@
 import { addHours, addMinutes, format, isAfter, differenceInDays } from "date-fns"
 
-function formatDateFirebase(date: FirestoreTimestamp): Date {
+export function formatDateFirebase(date: FirestoreTimestamp): Date {
     try {
         const { _nanoseconds, _seconds } = date
         const newDate = new Date(_seconds * 1000 + Math.floor(_nanoseconds / 1000000))

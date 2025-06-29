@@ -9,7 +9,7 @@ async function postHandler(req: NextApiRequest, res: NextApiResponse) {
         res.status(200).send({ message: "Base de datos sincronizada" })
     } catch (error) {
         if (error.message) {
-            res.status(401).send({ message: error.message })
+            res.status(400).send({ message: error.message })
         } else {
             res.status(500).send({ message: "Error interno del servidor", error: error })
         }

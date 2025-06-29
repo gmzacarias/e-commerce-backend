@@ -3,7 +3,7 @@ import { OrderRepository } from "repositories/orderRepository"
 import { UserRepository } from "repositories/userRepository"
 import { CartService } from "./cart"
 import { formatProductsForOrder, calcTotalPrice, formatItemsForPreference, hasStock } from "utils/cart"
-import { checkExpirationPayments, formatExpireDateForPreference } from "./dateFns"
+import { checkExpirationPayments, formatExpireDateForPreference, formatDateFirebase } from "./dateFns"
 import { updateStockProducts } from "./algolia"
 import { createPreference, getMerchantOrderId, getPayment } from "./mercadopago"
 import { saleAlert, purchaseAlert } from "./sendgrid"
@@ -17,7 +17,34 @@ export class OrderService {
         try {
             const myOrders = await this.repo.getOrders(userId)
             await this.checkExpirationOrders(myOrders)
-            return myOrders
+            const formatDateOrders = myOrders.map((item) => ({
+                ...item,
+                created: formatDateFirebase(item.created as FirestoreTimestamp).toLocaleString("es-AR", {
+                    day: "2-digit",
+                    month: "2-digit",
+                    year: "numeric",
+                    hour: "2-digit",
+                    minute: "2-digit",
+                    second: "2-digit",
+                    hour12: false,
+                }),
+                ...(item.payment && {
+                    payment: {
+                        ...item.payment,
+                        paymentCreated: new Date(item.payment.paymentCreated).toLocaleString("es-AR", {
+                            day: "2-digit",
+                            month: "2-digit",
+                            year: "numeric",
+                            hour: "2-digit",
+                            minute: "2-digit",
+                            second: "2-digit",
+                            hour12: false,
+                        }),
+                    },
+                })
+            }
+            ))
+            return formatDateOrders
         } catch (error) {
             console.error(error.message)
             throw error
@@ -27,11 +54,10 @@ export class OrderService {
     async checkExpirationOrders(orders: OrderData[]): Promise<boolean> {
         try {
             for (const item of orders) {
-                const result = checkExpirationPayments(item.created)
-                console.log("resultados",result)
+                const result = checkExpirationPayments(item.created as FirestoreTimestamp)
                 if (result >= 2 || item.status === "closed") {
                     const order = await this.repo.getOrderDoc(item.userId, item.orderId)
-                    const update = order.updateExpire(true)
+                    order.updateExpire(true)
                     await this.repo.save(order)
                 }
             }
@@ -45,7 +71,25 @@ export class OrderService {
     async getOrdersById(userId: string, orderId: string): Promise<OrderData> {
         try {
             const order = await this.repo.getOrderDoc(userId, orderId)
-            return order.data
+            const formatOrder = {
+                ...order.data,
+                created: formatDateFirebase(order.data.created as FirestoreTimestamp).toLocaleString(),
+                ...(order.data.payment&&{
+                    payment: {
+                        ...order.data.payment,
+                        paymentCreated: new Date(order.data.payment.paymentCreated).toLocaleString("es-AR", {
+                            day: "2-digit",
+                            month: "2-digit",
+                            year: "numeric",
+                            hour: "2-digit",
+                            minute: "2-digit",
+                            second: "2-digit",
+                            hour12: false,
+                        }),
+                    },
+                })
+            }
+            return formatOrder
         } catch (error) {
             console.error(error.message)
             throw error
@@ -138,7 +182,7 @@ export class OrderService {
                 this.repo.save(order),
                 this.cart.reset(userId),
                 purchaseAlert(user.data.email, user.data.userName, order.data),
-                saleAlert(user.data,order.data)
+                saleAlert(user.data, order.data)
             ])
             return order
         } catch (error) {

@@ -1,10 +1,12 @@
 import { describe, expect } from "@jest/globals"
 import { UserService } from "./user"
+import { UserRepository } from "repositories/userRepository"
+import { AuthRepository } from "repositories/authRepository"
 
 describe("test in user service", () => {
     let userService: UserService
-    let mockUserRepo: any
-    let mockAuthRepo: any
+    let mockUserRepo: jest.Mocked<Partial<UserRepository>>
+    let mockAuthRepo: jest.Mocked<Partial<AuthRepository>>
 
     beforeEach(() => {
         mockUserRepo = {
@@ -16,12 +18,13 @@ describe("test in user service", () => {
             getAuth: jest.fn(),
             save: jest.fn()
         }
+
         userService = new UserService(mockUserRepo, mockAuthRepo)
     })
 
     it("should returns user data", async () => {
         const mockUser = { data: { userName: "John", email: "john@email.com", phoneNumber: "123", address: { city: "my city" } } }
-        mockUserRepo.getUser.mockResolvedValue(mockUser)
+        mockUserRepo.getUser.mockResolvedValue(mockUser as any)
         const result = await userService.getUserData("user123")
         expect(mockUserRepo.getUser).toHaveBeenCalledWith("user123")
         expect(result).toEqual(mockUser.data)
@@ -45,10 +48,16 @@ describe("test in user service", () => {
         }
 
         const mockAuth = {
+            data: {
+                email: "oldEmail@email.com",
+                userId: "user123",
+                code: 12345,
+                expire: new Date().setMinutes(30)
+            },
             updateEmail: jest.fn()
         }
-        mockUserRepo.getUser.mockResolvedValue(mockUser)
-        mockAuthRepo.getAuth.mockResolvedValue(mockAuth)
+        mockUserRepo.getUser.mockResolvedValue(mockUser as any)
+        mockAuthRepo.getAuth.mockResolvedValue(mockAuth as any)
         mockUserRepo.save.mockResolvedValue(true)
         mockAuthRepo.save.mockResolvedValue(true)
 
@@ -91,10 +100,12 @@ describe("test in user service", () => {
         }
 
         const mockAuth = {
+            data: {},
             updateEmail: jest.fn()
         }
-        mockUserRepo.getUser.mockResolvedValue(mockUser)
-        mockAuthRepo.getAuth.mockResolvedValue(mockAuth)
+
+        mockUserRepo.getUser.mockResolvedValue(mockUser as any)
+        mockAuthRepo.getAuth.mockResolvedValue(mockAuth as any)
         mockUserRepo.save.mockRejectedValue(error)
         mockAuthRepo.save.mockRejectedValue(error)
         const updateData = { email: "failEmail@email.com" }

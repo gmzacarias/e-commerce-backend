@@ -9,7 +9,7 @@ import { sendCodeAuth } from "./sendgrid"
 import type { JwtPayload } from "jsonwebtoken"
 
 export class AuthService {
-    constructor(private repo: AuthRepository, private userRepo: UserRepository) { }
+    constructor(private repo: Partial<AuthRepository>, private userRepo: Partial<UserRepository>) { }
 
     async newAuth(email: string): Promise<Auth> {
         const formatEmail = cleanEmail(email)
@@ -59,7 +59,7 @@ export class AuthService {
                 auth.updateCode(newCode)
                 auth.updateExpire(newExpireDate)
                 await this.repo.save(auth)
-                codeToSend = newCode  
+                codeToSend = newCode
             }
             await sendCodeAuth(formatEmail, codeToSend)
             return true

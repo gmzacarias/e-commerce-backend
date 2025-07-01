@@ -11,7 +11,7 @@ declare global {
         email: string,
         userName: string,
         phoneNumber: string,
-        address: AddressData,
+        address: Partial<AddressData>,
         cart: ProductData[],
     }
 

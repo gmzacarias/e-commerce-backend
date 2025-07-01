@@ -2,7 +2,7 @@ import { UserRepository } from "repositories/userRepository"
 import { AuthRepository } from "repositories/authRepository"
 
 export class UserService {
-    constructor(private repo: UserRepository, private authRepo: AuthRepository) { }
+    constructor(private repo:Partial<UserRepository>, private authRepo: Partial<AuthRepository>) { }
 
     async getUserData(userId: string): Promise<UserData> {
         try {

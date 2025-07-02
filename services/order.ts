@@ -10,8 +10,8 @@ import { saleAlert, purchaseAlert } from "./sendgrid"
 import { getBaseUrl } from "utils/getBaseUrl"
 
 export class OrderService {
-    cart = new CartService(this.userRepo)
-    constructor(private repo: OrderRepository, private userRepo: UserRepository) { }
+    cart = new CartService(this.userRepo as UserRepository)
+    constructor(private repo: Partial<OrderRepository>, private userRepo: Partial<UserRepository>) { }
 
     async getMyOrders(userId: string): Promise<OrderData[]> {
         try {
@@ -51,17 +51,20 @@ export class OrderService {
         }
     }
 
-    async checkExpirationOrders(orders: OrderData[]): Promise<boolean> {
+    async checkExpirationOrders(orders: OrderData[]): Promise<boolean | OrderData[]> {
         try {
+            let orderExpires = []
             for (const item of orders) {
                 const result = checkExpirationPayments(item.created as FirestoreTimestamp)
                 if (result >= 2 || item.status === "closed") {
                     const order = await this.repo.getOrderDoc(item.userId, item.orderId)
                     order.updateExpire(true)
+                    orderExpires.push(item.orderId)
                     await this.repo.save(order)
+                    return orderExpires
                 }
             }
-            return true
+            return orderExpires.length > 0 ? orderExpires : true
         } catch (error) {
             console.error(error.message)
             throw error

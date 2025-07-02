@@ -64,9 +64,84 @@ describe("test in OrderService", () => {
         orderService = new OrderService(mockOrderRepo, mockUserRepo)
     })
 
+    it("should expire and save orders when expiration is >= 2 ", async () => {
+        const mockOrderData = [
+            {
+                userId: "user1",
+                orderId: "order1",
+                created: new Date(),
+                status: "pending",
+            }
+        ]
 
-   
+        const mockOrderInstance = {
+            updateExpire: jest.fn(),
+            data: mockOrderData[0],
+            id: "order1"
+        }
 
+        mockOrderRepo.getOrderDoc.mockResolvedValue(mockOrderInstance as any);
+        mockOrderRepo.save.mockResolvedValue(true);
+        (checkExpirationPayments as jest.Mock).mockReturnValue(2);
+        const result = await orderService.checkExpirationOrders(mockOrderData as any);
+        expect(mockOrderRepo.getOrderDoc).toHaveBeenCalledWith("user1", "order1");
+        expect(mockOrderInstance.updateExpire).toHaveBeenCalledWith(true);
+        expect(mockOrderRepo.save).toHaveBeenCalledWith(mockOrderInstance);
+        expect(result).toEqual(["order1"]);
+    })
 
-    
+    it("should expire and save orders when status is closed", async () => {
+        const mockOrderData = [
+            {
+                userId: "user1",
+                orderId: "order1",
+                created: new Date(),
+                status: "closed",
+            }
+        ]
+
+        const mockOrderInstance = {
+            updateExpire: jest.fn(),
+            data: mockOrderData[0],
+            id: "order1"
+        }
+
+        mockOrderRepo.getOrderDoc.mockResolvedValue(mockOrderInstance as any);
+        mockOrderRepo.save.mockResolvedValue(true);
+        (checkExpirationPayments as jest.Mock).mockReturnValue(0);
+        const result = await orderService.checkExpirationOrders(mockOrderData as any);
+        expect(mockOrderRepo.getOrderDoc).toHaveBeenCalledWith("user1", "order1");
+        expect(mockOrderInstance.updateExpire).toHaveBeenCalledWith(true);
+        expect(mockOrderRepo.save).toHaveBeenCalledWith(mockOrderInstance);
+        expect(result).toEqual(["order1"]);
+    })
+
+    it("should throw error if could not save orders", async () => {
+        const error = new Error("Hubo un error al actualizar la orden");
+        const mockOrderData = [
+            {
+                userId: "user1",
+                orderId: "order1",
+                created: new Date(),
+                status: "pending",
+            }
+        ]
+
+        const mockOrderInstance = {
+            updateExpire: jest.fn(),
+            data: mockOrderData[0],
+            id: "order1"
+        }
+
+        mockOrderRepo.getOrderDoc.mockResolvedValue(mockOrderInstance as any);
+        mockOrderRepo.save.mockRejectedValue(error);
+        (checkExpirationPayments as jest.Mock).mockReturnValue(2);
+        await expect(orderService.checkExpirationOrders(mockOrderData as any)).rejects.toThrow(error)
+        expect(mockOrderRepo.getOrderDoc).toHaveBeenCalledWith("user1", "order1");
+        expect(mockOrderInstance.updateExpire).toHaveBeenCalledWith(true);
+        expect(mockOrderRepo.save).toHaveBeenCalledWith(mockOrderInstance);
+    })
 })
+
+
+

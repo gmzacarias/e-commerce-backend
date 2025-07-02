@@ -207,7 +207,6 @@ describe("test in OrderService", () => {
         expect(mockOrderRepo.getOrders).toHaveBeenCalledWith("user1");
         expect(formatDateFirebase as jest.Mock).toHaveBeenCalledWith(mockOrders[0].created);
         expect(orderService.checkExpirationOrders(mockOrders as any));
-        expect(formatDateFirebase as jest.Mock).toHaveBeenNthCalledWith(1, mockOrders[0].created);
         expect(result).toEqual(expectedOrders);
     })
 
@@ -218,6 +217,77 @@ describe("test in OrderService", () => {
         expect(mockOrderRepo.getOrders).toHaveBeenCalledWith("user2");
     })
 
+    it("should return an order by orderId", async () => {
+        const mockOrder = {
+            data: {
+                userId: "user1",
+                orderId: "order1",
+                created:
+                {
+                    _seconds: 1751968800,
+                    _nanoseconds: 123000000,
+                },
+                status: "pending",
+                payment: {
+                    paymentCreated: new Date("2025-07-01T10:05:00.123Z")
+                }
+            }
+        };
+
+        const expectedCreatedDate = new Date("2025-07-01T10:00:00.123Z").toLocaleString("es-AR", {
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric",
+            hour: "2-digit",
+            minute: "2-digit",
+            second: "2-digit",
+            hour12: false,
+        });
+
+        const expectedPaymentDate = mockOrder.data.payment.paymentCreated.toLocaleString("es-AR", {
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric",
+            hour: "2-digit",
+            minute: "2-digit",
+            second: "2-digit",
+            hour12: false,
+        });
+
+        const expectedOrder = {
+            userId: "user1",
+            orderId: "order1",
+            created: expectedCreatedDate,
+            status: "pending",
+            payment: {
+                paymentCreated: expectedPaymentDate
+            }
+        };
+
+
+        mockOrderRepo.getOrderDoc.mockReturnValue(mockOrder as any);
+        (formatDateFirebase as jest.Mock).mockImplementation((date) => {
+            if (
+                date._seconds === mockOrder.data.created._seconds &&
+                date._nanoseconds === mockOrder.data.created._nanoseconds
+            ) {
+                return new Date("2025-07-01T10:00:00.123Z")
+            }
+            return new Date()
+        });
+
+        const result = await orderService.getOrdersById(mockOrder.data.userId, mockOrder.data.orderId);
+        expect(mockOrderRepo.getOrderDoc).toHaveBeenCalledWith(mockOrder.data.userId, mockOrder.data.orderId);
+        expect(formatDateFirebase as jest.Mock).toHaveBeenCalledWith(mockOrder.data.created)
+        expect(result).toEqual(expectedOrder);
+    })
+
+    it("should throw an error when orderId does not exist", async () => {
+        const error = new Error("No hay ordenes relacionadas al order Id");
+        mockOrderRepo.getOrderDoc.mockRejectedValue(error);
+        await expect(orderService.getOrdersById("user2","order005")).rejects.toThrow(error)
+        expect(mockOrderRepo.getOrderDoc).toHaveBeenCalledWith("user2","order005");
+    })
 
 })
 

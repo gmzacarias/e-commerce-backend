@@ -141,6 +141,84 @@ describe("test in OrderService", () => {
         expect(mockOrderInstance.updateExpire).toHaveBeenCalledWith(true);
         expect(mockOrderRepo.save).toHaveBeenCalledWith(mockOrderInstance);
     })
+
+    it("should return all my orders", async () => {
+        const mockOrders = [
+            {
+                userId: "user1",
+                orderId: "order1",
+                created:
+                {
+                    _seconds: 1751968800,
+                    _nanoseconds: 123000000,
+                },
+                status: "pending",
+                payment: {
+                    paymentCreated: new Date("2025-07-01T10:05:00.123Z")
+                }
+            }
+        ]
+
+        const expectedCreatedDate = new Date("2025-07-01T10:00:00.123Z").toLocaleString("es-AR", {
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric",
+            hour: "2-digit",
+            minute: "2-digit",
+            second: "2-digit",
+            hour12: false,
+        });
+
+        const expectedPaymentDate = mockOrders[0].payment.paymentCreated.toLocaleString("es-AR", {
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric",
+            hour: "2-digit",
+            minute: "2-digit",
+            second: "2-digit",
+            hour12: false,
+        });
+
+        const expectedOrders = [
+            {
+                userId: "user1",
+                orderId: "order1",
+                created: expectedCreatedDate,
+                status: "pending",
+                payment: {
+                    paymentCreated: expectedPaymentDate,
+                },
+            }
+        ];
+
+        mockOrderRepo.getOrders.mockReturnValue(mockOrders as any);
+        (formatDateFirebase as jest.Mock).mockImplementation((date) => {
+            if (
+                date._seconds === mockOrders[0].created._seconds &&
+                date._nanoseconds === mockOrders[0].created._nanoseconds
+            ) {
+                return new Date("2025-07-01T10:00:00.123Z")
+            }
+            return new Date()
+        });
+
+        jest.spyOn(orderService, "checkExpirationOrders").mockResolvedValue(true);
+        const result = await orderService.getMyOrders("user1");
+        expect(mockOrderRepo.getOrders).toHaveBeenCalledWith("user1");
+        expect(formatDateFirebase as jest.Mock).toHaveBeenCalledWith(mockOrders[0].created);
+        expect(orderService.checkExpirationOrders(mockOrders as any));
+        expect(formatDateFirebase as jest.Mock).toHaveBeenNthCalledWith(1, mockOrders[0].created);
+        expect(result).toEqual(expectedOrders);
+    })
+
+    it("should throw an error if userId does not match", async () => {
+        const error = new Error("No hay ordenes de este usuario");
+        mockOrderRepo.getOrders.mockRejectedValue(error);
+        await expect(orderService.getMyOrders("user2")).rejects.toThrow(error)
+        expect(mockOrderRepo.getOrders).toHaveBeenCalledWith("user2");
+    })
+
+
 })
 
 

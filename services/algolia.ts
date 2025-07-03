@@ -146,12 +146,10 @@ export async function updateStockProducts(data: ProductData[]) {
         const formatData = data.map(item => {
             return {
                 objectID: item.objectID,
-                stock: item.stock
+                stock: item.stock - item.quantity
             }
         })
-        console.log("data algolia", formatData)
         const response = await productIndex.partialUpdateObjects(formatData)
-        console.log("algolia", response)
         return response
     } catch (error) {
         console.error("error al actualizar el stock:", error.message)

@@ -2,6 +2,7 @@
 .next
 .env.test
 .env.local
+coverage
 node_modules
 .yarn/*
 !.yarn/releases

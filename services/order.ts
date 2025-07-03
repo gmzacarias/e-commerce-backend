@@ -10,8 +10,7 @@ import { saleAlert, purchaseAlert } from "./sendgrid"
 import { getBaseUrl } from "utils/getBaseUrl"
 
 export class OrderService {
-    cart = new CartService(this.userRepo as UserRepository)
-    constructor(private repo: Partial<OrderRepository>, private userRepo: Partial<UserRepository>) { }
+    constructor(private repo: Partial<OrderRepository>, private userRepo: Partial<UserRepository>,private cartService:Partial<CartService>) { }
 
     async getMyOrders(userId: string): Promise<OrderData[]> {
         try {
@@ -110,7 +109,7 @@ export class OrderService {
     async createOrder(userId: string, additionalInfo?: string): Promise<Order> {
         try {
             const getUserId = (await this.userRepo.getUser(userId)).id
-            const cartData = await this.cart.getCartData(getUserId)
+            const cartData = await this.cartService.getCartData(getUserId)
             const stockData = hasStock(cartData)
             const products = formatProductsForOrder(cartData)
             const totalPrice = calcTotalPrice(cartData)
@@ -138,7 +137,7 @@ export class OrderService {
         try {
             const order = await this.createOrder(userId, additionalInfo)
             const { id, data } = order
-            const cartData = await this.cart.getCartData(userId)
+            const cartData = await this.cartService.getCartData(userId)
             const items = formatItemsForPreference(cartData)
             const userData = await this.userRepo.getUser(userId)
             const expireDatePreference = formatExpireDateForPreference()
@@ -172,7 +171,7 @@ export class OrderService {
             order.setUrl(newPreference.init_point)
             await Promise.all([
                 this.repo.save(order),
-                this.cart.reset(userId)
+                this.cartService.reset(userId)
             ])
             return { url: order.data.url }
         } catch (error) {
@@ -191,7 +190,7 @@ export class OrderService {
             order.updateStatus(order_status)
             await Promise.all([
                 this.repo.save(order),
-                this.cart.reset(userId),
+                this.cartService.reset(userId),
                 purchaseAlert(user.data.email, user.data.userName, order.data),
                 saleAlert(user.data, order.data)
             ])

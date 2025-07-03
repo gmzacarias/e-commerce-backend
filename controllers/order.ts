@@ -1,11 +1,13 @@
 import { OrderService } from "services/order"
+import { CartService } from "services/cart"
 import { OrderRepository } from "repositories/orderRepository"
 import { UserRepository } from "repositories/userRepository"
 import { Order } from "models/order"
 
 const orderRepo = new OrderRepository()
 const userRepo = new UserRepository()
-const orderService = new OrderService(orderRepo, userRepo)
+const cartService = new CartService(userRepo)
+const orderService = new OrderService(orderRepo, userRepo, cartService)
 
 export async function getAllOrders(userId: string): Promise<OrderData[]> {
     return await orderService.getMyOrders(userId)
@@ -16,7 +18,7 @@ export async function getOrderDataById(userId: string, orderId: string): Promise
 }
 
 export async function createOrder(userId: string, additionalInfo: string,): Promise<{ url: string }> {
-    return await orderService.createPreference(userId,additionalInfo)
+    return await orderService.createPreference(userId, additionalInfo)
 }
 
 export async function deleteOrder(userId: string, orderId: string): Promise<boolean> {

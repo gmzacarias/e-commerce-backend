@@ -3,7 +3,7 @@ import { UserRepository } from "repositories/userRepository"
 import { searchProductById } from "./algolia"
 
 export class CartService {
-    constructor(private repo: UserRepository) { }
+    constructor(private repo: Partial<UserRepository>) { }
 
     async getCartData(userId: string): Promise<ProductData[]> {
         try {

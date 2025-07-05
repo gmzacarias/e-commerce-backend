@@ -73,474 +73,1622 @@ describe("test in OrderService", () => {
         jest.useRealTimers()
     })
 
-    it("should expire and save orders when expiration is >= 2 ", async () => {
-        const mockOrderData = [
-            {
-                userId: "user1",
-                orderId: "order1",
-                created: new Date(),
-                status: "pending",
-            }
-        ]
-
-        const mockOrderInstance = {
-            updateExpire: jest.fn(),
-            data: mockOrderData[0],
-            id: "order1"
-        }
-
-        mockOrderRepo.getOrderDoc.mockResolvedValue(mockOrderInstance as any);
-        mockOrderRepo.save.mockResolvedValue(true);
-        (checkExpirationPayments as jest.Mock).mockReturnValue(2);
-        const result = await orderService.checkExpirationOrders(mockOrderData as any);
-        expect(mockOrderRepo.getOrderDoc).toHaveBeenCalledWith("user1", "order1");
-        expect(mockOrderInstance.updateExpire).toHaveBeenCalledWith(true);
-        expect(mockOrderRepo.save).toHaveBeenCalledWith(mockOrderInstance);
-        expect(result).toEqual(["order1"]);
-    })
-
-    it("should expire and save orders when status is closed", async () => {
-        const mockOrderData = [
-            {
-                userId: "user1",
-                orderId: "order1",
-                created: new Date(),
-                status: "closed",
-            }
-        ]
-
-        const mockOrderInstance = {
-            updateExpire: jest.fn(),
-            data: mockOrderData[0],
-            id: "order1"
-        }
-
-        mockOrderRepo.getOrderDoc.mockResolvedValue(mockOrderInstance as any);
-        mockOrderRepo.save.mockResolvedValue(true);
-        (checkExpirationPayments as jest.Mock).mockReturnValue(0);
-        const result = await orderService.checkExpirationOrders(mockOrderData as any);
-        expect(mockOrderRepo.getOrderDoc).toHaveBeenCalledWith("user1", "order1");
-        expect(mockOrderInstance.updateExpire).toHaveBeenCalledWith(true);
-        expect(mockOrderRepo.save).toHaveBeenCalledWith(mockOrderInstance);
-        expect(result).toEqual(["order1"]);
-    })
-
-    it("should throw error if could not save orders", async () => {
-        const error = new Error("Hubo un error al actualizar la orden");
-        const mockOrderData = [
-            {
-                userId: "user1",
-                orderId: "order1",
-                created: new Date(),
-                status: "pending",
-            }
-        ]
-
-        const mockOrderInstance = {
-            updateExpire: jest.fn(),
-            data: mockOrderData[0],
-            id: "order1"
-        }
-
-        mockOrderRepo.getOrderDoc.mockResolvedValue(mockOrderInstance as any);
-        mockOrderRepo.save.mockRejectedValue(error);
-        (checkExpirationPayments as jest.Mock).mockReturnValue(2);
-        await expect(orderService.checkExpirationOrders(mockOrderData as any)).rejects.toThrow(error)
-        expect(mockOrderRepo.getOrderDoc).toHaveBeenCalledWith("user1", "order1");
-        expect(mockOrderInstance.updateExpire).toHaveBeenCalledWith(true);
-        expect(mockOrderRepo.save).toHaveBeenCalledWith(mockOrderInstance);
-    })
-
-    it("should return all my orders", async () => {
-        const mockOrders = [
-            {
-                userId: "user1",
-                orderId: "order1",
-                created:
+    describe("test in method checkExpirationOrders", () => {
+        it("should expire and save orders when expiration is >= 2 ", async () => {
+            const mockOrderData = [
                 {
-                    _seconds: 1751968800,
-                    _nanoseconds: 123000000,
-                },
-                status: "pending",
-                payment: {
-                    paymentCreated: new Date("2025-07-01T10:05:00.123Z")
+                    userId: "user1",
+                    orderId: "order1",
+                    created: new Date(),
+                    status: "pending",
                 }
+            ]
+
+            const mockOrderInstance = {
+                updateExpire: jest.fn(),
+                data: mockOrderData[0],
+                id: "order1"
             }
-        ]
 
-        const expectedCreatedDate = new Date("2025-07-01T10:00:00.123Z").toLocaleString("es-AR", {
-            day: "2-digit",
-            month: "2-digit",
-            year: "numeric",
-            hour: "2-digit",
-            minute: "2-digit",
-            second: "2-digit",
-            hour12: false,
-        });
+            mockOrderRepo.getOrderDoc.mockResolvedValue(mockOrderInstance as any);
+            mockOrderRepo.save.mockResolvedValue(true);
+            (checkExpirationPayments as jest.Mock).mockReturnValue(2);
+            const result = await orderService.checkExpirationOrders(mockOrderData as any);
+            expect(mockOrderRepo.getOrderDoc).toHaveBeenCalledWith("user1", "order1");
+            expect(mockOrderInstance.updateExpire).toHaveBeenCalledWith(true);
+            expect(mockOrderRepo.save).toHaveBeenCalledWith(mockOrderInstance);
+            expect(result).toEqual(["order1"]);
+        })
 
-        const expectedPaymentDate = mockOrders[0].payment.paymentCreated.toLocaleString("es-AR", {
-            day: "2-digit",
-            month: "2-digit",
-            year: "numeric",
-            hour: "2-digit",
-            minute: "2-digit",
-            second: "2-digit",
-            hour12: false,
-        });
+        it("should expire and save orders when status is closed", async () => {
+            const mockOrderData = [
+                {
+                    userId: "user1",
+                    orderId: "order1",
+                    created: new Date(),
+                    status: "closed",
+                }
+            ]
 
-        const expectedOrders = [
-            {
+            const mockOrderInstance = {
+                updateExpire: jest.fn(),
+                data: mockOrderData[0],
+                id: "order1"
+            }
+
+            mockOrderRepo.getOrderDoc.mockResolvedValue(mockOrderInstance as any);
+            mockOrderRepo.save.mockResolvedValue(true);
+            (checkExpirationPayments as jest.Mock).mockReturnValue(0);
+            const result = await orderService.checkExpirationOrders(mockOrderData as any);
+            expect(mockOrderRepo.getOrderDoc).toHaveBeenCalledWith("user1", "order1");
+            expect(mockOrderInstance.updateExpire).toHaveBeenCalledWith(true);
+            expect(mockOrderRepo.save).toHaveBeenCalledWith(mockOrderInstance);
+            expect(result).toEqual(["order1"]);
+        })
+
+        it("should throw error if could not save orders", async () => {
+            const error = new Error("Hubo un error al actualizar la orden");
+            const mockOrderData = [
+                {
+                    userId: "user1",
+                    orderId: "order1",
+                    created: new Date(),
+                    status: "pending",
+                }
+            ]
+
+            const mockOrderInstance = {
+                updateExpire: jest.fn(),
+                data: mockOrderData[0],
+                id: "order1"
+            }
+
+            mockOrderRepo.getOrderDoc.mockResolvedValue(mockOrderInstance as any);
+            mockOrderRepo.save.mockRejectedValue(error);
+            (checkExpirationPayments as jest.Mock).mockReturnValue(2);
+            await expect(orderService.checkExpirationOrders(mockOrderData as any)).rejects.toThrow(error)
+            expect(mockOrderRepo.getOrderDoc).toHaveBeenCalledWith("user1", "order1");
+            expect(mockOrderInstance.updateExpire).toHaveBeenCalledWith(true);
+            expect(mockOrderRepo.save).toHaveBeenCalledWith(mockOrderInstance);
+        })
+    })
+
+
+    describe("test in method getMyOrders", () => {
+        it("should return all my orders", async () => {
+            const mockOrders = [
+                {
+                    userId: "user1",
+                    orderId: "order1",
+                    created:
+                    {
+                        _seconds: 1751968800,
+                        _nanoseconds: 123000000,
+                    },
+                    status: "pending",
+                    payment: {
+                        paymentCreated: new Date("2025-07-01T10:05:00.123Z")
+                    }
+                }
+            ]
+
+            const expectedCreatedDate = new Date("2025-07-01T10:00:00.123Z").toLocaleString("es-AR", {
+                day: "2-digit",
+                month: "2-digit",
+                year: "numeric",
+                hour: "2-digit",
+                minute: "2-digit",
+                second: "2-digit",
+                hour12: false,
+            });
+
+            const expectedPaymentDate = mockOrders[0].payment.paymentCreated.toLocaleString("es-AR", {
+                day: "2-digit",
+                month: "2-digit",
+                year: "numeric",
+                hour: "2-digit",
+                minute: "2-digit",
+                second: "2-digit",
+                hour12: false,
+            });
+
+            const expectedOrders = [
+                {
+                    userId: "user1",
+                    orderId: "order1",
+                    created: expectedCreatedDate,
+                    status: "pending",
+                    payment: {
+                        paymentCreated: expectedPaymentDate,
+                    },
+                }
+            ];
+
+            mockOrderRepo.getOrders.mockReturnValue(mockOrders as any);
+            (formatDateFirebase as jest.Mock).mockImplementation((date) => {
+                if (
+                    date._seconds === mockOrders[0].created._seconds &&
+                    date._nanoseconds === mockOrders[0].created._nanoseconds
+                ) {
+                    return new Date("2025-07-01T10:00:00.123Z")
+                }
+                return new Date()
+            });
+
+            jest.spyOn(orderService, "checkExpirationOrders").mockResolvedValue(true);
+            const result = await orderService.getMyOrders("user1");
+            expect(mockOrderRepo.getOrders).toHaveBeenCalledWith("user1");
+            expect(formatDateFirebase as jest.Mock).toHaveBeenCalledWith(mockOrders[0].created);
+            expect(orderService.checkExpirationOrders(mockOrders as any));
+            expect(result).toEqual(expectedOrders);
+        })
+
+        it("should throw an error if userId does not match", async () => {
+            const error = new Error("No hay ordenes de este usuario");
+            mockOrderRepo.getOrders.mockRejectedValue(error);
+            await expect(orderService.getMyOrders("user2")).rejects.toThrow(error)
+            expect(mockOrderRepo.getOrders).toHaveBeenCalledWith("user2");
+        })
+    })
+
+
+    describe("", () => {
+        it("should return an order by orderId", async () => {
+            const mockOrder = {
+                data: {
+                    userId: "user1",
+                    orderId: "order1",
+                    created:
+                    {
+                        _seconds: 1751968800,
+                        _nanoseconds: 123000000,
+                    },
+                    status: "pending",
+                    payment: {
+                        paymentCreated: new Date("2025-07-01T10:05:00.123Z")
+                    }
+                }
+            };
+
+            const expectedCreatedDate = new Date("2025-07-01T10:00:00.123Z").toLocaleString("es-AR", {
+                day: "2-digit",
+                month: "2-digit",
+                year: "numeric",
+                hour: "2-digit",
+                minute: "2-digit",
+                second: "2-digit",
+                hour12: false,
+            });
+
+            const expectedPaymentDate = mockOrder.data.payment.paymentCreated.toLocaleString("es-AR", {
+                day: "2-digit",
+                month: "2-digit",
+                year: "numeric",
+                hour: "2-digit",
+                minute: "2-digit",
+                second: "2-digit",
+                hour12: false,
+            });
+
+            const expectedOrder = {
                 userId: "user1",
                 orderId: "order1",
                 created: expectedCreatedDate,
                 status: "pending",
                 payment: {
-                    paymentCreated: expectedPaymentDate,
-                },
-            }
-        ];
+                    paymentCreated: expectedPaymentDate
+                }
+            };
 
-        mockOrderRepo.getOrders.mockReturnValue(mockOrders as any);
-        (formatDateFirebase as jest.Mock).mockImplementation((date) => {
-            if (
-                date._seconds === mockOrders[0].created._seconds &&
-                date._nanoseconds === mockOrders[0].created._nanoseconds
-            ) {
-                return new Date("2025-07-01T10:00:00.123Z")
-            }
-            return new Date()
-        });
 
-        jest.spyOn(orderService, "checkExpirationOrders").mockResolvedValue(true);
-        const result = await orderService.getMyOrders("user1");
-        expect(mockOrderRepo.getOrders).toHaveBeenCalledWith("user1");
-        expect(formatDateFirebase as jest.Mock).toHaveBeenCalledWith(mockOrders[0].created);
-        expect(orderService.checkExpirationOrders(mockOrders as any));
-        expect(result).toEqual(expectedOrders);
+            mockOrderRepo.getOrderDoc.mockReturnValue(mockOrder as any);
+            (formatDateFirebase as jest.Mock).mockImplementation((date) => {
+                if (
+                    date._seconds === mockOrder.data.created._seconds &&
+                    date._nanoseconds === mockOrder.data.created._nanoseconds
+                ) {
+                    return new Date("2025-07-01T10:00:00.123Z")
+                }
+                return new Date()
+            });
+
+            const result = await orderService.getOrdersById(mockOrder.data.userId, mockOrder.data.orderId);
+            expect(mockOrderRepo.getOrderDoc).toHaveBeenCalledWith(mockOrder.data.userId, mockOrder.data.orderId);
+            expect(formatDateFirebase as jest.Mock).toHaveBeenCalledWith(mockOrder.data.created)
+            expect(result).toEqual(expectedOrder);
+        })
+
+        it("should throw an error when orderId does not exist", async () => {
+            const error = new Error("No hay ordenes relacionadas al order Id");
+            mockOrderRepo.getOrderDoc.mockRejectedValue(error);
+            await expect(orderService.getOrdersById("user2", "order005")).rejects.toThrow(error)
+            expect(mockOrderRepo.getOrderDoc).toHaveBeenCalledWith("user2", "order005");
+        })
     })
 
-    it("should throw an error if userId does not match", async () => {
-        const error = new Error("No hay ordenes de este usuario");
-        mockOrderRepo.getOrders.mockRejectedValue(error);
-        await expect(orderService.getMyOrders("user2")).rejects.toThrow(error)
-        expect(mockOrderRepo.getOrders).toHaveBeenCalledWith("user2");
-    })
+    describe("test in method createOrder", () => {
+        it("should create an order", async () => {
+            jest.useFakeTimers();
+            jest.setSystemTime(new Date('2025-06-29T20:00:00Z'));
 
-    it("should return an order by orderId", async () => {
-        const mockOrder = {
-            data: {
-                userId: "user1",
-                orderId: "order1",
-                created:
-                {
-                    _seconds: 1751968800,
-                    _nanoseconds: 123000000,
-                },
+            const userId = "user001";
+            const info = "additional info";
+
+            const mockCartData = [{
+                productId: "25",
+                brand: "Samsung",
+                familyModel: "Galaxy",
+                model: "S 23",
+                colour: "grey",
+                photo: "http://imageProductId25.jpg",
+                quantity: 1,
+                price: 200,
+                stock: 5,
+                totalPrice: 200
+            }]
+
+            const mockProducts = [{
+                productId: "25",
+                brand: "Samsung",
+                familyModel: "Galaxy",
+                model: "S 23",
+                colour: "grey",
+                photo: "http://imageProductId25.jpg",
+                quantity: 1,
+                price: 200
+            }]
+
+            const mockOrder = {
+                orderId: null,
+                userId: userId,
+                products: mockProducts,
                 status: "pending",
-                payment: {
-                    paymentCreated: new Date("2025-07-01T10:05:00.123Z")
+                totalPrice: mockCartData[0].totalPrice,
+                url: null,
+                additionalInfo: info,
+                created: new Date('2025-06-29T20:00:00Z'),
+                payment: null,
+                expire: false,
+            };
+
+            mockUserRepo.getUser.mockResolvedValue({ id: userId } as any);
+            mockCartService.getCartData.mockResolvedValue(mockCartData as any);
+            (hasStock as jest.Mock).mockReturnValue(mockCartData);
+            (formatProductsForOrder as jest.Mock).mockReturnValue(mockProducts);
+            (calcTotalPrice as jest.Mock).mockReturnValue(mockCartData[0].totalPrice);
+            mockOrderRepo.newOrder.mockResolvedValue(mockOrder as any);
+            (updateStockProducts as jest.Mock).mockResolvedValue(
+                mockCartData.map((item) => ({
+                    ...item,
+                    stock: item.stock - item.quantity,
+                }))
+            );
+
+            const result = await orderService.createOrder(userId, info);
+            expect(mockUserRepo.getUser).toHaveBeenCalledWith(userId);
+            expect(mockCartService.getCartData).toHaveBeenCalledWith(userId);
+            expect(hasStock).toHaveBeenCalledWith(mockCartData);
+            expect(formatProductsForOrder).toHaveBeenCalledWith(mockCartData);
+            expect(calcTotalPrice).toHaveBeenCalledWith(mockCartData);
+            expect(mockOrderRepo.newOrder).toHaveBeenCalledWith(mockOrder);
+            expect(updateStockProducts).toHaveBeenCalledWith(mockCartData);
+            expect(result).toEqual(mockOrder);
+        })
+
+        it("should throw an error if getUser fails in createOrder", async () => {
+            const error = new Error("No hay datos relacionados al userId");
+            mockUserRepo.getUser.mockRejectedValue(error);
+            await expect(orderService.createOrder("user002")).rejects.toThrow(error);
+            expect(mockUserRepo.getUser).toHaveBeenCalledWith("user002");
+        })
+
+        it("should throw an error if getCartData fails in createOrder", async () => {
+            const error = new Error("No hay datos en el carrito de compras");
+            const userId = "user001";
+            mockUserRepo.getUser.mockResolvedValue({ id: userId } as any);
+            mockCartService.getCartData.mockRejectedValue(error);
+            await expect(orderService.createOrder(userId)).rejects.toThrow(error);
+            expect(mockUserRepo.getUser).toHaveBeenCalledWith(userId);
+            expect(mockCartService.getCartData).toHaveBeenCalledWith(userId);
+        })
+
+
+        it("should throw an error if hasStock has out of stock products", async () => {
+            const error = new Error("Hay productos sin stock");
+            const userId = "user001";
+
+            const mockCartData = [{
+                productId: "25",
+                brand: "Samsung",
+                familyModel: "Galaxy",
+                model: "S 23",
+                colour: "grey",
+                photo: "http://imageProductId25.jpg",
+                quantity: 3,
+                price: 200,
+                stock: 0,
+                totalPrice: 600
+            }];
+
+            mockUserRepo.getUser.mockResolvedValue({ id: userId } as any);
+            mockCartService.getCartData.mockResolvedValue(mockCartData as any);
+            (hasStock as jest.Mock).mockImplementation(() => {
+                throw error
+            });
+            await expect(orderService.createOrder(userId)).rejects.toThrow(error);
+            expect(mockUserRepo.getUser).toHaveBeenCalledWith(userId);
+            expect(mockCartService.getCartData).toHaveBeenCalledWith(userId);
+            expect(hasStock).toHaveBeenCalledWith(mockCartData);
+        })
+
+        it("should throw an error when hasStock has no products to check", async () => {
+            const error = new Error("No hay productos para chequear el stock");
+            const userId = "user001";
+            const mockCartData = [];
+            mockUserRepo.getUser.mockResolvedValue({ id: userId } as any);
+            mockCartService.getCartData.mockResolvedValue(mockCartData as any);
+            (hasStock as jest.Mock).mockImplementation(() => {
+                throw error
+            });
+            await expect(orderService.createOrder(userId)).rejects.toThrow(error);
+            expect(mockUserRepo.getUser).toHaveBeenCalledWith(userId);
+            expect(mockCartService.getCartData).toHaveBeenCalledWith(userId);
+            expect(hasStock).toHaveBeenCalledWith(mockCartData);
+        })
+
+        it("should throw an error when formatProductsForOrder fails", async () => {
+            const error = new Error("No hay productos");
+            const userId = "user001";
+            const mockCartData = [];
+            mockUserRepo.getUser.mockResolvedValue({ id: userId } as any);
+            mockCartService.getCartData.mockResolvedValue(mockCartData as any);
+            (hasStock as jest.Mock).mockReturnValue(mockCartData);
+            (formatProductsForOrder as jest.Mock).mockImplementation(() => {
+                throw error
+            });
+            await expect(orderService.createOrder(userId)).rejects.toThrow(error);
+            expect(mockUserRepo.getUser).toHaveBeenCalledWith(userId);
+            expect(mockCartService.getCartData).toHaveBeenCalledWith(userId);
+            expect(hasStock).toHaveBeenCalledWith(mockCartData);
+            expect(formatProductsForOrder).toHaveBeenCalledWith(mockCartData);
+        })
+
+        it("should throw an error when calcToPrice fails", async () => {
+            const error = new Error("No hay productos");
+            const userId = "user001";
+            const mockCartData = [];
+            const mockProducts = [{
+                productId: "25",
+                brand: "Samsung",
+                familyModel: "Galaxy",
+                model: "S 23",
+                colour: "grey",
+                photo: "http://imageProductId25.jpg",
+                quantity: 1,
+                price: 200
+            }]
+
+            mockUserRepo.getUser.mockResolvedValue({ id: userId } as any);
+            mockCartService.getCartData.mockResolvedValue(mockCartData as any);
+            (hasStock as jest.Mock).mockReturnValue(mockCartData);
+            (formatProductsForOrder as jest.Mock).mockReturnValue(mockProducts);
+            (calcTotalPrice as jest.Mock).mockImplementation(() => {
+                throw error
+            });
+
+            await expect(orderService.createOrder(userId)).rejects.toThrow(error);
+            expect(mockUserRepo.getUser).toHaveBeenCalledWith(userId);
+            expect(mockCartService.getCartData).toHaveBeenCalledWith(userId);
+            expect(hasStock).toHaveBeenCalledWith(mockCartData);
+            expect(formatProductsForOrder).toHaveBeenCalledWith(mockCartData);
+            expect(calcTotalPrice).toHaveBeenCalledWith(mockCartData);
+        })
+
+        it("should an error when updateStockProducts fails", async () => {
+            jest.useFakeTimers();
+            jest.setSystemTime(new Date('2025-06-29T20:00:00Z'));
+
+            const error = new Error("No hay productos");
+            const userId = "user001";
+            const info = "additional info";
+
+            const mockCartData = [{
+                productId: "25",
+                brand: "Samsung",
+                familyModel: "Galaxy",
+                model: "S 23",
+                colour: "grey",
+                photo: "http://imageProductId25.jpg",
+                quantity: 1,
+                price: 200,
+                stock: 5,
+                totalPrice: 200
+            }]
+
+            const mockProducts = [{
+                productId: "25",
+                brand: "Samsung",
+                familyModel: "Galaxy",
+                model: "S 23",
+                colour: "grey",
+                photo: "http://imageProductId25.jpg",
+                quantity: 1,
+                price: 200
+            }]
+
+            const mockOrder = {
+                orderId: null,
+                userId: userId,
+                products: mockProducts,
+                status: "pending",
+                totalPrice: mockCartData[0].totalPrice,
+                url: null,
+                additionalInfo: info,
+                created: new Date('2025-06-29T20:00:00Z'),
+                payment: null,
+                expire: false,
+            };
+
+            mockUserRepo.getUser.mockResolvedValue({ id: userId } as any);
+            mockCartService.getCartData.mockResolvedValue(mockCartData as any);
+            (hasStock as jest.Mock).mockReturnValue(mockCartData);
+            (formatProductsForOrder as jest.Mock).mockReturnValue(mockProducts);
+            (calcTotalPrice as jest.Mock).mockReturnValue(mockCartData[0].totalPrice);
+            mockOrderRepo.newOrder.mockResolvedValue(mockOrder as any);
+            (updateStockProducts as jest.Mock).mockImplementation(() => {
+                throw error
+            }
+            );
+
+            await expect(orderService.createOrder(userId, info)).rejects.toThrow(error);
+            expect(mockUserRepo.getUser).toHaveBeenCalledWith(userId);
+            expect(mockCartService.getCartData).toHaveBeenCalledWith(userId);
+            expect(hasStock).toHaveBeenCalledWith(mockCartData);
+            expect(formatProductsForOrder).toHaveBeenCalledWith(mockCartData);
+            expect(calcTotalPrice).toHaveBeenCalledWith(mockCartData);
+            expect(mockOrderRepo.newOrder).toHaveBeenCalledWith(mockOrder);
+            expect(updateStockProducts).toHaveBeenCalledWith(mockCartData);
+        })
+    })
+
+    describe("test in method createPreference", () => {
+        it("should create preference and return url for paid", async () => {
+            const userId = "user001";
+            const additionalInfo = "info adicional";
+            const expireDateForPreference = "2025-07-04T19:12:45.123-03:00";
+
+            const mockProducts = [{
+                productId: "25",
+                brand: "Samsung",
+                familyModel: "Galaxy",
+                model: "S 23",
+                colour: "grey",
+                photo: "http://imageProductId25.jpg",
+                quantity: 1,
+                price: 200
+            }];
+
+            const mockCartData = [{
+                productId: "25",
+                brand: "Samsung",
+                familyModel: "Galaxy",
+                model: "S 23",
+                colour: "grey",
+                photo: "http://imageProductId25.jpg",
+                quantity: 1,
+                price: 200,
+                stock: 5,
+                totalPrice: 200
+            }];
+
+            const mockOrder = {
+                id: "orderId001",
+                data: {
+                    orderId: "orderId001",
+                    userId: userId,
+                    products: mockProducts,
+                    status: "pending",
+                    totalPrice: mockCartData[0].totalPrice,
+                    url: "https://mp.com.ar/paid/28182128",
+                    additionalInfo: additionalInfo,
+                    created: new Date('2025-06-29T20:00:00Z'),
+                    payment: null,
+                    expire: false,
+                },
+                setOrderId: jest.fn(),
+                setUrl: jest.fn(),
+            };
+
+            const mockItems = [{
+                id: `${mockCartData[0].productId}`,
+                title: `${mockCartData[0].brand} ${mockCartData[0].familyModel} ${mockCartData[0].model}`,
+                description: `smartphone ${mockCartData[0].brand} ${mockCartData[0].familyModel} ${mockCartData[0].model} `,
+                picture_url: mockCartData[0].photo,
+                category_id: "Phones",
+                quantity: mockCartData[0].quantity,
+                currency_id: "ARS",
+                unit_price: mockCartData[0].price
+            }];
+
+            const mockUser = {
+                data: {
+                    email: "test@email.com",
+                    userName: "user demo",
+                    phoneNumber: "123456789",
+                    address: {
+                        street: "fake street",
+                        locality: "fake locality",
+                        city: "fake city",
+                        state: "fake state",
+                        postalCode: 1234,
+                        country: "fake country"
+                    },
+                    cart: mockCartData,
+                }
+            };
+
+            const mockUrlData = {
+                notificationUrl: "http://notification.com",
+                successUrl: "http://notification.com",
+                failureUrl: "http://notification.com",
+                pendingUrl: "http://notification.com",
+
+            };
+
+            const mockCreatePreference = {
+                body: {
+                    external_reference: mockOrder.data.orderId,
+                    notification_url: `${mockUrlData.notificationUrl}`,
+                    items: mockItems,
+                    payer: {
+                        name: `${mockUser.data.userName}`,
+                        email: `${mockUser.data.email}`,
+                        phone: {
+                            number: `${mockUser.data.phoneNumber}`
+                        }
+                    },
+                    back_urls: {
+                        success: `${mockUrlData.successUrl}`,
+                        failure: `${mockUrlData.failureUrl}`,
+                        pending: `${mockUrlData.pendingUrl}`
+                    },
+                    expires: true,
+                    auto_return: "all",
+                    additional_info: additionalInfo,
+                    statement_descriptor: "MERCADOPAGO-SMARTSHOP",
+                    expiration_date_to: expireDateForPreference,
                 }
             }
-        };
 
-        const expectedCreatedDate = new Date("2025-07-01T10:00:00.123Z").toLocaleString("es-AR", {
-            day: "2-digit",
-            month: "2-digit",
-            year: "numeric",
-            hour: "2-digit",
-            minute: "2-digit",
-            second: "2-digit",
-            hour12: false,
-        });
+            const mockNewPreference = {
+                init_point: "https://mp.com.ar/paid/28182128"
+            };
 
-        const expectedPaymentDate = mockOrder.data.payment.paymentCreated.toLocaleString("es-AR", {
-            day: "2-digit",
-            month: "2-digit",
-            year: "numeric",
-            hour: "2-digit",
-            minute: "2-digit",
-            second: "2-digit",
-            hour12: false,
-        });
+            const createOrderSpy = jest.spyOn(orderService, "createOrder").mockResolvedValue(mockOrder as any);
+            mockCartService.getCartData.mockResolvedValue(mockCartData as any);
+            (formatItemsForPreference as jest.Mock).mockReturnValue(mockItems);
+            mockUserRepo.getUser.mockReturnValue(mockUser as any);
+            (formatExpireDateForPreference as jest.Mock).mockReturnValue(expireDateForPreference);
+            (getBaseUrl as jest.Mock).mockImplementation(() => {
+                return mockUrlData
+            });
+            (createPreference as jest.Mock).mockResolvedValue(mockNewPreference);
+            (mockOrder.setOrderId as jest.Mock).mockReturnValue(true);
+            (mockOrder.setUrl as jest.Mock).mockReturnValue(true);
+            mockOrderRepo.save.mockResolvedValue(true);
+            mockCartService.reset.mockResolvedValue(mockProducts as any)
 
-        const expectedOrder = {
-            userId: "user1",
-            orderId: "order1",
-            created: expectedCreatedDate,
-            status: "pending",
-            payment: {
-                paymentCreated: expectedPaymentDate
+            const result = await orderService.createPreference(userId, additionalInfo);
+            expect(createOrderSpy).toHaveBeenCalledWith(userId, additionalInfo);
+            expect(mockCartService.getCartData).toHaveBeenCalledWith(userId);
+            expect(formatItemsForPreference).toHaveBeenCalledWith(mockCartData);
+            expect(mockUserRepo.getUser).toHaveBeenCalledWith(userId);
+            expect(formatExpireDateForPreference).toHaveBeenCalled();
+            expect(getBaseUrl).toHaveBeenCalled();
+            expect(createPreference).toHaveBeenCalledWith(mockCreatePreference);
+            expect(mockOrder.setOrderId).toHaveBeenCalledWith(mockOrder.id);
+            expect(mockOrder.setUrl).toHaveBeenCalledWith(mockNewPreference.init_point);
+            expect(mockOrderRepo.save).toHaveBeenCalledWith(mockOrder);
+            expect(mockCartService.reset).toHaveBeenCalledWith(userId);
+            expect(result).toEqual({ url: mockNewPreference.init_point });
+        })
+
+        it("should throw an error when createOrder fails", async () => {
+            const error = new Error("No existe el userId");
+            const userId = "user002";
+            const additionalInfo = "info adicional";
+            const createOrderSpy = jest.spyOn(orderService, "createOrder").mockRejectedValue(error);
+            await expect(orderService.createPreference(userId, additionalInfo)).rejects.toThrow(error);
+            expect(createOrderSpy).toHaveBeenCalledWith(userId, additionalInfo);
+        })
+
+        it("should throw an error when getCartData has no products", async () => {
+            const error = new Error("No existen productos en el carrito de compras");
+            const userId = "user001";
+            const additionalInfo = "info adicional";
+
+            const mockOrder = {
+                id: "orderId001",
+                data: {
+                    orderId: "orderId001",
+                    userId: userId,
+                    products: [],
+                    status: "pending",
+                    totalPrice: 0,
+                    url: null,
+                    additionalInfo: additionalInfo,
+                    created: new Date('2025-06-29T20:00:00Z'),
+                    payment: null,
+                    expire: false,
+                },
+            };
+
+            const createOrderSpy = jest.spyOn(orderService, "createOrder").mockResolvedValue(mockOrder as any);
+            mockCartService.getCartData.mockRejectedValue(error);
+            await expect(orderService.createPreference(userId, additionalInfo)).rejects.toThrow(error);
+            expect(createOrderSpy).toHaveBeenCalledWith(userId, additionalInfo);
+            expect(mockCartService.getCartData).toHaveBeenCalledWith(userId);
+        })
+
+        it("should throw an error when formatItemsForPreference has no product to format", async () => {
+            const error = new Error("No existen productos en el carrito de compras");
+            const userId = "user001";
+            const additionalInfo = "info adicional";
+            const mockCartData = [];
+            const mockOrder = {
+                id: "orderId001",
+                data: {
+                    orderId: "orderId001",
+                    userId: userId,
+                    products: [],
+                    status: "pending",
+                    totalPrice: 0,
+                    url: "https://mp.com.ar/paid/28182128",
+                    additionalInfo: additionalInfo,
+                    created: new Date('2025-06-29T20:00:00Z'),
+                    payment: null,
+                    expire: false,
+                },
+            };
+
+            const createOrderSpy = jest.spyOn(orderService, "createOrder").mockResolvedValue(mockOrder as any);
+            mockCartService.getCartData.mockResolvedValue(mockCartData as any);
+            (formatItemsForPreference as jest.Mock).mockImplementation(() => {
+                throw error
+            });
+            await expect(orderService.createPreference(userId, additionalInfo)).rejects.toThrow(error);
+            expect(createOrderSpy).toHaveBeenCalledWith(userId, additionalInfo);
+            expect(mockCartService.getCartData).toHaveBeenCalledWith(userId);
+            expect(formatItemsForPreference).toHaveBeenCalledWith(mockCartData);
+        })
+
+        it("should throw an error when getUser does not return any data", async () => {
+            const error = new Error("No existen productos en el carrito de compras");
+            const userId = "user001";
+            const additionalInfo = "info adicional";
+
+            const mockProducts = [{
+                productId: "25",
+                brand: "Samsung",
+                familyModel: "Galaxy",
+                model: "S 23",
+                colour: "grey",
+                photo: "http://imageProductId25.jpg",
+                quantity: 1,
+                price: 200
+            }];
+
+            const mockCartData = [{
+                productId: "25",
+                brand: "Samsung",
+                familyModel: "Galaxy",
+                model: "S 23",
+                colour: "grey",
+                photo: "http://imageProductId25.jpg",
+                quantity: 1,
+                price: 200,
+                stock: 5,
+                totalPrice: 200
+            }];
+
+            const mockOrder = {
+                id: "orderId001",
+                data: {
+                    orderId: "orderId001",
+                    userId: userId,
+                    products: mockProducts,
+                    status: "pending",
+                    totalPrice: mockCartData[0].totalPrice,
+                    url: "https://mp.com.ar/paid/28182128",
+                    additionalInfo: additionalInfo,
+                    created: new Date('2025-06-29T20:00:00Z'),
+                    payment: null,
+                    expire: false,
+                },
+            };
+
+            const mockItems = [{
+                id: `${mockCartData[0].productId}`,
+                title: `${mockCartData[0].brand} ${mockCartData[0].familyModel} ${mockCartData[0].model}`,
+                description: `smartphone ${mockCartData[0].brand} ${mockCartData[0].familyModel} ${mockCartData[0].model} `,
+                picture_url: mockCartData[0].photo,
+                category_id: "Phones",
+                quantity: mockCartData[0].quantity,
+                currency_id: "ARS",
+                unit_price: mockCartData[0].price
+            }];
+
+            const createOrderSpy = jest.spyOn(orderService, "createOrder").mockResolvedValue(mockOrder as any);
+            mockCartService.getCartData.mockResolvedValue(mockCartData as any);
+            (formatItemsForPreference as jest.Mock).mockReturnValue(mockItems);
+            mockUserRepo.getUser.mockImplementation(() => {
+                throw error
+            });
+            await expect(orderService.createPreference(userId, additionalInfo)).rejects.toThrow(error);
+            expect(createOrderSpy).toHaveBeenCalledWith(userId, additionalInfo);
+            expect(mockCartService.getCartData).toHaveBeenCalledWith(userId);
+            expect(formatItemsForPreference).toHaveBeenCalledWith(mockCartData);
+            expect(mockUserRepo.getUser).toHaveBeenCalledWith(userId);
+        })
+
+        it("should throw an error when formatItemsForPreference is unable to create a data", async () => {
+            const error = new Error("Hubo un error al formatear la fecha");
+            const userId = "user001";
+            const additionalInfo = "info adicional";
+            const mockProducts = [{
+                productId: "25",
+                brand: "Samsung",
+                familyModel: "Galaxy",
+                model: "S 23",
+                colour: "grey",
+                photo: "http://imageProductId25.jpg",
+                quantity: 1,
+                price: 200
+            }];
+
+            const mockCartData = [{
+                productId: "25",
+                brand: "Samsung",
+                familyModel: "Galaxy",
+                model: "S 23",
+                colour: "grey",
+                photo: "http://imageProductId25.jpg",
+                quantity: 1,
+                price: 200,
+                stock: 5,
+                totalPrice: 200
+            }];
+
+            const mockOrder = {
+                id: "orderId001",
+                data: {
+                    orderId: "orderId001",
+                    userId: userId,
+                    products: mockProducts,
+                    status: "pending",
+                    totalPrice: mockCartData[0].totalPrice,
+                    url: "https://mp.com.ar/paid/28182128",
+                    additionalInfo: additionalInfo,
+                    created: new Date('2025-06-29T20:00:00Z'),
+                    payment: null,
+                    expire: false,
+                },
+            };
+
+            const mockItems = [{
+                id: `${mockCartData[0].productId}`,
+                title: `${mockCartData[0].brand} ${mockCartData[0].familyModel} ${mockCartData[0].model}`,
+                description: `smartphone ${mockCartData[0].brand} ${mockCartData[0].familyModel} ${mockCartData[0].model} `,
+                picture_url: mockCartData[0].photo,
+                category_id: "Phones",
+                quantity: mockCartData[0].quantity,
+                currency_id: "ARS",
+                unit_price: mockCartData[0].price
+            }];
+
+            const mockUser = {
+                data: {
+                    email: "test@email.com",
+                    userName: "user demo",
+                    phoneNumber: "123456789",
+                    address: {
+                        street: "fake street",
+                        locality: "fake locality",
+                        city: "fake city",
+                        state: "fake state",
+                        postalCode: 1234,
+                        country: "fake country"
+                    },
+                    cart: mockCartData,
+                }
+            };
+
+            const createOrderSpy = jest.spyOn(orderService, "createOrder").mockResolvedValue(mockOrder as any);
+            mockCartService.getCartData.mockResolvedValue(mockCartData as any);
+            (formatItemsForPreference as jest.Mock).mockReturnValue(mockItems);
+            mockUserRepo.getUser.mockReturnValue(mockUser as any);
+            (formatExpireDateForPreference as jest.Mock).mockImplementation(() => {
+                throw error
+            });
+            await expect(orderService.createPreference(userId, additionalInfo)).rejects.toThrow(error);
+            expect(createOrderSpy).toHaveBeenCalledWith(userId, additionalInfo);
+            expect(mockCartService.getCartData).toHaveBeenCalledWith(userId);
+            expect(formatItemsForPreference).toHaveBeenCalledWith(mockCartData);
+            expect(mockUserRepo.getUser).toHaveBeenCalledWith(userId);
+            expect(formatExpireDateForPreference).toHaveBeenCalled();
+        })
+
+        it("should throw an error if getBaseUrl returns no data", async () => {
+            const error = new Error("Hubo un error al obtener las urls");
+            const userId = "user001";
+            const additionalInfo = "info adicional";
+            const expireDateForPreference = "2025-07-04T19:12:45.123-03:00";
+
+            const mockProducts = [{
+                productId: "25",
+                brand: "Samsung",
+                familyModel: "Galaxy",
+                model: "S 23",
+                colour: "grey",
+                photo: "http://imageProductId25.jpg",
+                quantity: 1,
+                price: 200
+            }];
+
+            const mockCartData = [{
+                productId: "25",
+                brand: "Samsung",
+                familyModel: "Galaxy",
+                model: "S 23",
+                colour: "grey",
+                photo: "http://imageProductId25.jpg",
+                quantity: 1,
+                price: 200,
+                stock: 5,
+                totalPrice: 200
+            }];
+
+            const mockOrder = {
+                id: "orderId001",
+                data: {
+                    orderId: "orderId001",
+                    userId: userId,
+                    products: mockProducts,
+                    status: "pending",
+                    totalPrice: mockCartData[0].totalPrice,
+                    url: "https://mp.com.ar/paid/28182128",
+                    additionalInfo: additionalInfo,
+                    created: new Date('2025-06-29T20:00:00Z'),
+                    payment: null,
+                    expire: false,
+                },
+            };
+
+            const mockItems = [{
+                id: `${mockCartData[0].productId}`,
+                title: `${mockCartData[0].brand} ${mockCartData[0].familyModel} ${mockCartData[0].model}`,
+                description: `smartphone ${mockCartData[0].brand} ${mockCartData[0].familyModel} ${mockCartData[0].model} `,
+                picture_url: mockCartData[0].photo,
+                category_id: "Phones",
+                quantity: mockCartData[0].quantity,
+                currency_id: "ARS",
+                unit_price: mockCartData[0].price
+            }];
+
+            const mockUser = {
+                data: {
+                    email: "test@email.com",
+                    userName: "user demo",
+                    phoneNumber: "123456789",
+                    address: {
+                        street: "fake street",
+                        locality: "fake locality",
+                        city: "fake city",
+                        state: "fake state",
+                        postalCode: 1234,
+                        country: "fake country"
+                    },
+                    cart: mockCartData,
+                }
+            };
+
+            const createOrderSpy = jest.spyOn(orderService, "createOrder").mockResolvedValue(mockOrder as any);
+            mockCartService.getCartData.mockResolvedValue(mockCartData as any);
+            (formatItemsForPreference as jest.Mock).mockReturnValue(mockItems);
+            mockUserRepo.getUser.mockReturnValue(mockUser as any);
+            (formatExpireDateForPreference as jest.Mock).mockReturnValue(expireDateForPreference);
+            (getBaseUrl as jest.Mock).mockImplementation(() => {
+                throw error
+            });
+            await expect(orderService.createPreference(userId, additionalInfo)).rejects.toThrow(error);
+            expect(createOrderSpy).toHaveBeenCalledWith(userId, additionalInfo);
+            expect(mockCartService.getCartData).toHaveBeenCalledWith(userId);
+            expect(formatItemsForPreference).toHaveBeenCalledWith(mockCartData);
+            expect(mockUserRepo.getUser).toHaveBeenCalledWith(userId);
+            expect(formatExpireDateForPreference).toHaveBeenCalled();
+            expect(getBaseUrl).toHaveBeenCalled();
+        })
+
+        it("should throw an error when createPreference is unable to create a preference", async () => {
+            const error = new Error("Hubo un error al crear la preferencia");
+            const userId = "user001";
+            const additionalInfo = "info adicional";
+            const expireDateForPreference = "2025-07-04T19:12:45.123-03:00";
+
+            const mockProducts = [{
+                productId: "25",
+                brand: "Samsung",
+                familyModel: "Galaxy",
+                model: "S 23",
+                colour: "grey",
+                photo: "http://imageProductId25.jpg",
+                quantity: 1,
+                price: 200
+            }];
+
+            const mockCartData = [{
+                productId: "25",
+                brand: "Samsung",
+                familyModel: "Galaxy",
+                model: "S 23",
+                colour: "grey",
+                photo: "http://imageProductId25.jpg",
+                quantity: 1,
+                price: 200,
+                stock: 5,
+                totalPrice: 200
+            }];
+
+            const mockOrder = {
+                id: "orderId001",
+                data: {
+                    orderId: "orderId001",
+                    userId: userId,
+                    products: mockProducts,
+                    status: "pending",
+                    totalPrice: mockCartData[0].totalPrice,
+                    url: "https://mp.com.ar/paid/28182128",
+                    additionalInfo: additionalInfo,
+                    created: new Date('2025-06-29T20:00:00Z'),
+                    payment: null,
+                    expire: false,
+                },
+            };
+
+            const mockItems = [{
+                id: `${mockCartData[0].productId}`,
+                title: `${mockCartData[0].brand} ${mockCartData[0].familyModel} ${mockCartData[0].model}`,
+                description: `smartphone ${mockCartData[0].brand} ${mockCartData[0].familyModel} ${mockCartData[0].model} `,
+                picture_url: mockCartData[0].photo,
+                category_id: "Phones",
+                quantity: mockCartData[0].quantity,
+                currency_id: "ARS",
+                unit_price: mockCartData[0].price
+            }];
+
+            const mockUser = {
+                data: {
+                    email: "test@email.com",
+                    userName: "user demo",
+                    phoneNumber: "123456789",
+                    address: {
+                        street: "fake street",
+                        locality: "fake locality",
+                        city: "fake city",
+                        state: "fake state",
+                        postalCode: 1234,
+                        country: "fake country"
+                    },
+                    cart: mockCartData,
+                }
+            };
+
+            const mockUrlData = {
+                notificationUrl: "http://notification.com",
+                successUrl: "http://notification.com",
+                failureUrl: "http://notification.com",
+                pendingUrl: "http://notification.com",
+
+            };
+
+            const mockCreatePreference = {
+                body: {
+                    external_reference: mockOrder.data.orderId,
+                    notification_url: `${mockUrlData.notificationUrl}`,
+                    items: mockItems,
+                    payer: {
+                        name: `${mockUser.data.userName}`,
+                        email: `${mockUser.data.email}`,
+                        phone: {
+                            number: `${mockUser.data.phoneNumber}`
+                        }
+                    },
+                    back_urls: {
+                        success: `${mockUrlData.successUrl}`,
+                        failure: `${mockUrlData.failureUrl}`,
+                        pending: `${mockUrlData.pendingUrl}`
+                    },
+                    expires: true,
+                    auto_return: "all",
+                    additional_info: additionalInfo,
+                    statement_descriptor: "MERCADOPAGO-SMARTSHOP",
+                    expiration_date_to: expireDateForPreference,
+                }
             }
-        };
 
+            const createOrderSpy = jest.spyOn(orderService, "createOrder").mockResolvedValue(mockOrder as any);
+            mockCartService.getCartData.mockResolvedValue(mockCartData as any);
+            (formatItemsForPreference as jest.Mock).mockReturnValue(mockItems);
+            mockUserRepo.getUser.mockReturnValue(mockUser as any);
+            (formatExpireDateForPreference as jest.Mock).mockReturnValue(expireDateForPreference);
+            (getBaseUrl as jest.Mock).mockImplementation(() => {
+                return mockUrlData
+            });
+            (createPreference as jest.Mock).mockRejectedValue(error);
+            await expect(orderService.createPreference(userId, additionalInfo)).rejects.toThrow(error);
+            expect(createOrderSpy).toHaveBeenCalledWith(userId, additionalInfo);
+            expect(mockCartService.getCartData).toHaveBeenCalledWith(userId);
+            expect(formatItemsForPreference).toHaveBeenCalledWith(mockCartData);
+            expect(mockUserRepo.getUser).toHaveBeenCalledWith(userId);
+            expect(formatExpireDateForPreference).toHaveBeenCalled();
+            expect(getBaseUrl).toHaveBeenCalled();
+            expect(createPreference).toHaveBeenCalledWith(mockCreatePreference);
+        })
 
-        mockOrderRepo.getOrderDoc.mockReturnValue(mockOrder as any);
-        (formatDateFirebase as jest.Mock).mockImplementation((date) => {
-            if (
-                date._seconds === mockOrder.data.created._seconds &&
-                date._nanoseconds === mockOrder.data.created._nanoseconds
-            ) {
-                return new Date("2025-07-01T10:00:00.123Z")
+        it("should throw an error when saving the orderId fails", async () => {
+            const error = new Error("Hubo un error al guardar la orderId");
+            const userId = "user001";
+            const additionalInfo = "info adicional";
+            const expireDateForPreference = "2025-07-04T19:12:45.123-03:00";
+
+            const mockProducts = [{
+                productId: "25",
+                brand: "Samsung",
+                familyModel: "Galaxy",
+                model: "S 23",
+                colour: "grey",
+                photo: "http://imageProductId25.jpg",
+                quantity: 1,
+                price: 200
+            }];
+
+            const mockCartData = [{
+                productId: "25",
+                brand: "Samsung",
+                familyModel: "Galaxy",
+                model: "S 23",
+                colour: "grey",
+                photo: "http://imageProductId25.jpg",
+                quantity: 1,
+                price: 200,
+                stock: 5,
+                totalPrice: 200
+            }];
+
+            const mockOrder = {
+                id: "orderId001",
+                data: {
+                    orderId: "orderId001",
+                    userId: userId,
+                    products: mockProducts,
+                    status: "pending",
+                    totalPrice: mockCartData[0].totalPrice,
+                    url: "https://mp.com.ar/paid/28182128",
+                    additionalInfo: additionalInfo,
+                    created: new Date('2025-06-29T20:00:00Z'),
+                    payment: null,
+                    expire: false,
+                },
+                setOrderId: jest.fn(),
+            };
+
+            const mockItems = [{
+                id: `${mockCartData[0].productId}`,
+                title: `${mockCartData[0].brand} ${mockCartData[0].familyModel} ${mockCartData[0].model}`,
+                description: `smartphone ${mockCartData[0].brand} ${mockCartData[0].familyModel} ${mockCartData[0].model} `,
+                picture_url: mockCartData[0].photo,
+                category_id: "Phones",
+                quantity: mockCartData[0].quantity,
+                currency_id: "ARS",
+                unit_price: mockCartData[0].price
+            }];
+
+            const mockUser = {
+                data: {
+                    email: "test@email.com",
+                    userName: "user demo",
+                    phoneNumber: "123456789",
+                    address: {
+                        street: "fake street",
+                        locality: "fake locality",
+                        city: "fake city",
+                        state: "fake state",
+                        postalCode: 1234,
+                        country: "fake country"
+                    },
+                    cart: mockCartData,
+                }
+            };
+
+            const mockUrlData = {
+                notificationUrl: "http://notification.com",
+                successUrl: "http://notification.com",
+                failureUrl: "http://notification.com",
+                pendingUrl: "http://notification.com",
+
+            };
+
+            const mockCreatePreference = {
+                body: {
+                    external_reference: mockOrder.data.orderId,
+                    notification_url: `${mockUrlData.notificationUrl}`,
+                    items: mockItems,
+                    payer: {
+                        name: `${mockUser.data.userName}`,
+                        email: `${mockUser.data.email}`,
+                        phone: {
+                            number: `${mockUser.data.phoneNumber}`
+                        }
+                    },
+                    back_urls: {
+                        success: `${mockUrlData.successUrl}`,
+                        failure: `${mockUrlData.failureUrl}`,
+                        pending: `${mockUrlData.pendingUrl}`
+                    },
+                    expires: true,
+                    auto_return: "all",
+                    additional_info: additionalInfo,
+                    statement_descriptor: "MERCADOPAGO-SMARTSHOP",
+                    expiration_date_to: expireDateForPreference,
+                }
             }
-            return new Date()
-        });
 
-        const result = await orderService.getOrdersById(mockOrder.data.userId, mockOrder.data.orderId);
-        expect(mockOrderRepo.getOrderDoc).toHaveBeenCalledWith(mockOrder.data.userId, mockOrder.data.orderId);
-        expect(formatDateFirebase as jest.Mock).toHaveBeenCalledWith(mockOrder.data.created)
-        expect(result).toEqual(expectedOrder);
+            const mockNewPreference = {
+                init_point: "https://mp.com.ar/paid/28182128"
+            };
+
+            const createOrderSpy = jest.spyOn(orderService, "createOrder").mockResolvedValue(mockOrder as any);
+            mockCartService.getCartData.mockResolvedValue(mockCartData as any);
+            (formatItemsForPreference as jest.Mock).mockReturnValue(mockItems);
+            mockUserRepo.getUser.mockReturnValue(mockUser as any);
+            (formatExpireDateForPreference as jest.Mock).mockReturnValue(expireDateForPreference);
+            (getBaseUrl as jest.Mock).mockImplementation(() => {
+                return mockUrlData
+            });
+            (createPreference as jest.Mock).mockResolvedValue(mockNewPreference);
+            (mockOrder.setOrderId as jest.Mock).mockImplementation(() => {
+                throw error
+            });
+            await expect(orderService.createPreference(userId, additionalInfo)).rejects.toThrow(error);
+            expect(createOrderSpy).toHaveBeenCalledWith(userId, additionalInfo);
+            expect(mockCartService.getCartData).toHaveBeenCalledWith(userId);
+            expect(formatItemsForPreference).toHaveBeenCalledWith(mockCartData);
+            expect(mockUserRepo.getUser).toHaveBeenCalledWith(userId);
+            expect(formatExpireDateForPreference).toHaveBeenCalled();
+            expect(getBaseUrl).toHaveBeenCalled();
+            expect(createPreference).toHaveBeenCalledWith(mockCreatePreference);
+            expect(mockOrder.setOrderId).toHaveBeenCalledWith(mockOrder.id);
+        })
+
+        it("should throw an error when saving the URL fails", async () => {
+            const error = new Error("Hubo un error al guardar la url en la orden");
+            const userId = "user001";
+            const additionalInfo = "info adicional";
+            const expireDateForPreference = "2025-07-04T19:12:45.123-03:00";
+
+            const mockProducts = [{
+                productId: "25",
+                brand: "Samsung",
+                familyModel: "Galaxy",
+                model: "S 23",
+                colour: "grey",
+                photo: "http://imageProductId25.jpg",
+                quantity: 1,
+                price: 200
+            }];
+
+            const mockCartData = [{
+                productId: "25",
+                brand: "Samsung",
+                familyModel: "Galaxy",
+                model: "S 23",
+                colour: "grey",
+                photo: "http://imageProductId25.jpg",
+                quantity: 1,
+                price: 200,
+                stock: 5,
+                totalPrice: 200
+            }];
+
+            const mockOrder = {
+                id: "orderId001",
+                data: {
+                    orderId: "orderId001",
+                    userId: userId,
+                    products: mockProducts,
+                    status: "pending",
+                    totalPrice: mockCartData[0].totalPrice,
+                    url: "https://mp.com.ar/paid/28182128",
+                    additionalInfo: additionalInfo,
+                    created: new Date('2025-06-29T20:00:00Z'),
+                    payment: null,
+                    expire: false,
+                },
+                setOrderId: jest.fn(),
+                setUrl: jest.fn(),
+            };
+
+            const mockItems = [{
+                id: `${mockCartData[0].productId}`,
+                title: `${mockCartData[0].brand} ${mockCartData[0].familyModel} ${mockCartData[0].model}`,
+                description: `smartphone ${mockCartData[0].brand} ${mockCartData[0].familyModel} ${mockCartData[0].model} `,
+                picture_url: mockCartData[0].photo,
+                category_id: "Phones",
+                quantity: mockCartData[0].quantity,
+                currency_id: "ARS",
+                unit_price: mockCartData[0].price
+            }];
+
+            const mockUser = {
+                data: {
+                    email: "test@email.com",
+                    userName: "user demo",
+                    phoneNumber: "123456789",
+                    address: {
+                        street: "fake street",
+                        locality: "fake locality",
+                        city: "fake city",
+                        state: "fake state",
+                        postalCode: 1234,
+                        country: "fake country"
+                    },
+                    cart: mockCartData,
+                }
+            };
+
+            const mockUrlData = {
+                notificationUrl: "http://notification.com",
+                successUrl: "http://notification.com",
+                failureUrl: "http://notification.com",
+                pendingUrl: "http://notification.com",
+
+            };
+
+            const mockCreatePreference = {
+                body: {
+                    external_reference: mockOrder.data.orderId,
+                    notification_url: `${mockUrlData.notificationUrl}`,
+                    items: mockItems,
+                    payer: {
+                        name: `${mockUser.data.userName}`,
+                        email: `${mockUser.data.email}`,
+                        phone: {
+                            number: `${mockUser.data.phoneNumber}`
+                        }
+                    },
+                    back_urls: {
+                        success: `${mockUrlData.successUrl}`,
+                        failure: `${mockUrlData.failureUrl}`,
+                        pending: `${mockUrlData.pendingUrl}`
+                    },
+                    expires: true,
+                    auto_return: "all",
+                    additional_info: additionalInfo,
+                    statement_descriptor: "MERCADOPAGO-SMARTSHOP",
+                    expiration_date_to: expireDateForPreference,
+                }
+            }
+
+            const mockNewPreference = {
+                init_point: "https://mp.com.ar/paid/28182128"
+            };
+
+            const createOrderSpy = jest.spyOn(orderService, "createOrder").mockResolvedValue(mockOrder as any);
+            mockCartService.getCartData.mockResolvedValue(mockCartData as any);
+            (formatItemsForPreference as jest.Mock).mockReturnValue(mockItems);
+            mockUserRepo.getUser.mockReturnValue(mockUser as any);
+            (formatExpireDateForPreference as jest.Mock).mockReturnValue(expireDateForPreference);
+            (getBaseUrl as jest.Mock).mockImplementation(() => {
+                return mockUrlData
+            });
+            (createPreference as jest.Mock).mockResolvedValue(mockNewPreference);
+            (mockOrder.setOrderId as jest.Mock).mockReturnValue(true);
+            (mockOrder.setUrl as jest.Mock).mockImplementation(() => {
+                throw error
+            });
+
+            await expect(orderService.createPreference(userId, additionalInfo)).rejects.toThrow(error);
+            expect(createOrderSpy).toHaveBeenCalledWith(userId, additionalInfo);
+            expect(mockCartService.getCartData).toHaveBeenCalledWith(userId);
+            expect(formatItemsForPreference).toHaveBeenCalledWith(mockCartData);
+            expect(mockUserRepo.getUser).toHaveBeenCalledWith(userId);
+            expect(formatExpireDateForPreference).toHaveBeenCalled();
+            expect(getBaseUrl).toHaveBeenCalled();
+            expect(createPreference).toHaveBeenCalledWith(mockCreatePreference);
+            expect(mockOrder.setOrderId).toHaveBeenCalledWith(mockOrder.id);
+            expect(mockOrder.setUrl).toHaveBeenCalledWith(mockNewPreference.init_point);
+        })
+
+        it("should throw an error when saving the order fails", async () => {
+            const error = new Error("Hubo un error al guardar la orden");
+            const userId = "user001";
+            const additionalInfo = "info adicional";
+            const expireDateForPreference = "2025-07-04T19:12:45.123-03:00";
+
+            const mockProducts = [{
+                productId: "25",
+                brand: "Samsung",
+                familyModel: "Galaxy",
+                model: "S 23",
+                colour: "grey",
+                photo: "http://imageProductId25.jpg",
+                quantity: 1,
+                price: 200
+            }];
+
+            const mockCartData = [{
+                productId: "25",
+                brand: "Samsung",
+                familyModel: "Galaxy",
+                model: "S 23",
+                colour: "grey",
+                photo: "http://imageProductId25.jpg",
+                quantity: 1,
+                price: 200,
+                stock: 5,
+                totalPrice: 200
+            }];
+
+            const mockOrder = {
+                id: "orderId001",
+                data: {
+                    orderId: "orderId001",
+                    userId: userId,
+                    products: mockProducts,
+                    status: "pending",
+                    totalPrice: mockCartData[0].totalPrice,
+                    url: "https://mp.com.ar/paid/28182128",
+                    additionalInfo: additionalInfo,
+                    created: new Date('2025-06-29T20:00:00Z'),
+                    payment: null,
+                    expire: false,
+                },
+                setOrderId: jest.fn(),
+                setUrl: jest.fn(),
+            };
+
+            const mockItems = [{
+                id: `${mockCartData[0].productId}`,
+                title: `${mockCartData[0].brand} ${mockCartData[0].familyModel} ${mockCartData[0].model}`,
+                description: `smartphone ${mockCartData[0].brand} ${mockCartData[0].familyModel} ${mockCartData[0].model} `,
+                picture_url: mockCartData[0].photo,
+                category_id: "Phones",
+                quantity: mockCartData[0].quantity,
+                currency_id: "ARS",
+                unit_price: mockCartData[0].price
+            }];
+
+            const mockUser = {
+                data: {
+                    email: "test@email.com",
+                    userName: "user demo",
+                    phoneNumber: "123456789",
+                    address: {
+                        street: "fake street",
+                        locality: "fake locality",
+                        city: "fake city",
+                        state: "fake state",
+                        postalCode: 1234,
+                        country: "fake country"
+                    },
+                    cart: mockCartData,
+                }
+            };
+
+            const mockUrlData = {
+                notificationUrl: "http://notification.com",
+                successUrl: "http://notification.com",
+                failureUrl: "http://notification.com",
+                pendingUrl: "http://notification.com",
+
+            };
+
+            const mockCreatePreference = {
+                body: {
+                    external_reference: mockOrder.data.orderId,
+                    notification_url: `${mockUrlData.notificationUrl}`,
+                    items: mockItems,
+                    payer: {
+                        name: `${mockUser.data.userName}`,
+                        email: `${mockUser.data.email}`,
+                        phone: {
+                            number: `${mockUser.data.phoneNumber}`
+                        }
+                    },
+                    back_urls: {
+                        success: `${mockUrlData.successUrl}`,
+                        failure: `${mockUrlData.failureUrl}`,
+                        pending: `${mockUrlData.pendingUrl}`
+                    },
+                    expires: true,
+                    auto_return: "all",
+                    additional_info: additionalInfo,
+                    statement_descriptor: "MERCADOPAGO-SMARTSHOP",
+                    expiration_date_to: expireDateForPreference,
+                }
+            }
+
+            const mockNewPreference = {
+                init_point: "https://mp.com.ar/paid/28182128"
+            };
+
+            const createOrderSpy = jest.spyOn(orderService, "createOrder").mockResolvedValue(mockOrder as any);
+            mockCartService.getCartData.mockResolvedValue(mockCartData as any);
+            (formatItemsForPreference as jest.Mock).mockReturnValue(mockItems);
+            mockUserRepo.getUser.mockReturnValue(mockUser as any);
+            (formatExpireDateForPreference as jest.Mock).mockReturnValue(expireDateForPreference);
+            (getBaseUrl as jest.Mock).mockImplementation(() => {
+                return mockUrlData
+            });
+            (createPreference as jest.Mock).mockResolvedValue(mockNewPreference);
+            (mockOrder.setOrderId as jest.Mock).mockReturnValue(true);
+            (mockOrder.setUrl as jest.Mock).mockReturnValue(true);
+            mockOrderRepo.save.mockRejectedValue(error);
+
+            await expect(orderService.createPreference(userId, additionalInfo)).rejects.toThrow(error);
+            expect(createOrderSpy).toHaveBeenCalledWith(userId, additionalInfo);
+            expect(mockCartService.getCartData).toHaveBeenCalledWith(userId);
+            expect(formatItemsForPreference).toHaveBeenCalledWith(mockCartData);
+            expect(mockUserRepo.getUser).toHaveBeenCalledWith(userId);
+            expect(formatExpireDateForPreference).toHaveBeenCalled();
+            expect(getBaseUrl).toHaveBeenCalled();
+            expect(createPreference).toHaveBeenCalledWith(mockCreatePreference);
+            expect(mockOrder.setOrderId).toHaveBeenCalledWith(mockOrder.id);
+            expect(mockOrder.setUrl).toHaveBeenCalledWith(mockNewPreference.init_point);
+            expect(mockOrderRepo.save).toHaveBeenCalledWith(mockOrder);
+        })
+
+        it("should throw an error if the cart reset fails", async () => {
+            const error = new Error("Hubo un error al resetear el carrito de compras");
+            const userId = "user001";
+            const additionalInfo = "info adicional";
+            const expireDateForPreference = "2025-07-04T19:12:45.123-03:00";
+
+            const mockProducts = [{
+                productId: "25",
+                brand: "Samsung",
+                familyModel: "Galaxy",
+                model: "S 23",
+                colour: "grey",
+                photo: "http://imageProductId25.jpg",
+                quantity: 1,
+                price: 200
+            }];
+
+            const mockCartData = [{
+                productId: "25",
+                brand: "Samsung",
+                familyModel: "Galaxy",
+                model: "S 23",
+                colour: "grey",
+                photo: "http://imageProductId25.jpg",
+                quantity: 1,
+                price: 200,
+                stock: 5,
+                totalPrice: 200
+            }];
+
+            const mockOrder = {
+                id: "orderId001",
+                data: {
+                    orderId: "orderId001",
+                    userId: userId,
+                    products: mockProducts,
+                    status: "pending",
+                    totalPrice: mockCartData[0].totalPrice,
+                    url: "https://mp.com.ar/paid/28182128",
+                    additionalInfo: additionalInfo,
+                    created: new Date('2025-06-29T20:00:00Z'),
+                    payment: null,
+                    expire: false,
+                },
+                setOrderId: jest.fn(),
+                setUrl: jest.fn(),
+            };
+
+            const mockItems = [{
+                id: `${mockCartData[0].productId}`,
+                title: `${mockCartData[0].brand} ${mockCartData[0].familyModel} ${mockCartData[0].model}`,
+                description: `smartphone ${mockCartData[0].brand} ${mockCartData[0].familyModel} ${mockCartData[0].model} `,
+                picture_url: mockCartData[0].photo,
+                category_id: "Phones",
+                quantity: mockCartData[0].quantity,
+                currency_id: "ARS",
+                unit_price: mockCartData[0].price
+            }];
+
+            const mockUser = {
+                data: {
+                    email: "test@email.com",
+                    userName: "user demo",
+                    phoneNumber: "123456789",
+                    address: {
+                        street: "fake street",
+                        locality: "fake locality",
+                        city: "fake city",
+                        state: "fake state",
+                        postalCode: 1234,
+                        country: "fake country"
+                    },
+                    cart: mockCartData,
+                }
+            };
+
+            const mockUrlData = {
+                notificationUrl: "http://notification.com",
+                successUrl: "http://notification.com",
+                failureUrl: "http://notification.com",
+                pendingUrl: "http://notification.com",
+
+            };
+
+            const mockCreatePreference = {
+                body: {
+                    external_reference: mockOrder.data.orderId,
+                    notification_url: `${mockUrlData.notificationUrl}`,
+                    items: mockItems,
+                    payer: {
+                        name: `${mockUser.data.userName}`,
+                        email: `${mockUser.data.email}`,
+                        phone: {
+                            number: `${mockUser.data.phoneNumber}`
+                        }
+                    },
+                    back_urls: {
+                        success: `${mockUrlData.successUrl}`,
+                        failure: `${mockUrlData.failureUrl}`,
+                        pending: `${mockUrlData.pendingUrl}`
+                    },
+                    expires: true,
+                    auto_return: "all",
+                    additional_info: additionalInfo,
+                    statement_descriptor: "MERCADOPAGO-SMARTSHOP",
+                    expiration_date_to: expireDateForPreference,
+                }
+            }
+
+            const mockNewPreference = {
+                init_point: "https://mp.com.ar/paid/28182128"
+            };
+
+            const createOrderSpy = jest.spyOn(orderService, "createOrder").mockResolvedValue(mockOrder as any);
+            mockCartService.getCartData.mockResolvedValue(mockCartData as any);
+            (formatItemsForPreference as jest.Mock).mockReturnValue(mockItems);
+            mockUserRepo.getUser.mockReturnValue(mockUser as any);
+            (formatExpireDateForPreference as jest.Mock).mockReturnValue(expireDateForPreference);
+            (getBaseUrl as jest.Mock).mockImplementation(() => {
+                return mockUrlData
+            });
+            (createPreference as jest.Mock).mockResolvedValue(mockNewPreference);
+            (mockOrder.setOrderId as jest.Mock).mockReturnValue(true);
+            (mockOrder.setUrl as jest.Mock).mockReturnValue(true);
+            mockOrderRepo.save.mockResolvedValue(true);
+            mockCartService.reset.mockRejectedValue(error);
+
+            await expect(orderService.createPreference(userId, additionalInfo)).rejects.toThrow(error);
+            expect(createOrderSpy).toHaveBeenCalledWith(userId, additionalInfo);
+            expect(mockCartService.getCartData).toHaveBeenCalledWith(userId);
+            expect(formatItemsForPreference).toHaveBeenCalledWith(mockCartData);
+            expect(mockUserRepo.getUser).toHaveBeenCalledWith(userId);
+            expect(formatExpireDateForPreference).toHaveBeenCalled();
+            expect(getBaseUrl).toHaveBeenCalled();
+            expect(createPreference).toHaveBeenCalledWith(mockCreatePreference);
+            expect(mockOrder.setOrderId).toHaveBeenCalledWith(mockOrder.id);
+            expect(mockOrder.setUrl).toHaveBeenCalledWith(mockNewPreference.init_point);
+            expect(mockOrderRepo.save).toHaveBeenCalledWith(mockOrder);
+            expect(mockCartService.reset).toHaveBeenCalledWith(userId);
+        })
     })
 
-    it("should throw an error when orderId does not exist", async () => {
-        const error = new Error("No hay ordenes relacionadas al order Id");
-        mockOrderRepo.getOrderDoc.mockRejectedValue(error);
-        await expect(orderService.getOrdersById("user2", "order005")).rejects.toThrow(error)
-        expect(mockOrderRepo.getOrderDoc).toHaveBeenCalledWith("user2", "order005");
-    })
-
-    it("should create an order", async () => {
-        jest.useFakeTimers();
-        jest.setSystemTime(new Date('2025-06-29T20:00:00Z'));
-
-        const userId = "user001";
-        const info = "additional info";
-
-        const mockCartData = [{
-            productId: "25",
-            brand: "Samsung",
-            familyModel: "Galaxy",
-            model: "S 23",
-            colour: "grey",
-            photo: "http://imageProductId25.jpg",
-            quantity: 1,
-            price: 200,
-            stock: 5,
-            totalPrice: 200
-        }]
-
-        const mockProducts = [{
-            productId: "25",
-            brand: "Samsung",
-            familyModel: "Galaxy",
-            model: "S 23",
-            colour: "grey",
-            photo: "http://imageProductId25.jpg",
-            quantity: 1,
-            price: 200
-        }]
-
-        const mockOrder = {
-            orderId: null,
-            userId: userId,
-            products: mockProducts,
-            status: "pending",
-            totalPrice: mockCartData[0].totalPrice,
-            url: null,
-            additionalInfo: info,
-            created: new Date('2025-06-29T20:00:00Z'),
-            payment: null,
-            expire: false,
-        };
-
-        mockUserRepo.getUser.mockResolvedValue({ id: userId } as any);
-        mockCartService.getCartData.mockResolvedValue(mockCartData as any);
-        (hasStock as jest.Mock).mockReturnValue(mockCartData);
-        (formatProductsForOrder as jest.Mock).mockReturnValue(mockProducts);
-        (calcTotalPrice as jest.Mock).mockReturnValue(mockCartData[0].totalPrice);
-        mockOrderRepo.newOrder.mockResolvedValue(mockOrder as any);
-        (updateStockProducts as jest.Mock).mockResolvedValue(
-            mockCartData.map((item) => ({
-                ...item,
-                stock: item.stock - item.quantity,
-            }))
-        );
-
-        const result = await orderService.createOrder(userId, info);
-        expect(mockUserRepo.getUser).toHaveBeenCalledWith(userId);
-        expect(mockCartService.getCartData).toHaveBeenCalledWith(userId);
-        expect(hasStock).toHaveBeenCalledWith(mockCartData);
-        expect(formatProductsForOrder).toHaveBeenCalledWith(mockCartData);
-        expect(calcTotalPrice).toHaveBeenCalledWith(mockCartData);
-        expect(mockOrderRepo.newOrder).toHaveBeenCalledWith(mockOrder);
-        expect(updateStockProducts).toHaveBeenCalledWith(mockCartData);
-        expect(result).toEqual(mockOrder);
-    })
-
-    it("should throw an error if getUser fails in createOrder", async () => {
-        const error = new Error("No hay datos relacionados al userId");
-        mockUserRepo.getUser.mockRejectedValue(error);
-        await expect(orderService.createOrder("user002")).rejects.toThrow(error);
-        expect(mockUserRepo.getUser).toHaveBeenCalledWith("user002");
-    })
-
-    it("should throw an error if getCartData fails in createOrder", async () => {
-        const error = new Error("No hay datos en el carrito de compras");
-        const userId = "user001";
-        mockUserRepo.getUser.mockResolvedValue({ id: userId } as any);
-        mockCartService.getCartData.mockRejectedValue(error);
-        await expect(orderService.createOrder(userId)).rejects.toThrow(error);
-        expect(mockUserRepo.getUser).toHaveBeenCalledWith(userId);
-        expect(mockCartService.getCartData).toHaveBeenCalledWith(userId);
-    })
-
-
-    it("should throw an error if hasStock has out of stock products", async () => {
-        const error = new Error("Hay productos sin stock");
-        const userId = "user001";
-
-        const mockCartData = [{
-            productId: "25",
-            brand: "Samsung",
-            familyModel: "Galaxy",
-            model: "S 23",
-            colour: "grey",
-            photo: "http://imageProductId25.jpg",
-            quantity: 3,
-            price: 200,
-            stock: 0,
-            totalPrice: 600
-        }];
-
-        mockUserRepo.getUser.mockResolvedValue({ id: userId } as any);
-        mockCartService.getCartData.mockResolvedValue(mockCartData as any);
-        (hasStock as jest.Mock).mockImplementation(() => {
-            throw error
-        });
-        await expect(orderService.createOrder(userId)).rejects.toThrow(error);
-        expect(mockUserRepo.getUser).toHaveBeenCalledWith(userId);
-        expect(mockCartService.getCartData).toHaveBeenCalledWith(userId);
-        expect(hasStock).toHaveBeenCalledWith(mockCartData);
-    })
-
-    it("should throw an error if hasStock has no products to check", async () => {
-        const error = new Error("No hay productos para chequear el stock");
-        const userId = "user001";
-        const mockCartData = [];
-        mockUserRepo.getUser.mockResolvedValue({ id: userId } as any);
-        mockCartService.getCartData.mockResolvedValue(mockCartData as any);
-        (hasStock as jest.Mock).mockImplementation(() => {
-            throw error
-        });
-        await expect(orderService.createOrder(userId)).rejects.toThrow(error);
-        expect(mockUserRepo.getUser).toHaveBeenCalledWith(userId);
-        expect(mockCartService.getCartData).toHaveBeenCalledWith(userId);
-        expect(hasStock).toHaveBeenCalledWith(mockCartData);
-    })
-
-    it("should throw an error if formatProductsForOrder fails", async () => {
-        const error = new Error("No hay productos");
-        const userId = "user001";
-        const mockCartData = [];
-        mockUserRepo.getUser.mockResolvedValue({ id: userId } as any);
-        mockCartService.getCartData.mockResolvedValue(mockCartData as any);
-        (hasStock as jest.Mock).mockReturnValue(mockCartData);
-        (formatProductsForOrder as jest.Mock).mockImplementation(() => {
-            throw error
-        });
-        await expect(orderService.createOrder(userId)).rejects.toThrow(error);
-        expect(mockUserRepo.getUser).toHaveBeenCalledWith(userId);
-        expect(mockCartService.getCartData).toHaveBeenCalledWith(userId);
-        expect(hasStock).toHaveBeenCalledWith(mockCartData);
-        expect(formatProductsForOrder).toHaveBeenCalledWith(mockCartData);
-    })
-
-    it("should throw an error if calcToPrice fails", async () => {
-        const error = new Error("No hay productos");
-        const userId = "user001";
-        const mockCartData = [];
-        const mockProducts = [{
-            productId: "25",
-            brand: "Samsung",
-            familyModel: "Galaxy",
-            model: "S 23",
-            colour: "grey",
-            photo: "http://imageProductId25.jpg",
-            quantity: 1,
-            price: 200
-        }]
-
-        mockUserRepo.getUser.mockResolvedValue({ id: userId } as any);
-        mockCartService.getCartData.mockResolvedValue(mockCartData as any);
-        (hasStock as jest.Mock).mockReturnValue(mockCartData);
-        (formatProductsForOrder as jest.Mock).mockReturnValue(mockProducts);
-        (calcTotalPrice as jest.Mock).mockImplementation(() => {
-            throw error
-        });
-
-        await expect(orderService.createOrder(userId)).rejects.toThrow(error);
-        expect(mockUserRepo.getUser).toHaveBeenCalledWith(userId);
-        expect(mockCartService.getCartData).toHaveBeenCalledWith(userId);
-        expect(hasStock).toHaveBeenCalledWith(mockCartData);
-        expect(formatProductsForOrder).toHaveBeenCalledWith(mockCartData);
-        expect(calcTotalPrice).toHaveBeenCalledWith(mockCartData);
-    })
-
-    it("should an error if updateStockProducts fails", async () => {
-        jest.useFakeTimers();
-        jest.setSystemTime(new Date('2025-06-29T20:00:00Z'));
-
-        const error = new Error("No hay productos");
-        const userId = "user001";
-        const info = "additional info";
-
-        const mockCartData = [{
-            productId: "25",
-            brand: "Samsung",
-            familyModel: "Galaxy",
-            model: "S 23",
-            colour: "grey",
-            photo: "http://imageProductId25.jpg",
-            quantity: 1,
-            price: 200,
-            stock: 5,
-            totalPrice: 200
-        }]
-
-        const mockProducts = [{
-            productId: "25",
-            brand: "Samsung",
-            familyModel: "Galaxy",
-            model: "S 23",
-            colour: "grey",
-            photo: "http://imageProductId25.jpg",
-            quantity: 1,
-            price: 200
-        }]
-
-        const mockOrder = {
-            orderId: null,
-            userId: userId,
-            products: mockProducts,
-            status: "pending",
-            totalPrice: mockCartData[0].totalPrice,
-            url: null,
-            additionalInfo: info,
-            created: new Date('2025-06-29T20:00:00Z'),
-            payment: null,
-            expire: false,
-        };
-
-        mockUserRepo.getUser.mockResolvedValue({ id: userId } as any);
-        mockCartService.getCartData.mockResolvedValue(mockCartData as any);
-        (hasStock as jest.Mock).mockReturnValue(mockCartData);
-        (formatProductsForOrder as jest.Mock).mockReturnValue(mockProducts);
-        (calcTotalPrice as jest.Mock).mockReturnValue(mockCartData[0].totalPrice);
-        mockOrderRepo.newOrder.mockResolvedValue(mockOrder as any);
-        (updateStockProducts as jest.Mock).mockImplementation(() => {
-            throw error
-        }
-        );
-
-        await expect(orderService.createOrder(userId, info)).rejects.toThrow(error);
-        expect(mockUserRepo.getUser).toHaveBeenCalledWith(userId);
-        expect(mockCartService.getCartData).toHaveBeenCalledWith(userId);
-        expect(hasStock).toHaveBeenCalledWith(mockCartData);
-        expect(formatProductsForOrder).toHaveBeenCalledWith(mockCartData);
-        expect(calcTotalPrice).toHaveBeenCalledWith(mockCartData);
-        expect(mockOrderRepo.newOrder).toHaveBeenCalledWith(mockOrder);
-        expect(updateStockProducts).toHaveBeenCalledWith(mockCartData);
-    })
 })
-
-
 

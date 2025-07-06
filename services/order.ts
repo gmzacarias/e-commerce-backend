@@ -184,13 +184,12 @@ export class OrderService {
         if (topic !== "merchant_order") return null
         try {
             const { order_status, external_reference } = await getMerchantOrderId({ merchantOrderId: id as string })
-            if (order_status !== "paid") return
+            if (order_status !== "paid") return null
             const order = await this.repo.getOrderDoc(userId, external_reference)
             const user = await this.userRepo.getUser(userId)
             order.updateStatus(order_status)
             await Promise.all([
                 this.repo.save(order),
-                this.cartService.reset(userId),
                 purchaseAlert(user.data.email, user.data.userName, order.data),
                 saleAlert(user.data, order.data)
             ])

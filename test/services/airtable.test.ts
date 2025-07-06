@@ -1,5 +1,5 @@
 import { expect, describe } from '@jest/globals'
-import { authAirtable } from './airtable'
+import { authAirtable } from '../../services/airtable'
 
 describe("test in Airtable", () => {
     beforeEach(() => {
@@ -49,7 +49,7 @@ describe("test in Airtable", () => {
         const mockResponse = { records: [] };
         (fetch as jest.Mock).mockResolvedValueOnce({
             ok: true,
-            json: async () => { {} }
+            json: async () => { { } }
         })
         await expect(authAirtable()).rejects.toThrow("No hay records disponibles")
     })

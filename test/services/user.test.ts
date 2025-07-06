@@ -1,5 +1,5 @@
 import { describe, expect } from "@jest/globals"
-import { UserService } from "./user"
+import { UserService } from "../../services/user"
 import { UserRepository } from "repositories/userRepository"
 import { AuthRepository } from "repositories/authRepository"
 

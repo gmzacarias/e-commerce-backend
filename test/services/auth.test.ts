@@ -1,11 +1,11 @@
 import { describe, expect } from "@jest/globals"
-import { AuthService } from "./auth"
+import { AuthService } from "../../services/auth"
 import { AuthRepository } from "repositories/authRepository"
 import { UserRepository } from "repositories/userRepository"
-import { generateRandomCode } from "./randomSeed"
-import { createExpireDate, checkExpiration } from "./dateFns"
-import { generateToken } from "./jwt"
-import { sendCodeAuth } from "./sendgrid"
+import { generateRandomCode } from "../../services/randomSeed"
+import { createExpireDate, checkExpiration } from "../../services/dateFns"
+import { generateToken } from "../../services/jwt"
+import { sendCodeAuth } from "../../services/sendgrid"
 
 jest.mock("services/sendgrid", () => ({
     sendCodeAuth: jest.fn().mockReturnValue("mock-code")

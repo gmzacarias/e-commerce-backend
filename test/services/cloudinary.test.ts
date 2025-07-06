@@ -1,7 +1,7 @@
 import { describe, expect } from "@jest/globals"
 import { cloudinary } from 'lib/cloudinary'
 import type { UploadApiResponse } from "cloudinary"
-import { uploadCloudinary } from "./cloudinary"
+import { uploadCloudinary } from "../../services/cloudinary"
 
 beforeEach(() => {
     jest.clearAllMocks();

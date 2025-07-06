@@ -1,9 +1,9 @@
-import { authSchema, tokenSchema } from "lib/schemas/authSchema"
-import { updateUserSchema } from "lib/schemas/userSchema"
-import { partialCartSchema } from "lib/schemas/cartSchema"
-import { orderIdSchema, orderSchema } from "lib/schemas/orderSchema"
-import { partialSearchSchema } from "lib/schemas/searchSchema"
-import { productSchema } from "lib/schemas/productSchema"
+import { authSchema, tokenSchema } from "schemas/authSchema"
+import { updateUserSchema } from "schemas/userSchema"
+import { partialCartSchema } from "schemas/cartSchema"
+import { orderIdSchema, orderSchema } from "schemas/orderSchema"
+import { partialSearchSchema } from "schemas/searchSchema"
+import { productSchema } from "schemas/productSchema"
 
 export function validateAuth(email: string): { email: string } {
     try {

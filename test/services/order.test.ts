@@ -2475,5 +2475,25 @@ describe("test in OrderService", () => {
         })
     })
 
+    describe("test in method deleteOrderById", () => {
+        it("should delete an order associated with the orderId", async () => {
+            const userId = "user001";
+            const orderId = "order001";
+            mockOrderRepo.delete.mockResolvedValue(true);
+            const result = await orderService.deleteOrderById(userId, orderId);
+            expect(mockOrderRepo.delete).toHaveBeenCalledWith(userId, orderId);
+            expect(result).toEqual(true);
+        })
+
+        it("should delete an order associated with the orderId", async () => {
+            const error = new Error("OrderId no esta asociado al usuario ingresado")
+            const userId = "user001";
+            const orderId = "order001";
+            mockOrderRepo.delete.mockRejectedValue(error);
+            await expect(orderService.deleteOrderById(userId, orderId)).rejects.toThrow(error);
+            expect(mockOrderRepo.delete).toHaveBeenCalledWith(userId, orderId);
+        })
+    })
+
 })
 

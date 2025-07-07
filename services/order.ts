@@ -12,6 +12,24 @@ import { getBaseUrl } from "utils/getBaseUrl"
 export class OrderService {
     constructor(private repo: Partial<OrderRepository>, private userRepo: Partial<UserRepository>, private cartService: Partial<CartService>) { }
 
+    async checkExpirationOrders(orders: OrderData[]): Promise<void> {
+        try {
+            let orderExpires = []
+            for (const item of orders) {
+                const result = checkExpirationPayments(item.created as FirestoreTimestamp)
+                if (result >= 2 || item.status === "closed") {
+                    const order = await this.repo.getOrderDoc(item.userId, item.orderId)
+                    order.updateExpire(true)
+                    orderExpires.push(item.orderId)
+                    await this.repo.save(order)
+                }
+            }
+        } catch (error) {
+            console.error(error.message)
+            throw error
+        }
+    }
+
     async getMyOrders(userId: string): Promise<OrderData[]> {
         try {
             const myOrders = await this.repo.getOrders(userId)
@@ -44,26 +62,6 @@ export class OrderService {
             }
             ))
             return formatDateOrders
-        } catch (error) {
-            console.error(error.message)
-            throw error
-        }
-    }
-
-    async checkExpirationOrders(orders: OrderData[]): Promise<boolean | OrderData[]> {
-        try {
-            let orderExpires = []
-            for (const item of orders) {
-                const result = checkExpirationPayments(item.created as FirestoreTimestamp)
-                if (result >= 2 || item.status === "closed") {
-                    const order = await this.repo.getOrderDoc(item.userId, item.orderId)
-                    order.updateExpire(true)
-                    orderExpires.push(item.orderId)
-                    await this.repo.save(order)
-                    return orderExpires
-                }
-            }
-            return orderExpires.length > 0 ? orderExpires : true
         } catch (error) {
             console.error(error.message)
             throw error

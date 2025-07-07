@@ -10,7 +10,7 @@ import { saleAlert, purchaseAlert } from "./sendgrid"
 import { getBaseUrl } from "utils/getBaseUrl"
 
 export class OrderService {
-    constructor(private repo: Partial<OrderRepository>, private userRepo: Partial<UserRepository>,private cartService:Partial<CartService>) { }
+    constructor(private repo: Partial<OrderRepository>, private userRepo: Partial<UserRepository>, private cartService: Partial<CartService>) { }
 
     async getMyOrders(userId: string): Promise<OrderData[]> {
         try {
@@ -232,7 +232,7 @@ export class OrderService {
                     second: "2-digit",
                     hour12: false,
                 }),
-                ...(order.data.payment && {
+                payment: order.data.payment ? {
                     ...order.data.payment,
                     paymentCreated: new Date(order.data.payment.paymentCreated).toLocaleString("es-AR", {
                         day: "2-digit",
@@ -243,8 +243,7 @@ export class OrderService {
                         second: "2-digit",
                         hour12: false,
                     }),
-
-                })
+                } : null
             }
             return formatOrder
         } catch (error) {

@@ -90,10 +90,38 @@ describe("test in method getOrdersById", () => {
         expect(result).toEqual(expectedOrder);
     })
 
-    it("should throw an error when orderId does not exist", async () => {
-        const error = new Error("No existe el orderId");
+    it("should throw an error when getOrderDoc does not return any data ", async () => {
+        const error = new Error("No hay ordenes relacionadas al orderId");
         mockOrderRepo.getOrderDoc.mockRejectedValue(error);
         await expect(orderService.getOrdersById("user2", "order005")).rejects.toThrow(error)
         expect(mockOrderRepo.getOrderDoc).toHaveBeenCalledWith("user2", "order005");
     })
+
+    it("should throw an error when formatDateFirebase could not format the dates", async () => {
+        const error = new Error("No se pudo formatear los datos de las fechas");
+        const mockOrder = {
+            data: {
+                userId: "user1",
+                orderId: "order1",
+                created:
+                {
+                    _seconds: 1751968800,
+                    _nanoseconds: 123000000,
+                },
+                status: "pending",
+                payment: {
+                    paymentCreated: new Date("2025-07-01T10:05:00.123Z")
+                }
+            }
+        };
+
+        mockOrderRepo.getOrderDoc.mockResolvedValue(mockOrder as any);
+        (formatDateFirebase as jest.Mock).mockImplementation(() => {
+            throw error
+        });
+        await expect(orderService.getOrdersById(mockOrder.data.userId, mockOrder.data.orderId)).rejects.toThrow(error);
+        expect(mockOrderRepo.getOrderDoc).toHaveBeenCalledWith(mockOrder.data.userId, mockOrder.data.orderId);
+        expect(formatDateFirebase as jest.Mock).toHaveBeenCalledWith(mockOrder.data.created);
+    })
+
 })

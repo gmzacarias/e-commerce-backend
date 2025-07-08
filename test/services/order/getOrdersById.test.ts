@@ -73,7 +73,7 @@ describe("test in method getOrdersById", () => {
         };
 
 
-        mockOrderRepo.getOrderDoc.mockReturnValue(mockOrder as any);
+        mockOrderRepo.getOrderDoc.mockResolvedValue(mockOrder as any);
         (formatDateFirebase as jest.Mock).mockImplementation((date) => {
             if (
                 date._seconds === mockOrder.data.created._seconds &&

@@ -43,7 +43,7 @@ describe("test in method createOrder", () => {
         orderService = new OrderService(mockOrderRepo, mockUserRepo, mockCartService)
     })
 
-    it("should create an order", async () => {
+    it("should create an order and update the stock.", async () => {
         jest.useFakeTimers();
         jest.setSystemTime(new Date('2025-06-29T20:00:00Z'));
 
@@ -101,6 +101,72 @@ describe("test in method createOrder", () => {
         );
 
         const result = await orderService.createOrder(userId, info);
+        expect(mockUserRepo.getUser).toHaveBeenCalledWith(userId);
+        expect(mockCartService.getCartData).toHaveBeenCalledWith(userId);
+        expect(hasStock).toHaveBeenCalledWith(mockCartData);
+        expect(formatProductsForOrder).toHaveBeenCalledWith(mockCartData);
+        expect(calcTotalPrice).toHaveBeenCalledWith(mockCartData);
+        expect(mockOrderRepo.newOrder).toHaveBeenCalledWith(mockOrder);
+        expect(updateStockProducts).toHaveBeenCalledWith(mockCartData);
+        expect(result).toEqual(mockOrder);
+    })
+
+    it("should create an order without additional info and update the stock.", async () => {
+        jest.useFakeTimers();
+        jest.setSystemTime(new Date('2025-06-29T20:00:00Z'));
+
+        const userId = "user001";
+        const mockCartData = [{
+            productId: "25",
+            brand: "Samsung",
+            familyModel: "Galaxy",
+            model: "S 23",
+            colour: "grey",
+            photo: "http://imageProductId25.jpg",
+            quantity: 1,
+            price: 200,
+            stock: 5,
+            totalPrice: 200
+        }]
+
+        const mockProducts = [{
+            productId: "25",
+            brand: "Samsung",
+            familyModel: "Galaxy",
+            model: "S 23",
+            colour: "grey",
+            photo: "http://imageProductId25.jpg",
+            quantity: 1,
+            price: 200
+        }]
+
+        const mockOrder = {
+            orderId: null,
+            userId: userId,
+            products: mockProducts,
+            status: "pending",
+            totalPrice: mockCartData[0].totalPrice,
+            url: null,
+            additionalInfo: null,
+            created: new Date('2025-06-29T20:00:00Z'),
+            payment: null,
+            expire: false,
+        };
+
+        mockUserRepo.getUser.mockResolvedValue({ id: userId } as any);
+        mockCartService.getCartData.mockResolvedValue(mockCartData as any);
+        (hasStock as jest.Mock).mockReturnValue(mockCartData);
+        (formatProductsForOrder as jest.Mock).mockReturnValue(mockProducts);
+        (calcTotalPrice as jest.Mock).mockReturnValue(mockCartData[0].totalPrice);
+        mockOrderRepo.newOrder.mockResolvedValue(mockOrder as any);
+        (updateStockProducts as jest.Mock).mockResolvedValue(
+            mockCartData.map((item) => ({
+                ...item,
+                stock: item.stock - item.quantity,
+            }))
+        );
+
+        const result = await orderService.createOrder(userId);
         expect(mockUserRepo.getUser).toHaveBeenCalledWith(userId);
         expect(mockCartService.getCartData).toHaveBeenCalledWith(userId);
         expect(hasStock).toHaveBeenCalledWith(mockCartData);

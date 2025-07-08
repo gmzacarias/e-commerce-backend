@@ -150,38 +150,6 @@ describe("test in method getMyOrders", () => {
             }
         ]
 
-        const expectedCreatedDate = new Date("2025-07-01T10:00:00.123Z").toLocaleString("es-AR", {
-            day: "2-digit",
-            month: "2-digit",
-            year: "numeric",
-            hour: "2-digit",
-            minute: "2-digit",
-            second: "2-digit",
-            hour12: false,
-        });
-
-        const expectedPaymentDate = mockOrders[0].payment.paymentCreated.toLocaleString("es-AR", {
-            day: "2-digit",
-            month: "2-digit",
-            year: "numeric",
-            hour: "2-digit",
-            minute: "2-digit",
-            second: "2-digit",
-            hour12: false,
-        });
-
-        const expectedOrders = [
-            {
-                userId: "user1",
-                orderId: "order1",
-                created: expectedCreatedDate,
-                status: "pending",
-                payment: {
-                    paymentCreated: expectedPaymentDate,
-                },
-            }
-        ];
-
         mockOrderRepo.getOrders.mockResolvedValue(mockOrders as any);
         jest.spyOn(orderService, "checkExpirationOrders");
         (formatDateFirebase as jest.Mock).mockImplementation(() => {

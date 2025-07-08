@@ -26,7 +26,7 @@ export class OrderRepository {
             const snap = await this.orderCollection.add(data)
             return new Order(snap.id, data)
         } catch (error) {
-            console.error("no se pudo crear una nueva orden")
+            console.error("no se pudo crear una nueva orden",error.message)
             throw error
         }
     }

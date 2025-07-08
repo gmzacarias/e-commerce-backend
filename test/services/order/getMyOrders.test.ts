@@ -75,7 +75,8 @@ describe("test in method getMyOrders", () => {
             }
         ];
 
-        mockOrderRepo.getOrders.mockReturnValue(mockOrders as any);
+        mockOrderRepo.getOrders.mockResolvedValue(mockOrders as any);
+        jest.spyOn(orderService, "checkExpirationOrders");
         (formatDateFirebase as jest.Mock).mockImplementation((date) => {
             if (
                 date._seconds === mockOrders[0].created._seconds &&
@@ -86,11 +87,10 @@ describe("test in method getMyOrders", () => {
             return new Date()
         });
 
-        jest.spyOn(orderService, "checkExpirationOrders")
         const result = await orderService.getMyOrders("user1");
         expect(mockOrderRepo.getOrders).toHaveBeenCalledWith("user1");
+        expect(orderService.checkExpirationOrders).toHaveBeenCalledWith(mockOrders);
         expect(formatDateFirebase as jest.Mock).toHaveBeenCalledWith(mockOrders[0].created);
-        expect(orderService.checkExpirationOrders(mockOrders as any));
         expect(result).toEqual(expectedOrders);
     })
 
@@ -100,5 +100,99 @@ describe("test in method getMyOrders", () => {
         await expect(orderService.getMyOrders("user2")).rejects.toThrow(error)
         expect(mockOrderRepo.getOrders).toHaveBeenCalledWith("user2");
     })
+
+    it("should throw an error when getOrders does not return any data ", async () => {
+        const error = new Error("No hay ordenes relacionadas al userId");
+        mockOrderRepo.getOrders.mockRejectedValue(error);
+        await expect(orderService.getMyOrders("user1")).rejects.toThrow(error);
+        expect(mockOrderRepo.getOrders).toHaveBeenCalledWith("user1");
+    })
+
+    it("should throw an error if checkExpirationOrders has no data to check", async () => {
+        const error = new Error("No hay datos para realizar la consulta");
+        const mockOrders = [
+            {
+                userId: "user1",
+                orderId: "order1",
+                created:
+                {
+                    _seconds: 1751968800,
+                    _nanoseconds: 123000000,
+                },
+                status: "pending",
+                payment: {
+                    paymentCreated: new Date("2025-07-01T10:05:00.123Z")
+                }
+            }
+        ]
+        mockOrderRepo.getOrders.mockResolvedValue(mockOrders as any);
+        jest.spyOn(orderService, "checkExpirationOrders").mockRejectedValue(error);
+        await expect(orderService.getMyOrders("user1")).rejects.toThrow(error);
+        expect(mockOrderRepo.getOrders).toHaveBeenCalledWith("user1");
+        expect(orderService.checkExpirationOrders).toHaveBeenCalledWith(mockOrders);
+    })
+
+    it("should throw an error when formatDateFirebase could not format the dates", async () => {
+        const error = new Error("No se pudo formatear los datos de las fechas");
+        const mockOrders = [
+            {
+                userId: "user1",
+                orderId: "order1",
+                created:
+                {
+                    _seconds: 1751968800,
+                    _nanoseconds: 123000000,
+                },
+                status: "pending",
+                payment: {
+                    paymentCreated: new Date("2025-07-01T10:05:00.123Z")
+                }
+            }
+        ]
+
+        const expectedCreatedDate = new Date("2025-07-01T10:00:00.123Z").toLocaleString("es-AR", {
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric",
+            hour: "2-digit",
+            minute: "2-digit",
+            second: "2-digit",
+            hour12: false,
+        });
+
+        const expectedPaymentDate = mockOrders[0].payment.paymentCreated.toLocaleString("es-AR", {
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric",
+            hour: "2-digit",
+            minute: "2-digit",
+            second: "2-digit",
+            hour12: false,
+        });
+
+        const expectedOrders = [
+            {
+                userId: "user1",
+                orderId: "order1",
+                created: expectedCreatedDate,
+                status: "pending",
+                payment: {
+                    paymentCreated: expectedPaymentDate,
+                },
+            }
+        ];
+
+        mockOrderRepo.getOrders.mockResolvedValue(mockOrders as any);
+        jest.spyOn(orderService, "checkExpirationOrders");
+        (formatDateFirebase as jest.Mock).mockImplementation(() => {
+            throw error
+        });
+        await expect(orderService.getMyOrders("user1")).rejects.toThrow(error);
+        expect(mockOrderRepo.getOrders).toHaveBeenCalledWith("user1");
+        expect(orderService.checkExpirationOrders).toHaveBeenCalledWith(mockOrders);
+        expect(formatDateFirebase as jest.Mock).toHaveBeenCalledWith(mockOrders[0].created);
+    })
+
+
 })
 

@@ -31,15 +31,10 @@ describe("test in method sendCode", () => {
 
     beforeEach(() => {
         mockAuthRepo = {
-            findByEmail: jest.fn(),
-            createAuth: jest.fn(),
-            findByCode: jest.fn(),
             save: jest.fn()
         }
 
-        mockUserRepo = {
-            createUser: jest.fn()
-        }
+        mockUserRepo = {}
 
         authService = new AuthService(mockAuthRepo, mockUserRepo)
     })

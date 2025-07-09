@@ -4,16 +4,11 @@ import { AuthRepository } from "repositories/authRepository"
 import { UserRepository } from "repositories/userRepository"
 import { generateRandomCode } from "services/randomSeed"
 import { createExpireDate, checkExpiration } from "services/dateFns"
-import { generateToken } from "services/jwt"
 import { sendCodeAuth } from "services/sendgrid"
 import { cleanEmail } from "utils/cleanEmail"
 
 jest.mock("services/sendgrid", () => ({
     sendCodeAuth: jest.fn().mockReturnValue("mock-code")
-}))
-
-jest.mock("services/jwt", () => ({
-    generateToken: jest.fn().mockReturnValue("mock-token")
 }))
 
 jest.mock("services/randomSeed", () => ({

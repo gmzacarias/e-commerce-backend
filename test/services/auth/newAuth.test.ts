@@ -36,7 +36,6 @@ describe("test in method newAuth", () => {
         mockAuthRepo = {
             findByEmail: jest.fn(),
             createAuth: jest.fn(),
-            findByCode: jest.fn(),
             save: jest.fn()
         }
 

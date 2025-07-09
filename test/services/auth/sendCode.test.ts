@@ -79,7 +79,7 @@ describe("test in method sendCode", () => {
         expect(generateRandomCode).toHaveBeenCalled();
         expect(createExpireDate).toHaveBeenCalledWith(30);
         expect(authService.newAuth).toHaveBeenCalledWith(email);
-        expect(checkExpiration as jest.Mock).toHaveBeenCalledWith(mockAuth.data.expire);
+        expect(checkExpiration).toHaveBeenCalledWith(mockAuth.data.expire);
         expect(sendCodeAuth).toHaveBeenCalledWith(email, mockAuth.data.code);
         expect(result).toBe(true);
     })
@@ -246,7 +246,7 @@ describe("test in method sendCode", () => {
         expect(generateRandomCode).toHaveBeenCalled();
         expect(createExpireDate).toHaveBeenCalledWith(30);
         expect(authService.newAuth).toHaveBeenCalledWith(email);
-        expect(checkExpiration as jest.Mock).toHaveBeenCalledWith(mockAuth.data.expire);
+        expect(checkExpiration).toHaveBeenCalledWith(mockAuth.data.expire);
     })
 
     it("should throw an error when updating code fails", async () => {

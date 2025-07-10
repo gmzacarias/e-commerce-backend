@@ -4,17 +4,12 @@ import { OrderRepository } from "repositories/orderRepository"
 import { UserRepository } from "repositories/userRepository"
 import { CartService } from "services/cart"
 import { formatProductsForOrder, calcTotalPrice, hasStock } from "utils/cart"
-import { formatDateFirebase } from "services/dateFns"
 import { updateStockProducts } from "services/algolia"
 
 jest.mock("utils/cart", () => ({
     formatProductsForOrder: jest.fn().mockReturnValue("mock-order-data"),
     calcTotalPrice: jest.fn().mockReturnValue("mock-total-price"),
     hasStock: jest.fn().mockReturnValue("mock-product-data"),
-}))
-
-jest.mock("services/dateFns", () => ({
-    formatDateFirebase: jest.fn().mockReturnValue("mock-date"),
 }))
 
 jest.mock("services/algolia", () => ({

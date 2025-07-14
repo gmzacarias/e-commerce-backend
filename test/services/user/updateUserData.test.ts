@@ -49,7 +49,7 @@ describe("test in method updateUserData", () => {
             updateEmail: jest.fn()
         };
 
-        const mockExpectedUser = {
+        const mockNewData = {
             data: {
                 userName: "newName",
                 email: "newEmail@email.com",
@@ -80,14 +80,277 @@ describe("test in method updateUserData", () => {
         mockUserRepo.save.mockResolvedValue(true);
         mockAuthRepo.save.mockResolvedValue(true);
 
-        const result = await userService.updateUserData("user123", mockExpectedUser.data);
+        const result = await userService.updateUserData("user123", mockNewData.data);
         expect(mockUserRepo.getUser).toHaveBeenCalledWith("user123");
         expect(mockAuthRepo.getAuth).toHaveBeenCalledWith("user123");
-        expect(mockUser.updateUserName).toHaveBeenCalledWith(mockExpectedUser.data.userName);
-        expect(mockUser.updateEmail).toHaveBeenCalledWith(mockExpectedUser.data.email);
-        expect(mockAuth.updateEmail).toHaveBeenCalledWith(mockExpectedUser.data.email);
-        expect(mockUser.updatePhoneNumber).toHaveBeenCalledWith(mockExpectedUser.data.phoneNumber);
-        expect(mockUser.updateAddress).toHaveBeenCalledWith(mockExpectedUser.data.address);
+        expect(mockUser.updateUserName).toHaveBeenCalledWith(mockNewData.data.userName);
+        expect(mockUser.updateEmail).toHaveBeenCalledWith(mockNewData.data.email);
+        expect(mockAuth.updateEmail).toHaveBeenCalledWith(mockNewData.data.email);
+        expect(mockUser.updatePhoneNumber).toHaveBeenCalledWith(mockNewData.data.phoneNumber);
+        expect(mockUser.updateAddress).toHaveBeenCalledWith(mockNewData.data.address);
+        expect(mockUserRepo.save).toHaveBeenCalledWith(mockUser);
+        expect(mockAuthRepo.save).toHaveBeenCalledWith(mockAuth);
+        expect(result).toEqual(mockUser.data);
+    })
+
+    it("should not update userName when data.userName is not provided", async () => {
+        const mockUser = {
+            data: {
+                userName: "oldName",
+                email: "oldEmail@email.com",
+                phoneNumber: "123",
+                address: {
+                    city: "oldCity"
+                }
+
+            },
+            updateUserName: jest.fn(),
+            updateEmail: jest.fn(),
+            updatePhoneNumber: jest.fn(),
+            updateAddress: jest.fn()
+        };
+
+        const mockAuth = {
+            data: {
+                email: "oldEmail@email.com",
+                userId: "user123",
+                code: 12345,
+                expire: new Date().setMinutes(30)
+            },
+            updateEmail: jest.fn()
+        };
+
+        const mockNewData = {
+            data: {
+                email: "newEmail@email.com",
+                phoneNumber: "1234567890",
+                address: {
+                    city: "new city"
+                }
+            }
+        };
+
+        mockUserRepo.getUser.mockResolvedValue(mockUser as any);
+        mockAuthRepo.getAuth.mockResolvedValue(mockAuth as any);
+
+        (mockUser.updatePhoneNumber as jest.Mock).mockImplementation((newPhoneNumber) => {
+            mockUser.data.phoneNumber = newPhoneNumber;
+        });
+        (mockUser.updateEmail as jest.Mock).mockImplementation((newEmail) => {
+            mockUser.data.email = newEmail;
+        });
+        (mockAuth.updateEmail as jest.Mock).mockImplementation((newEmail) => {
+            mockAuth.data.email = newEmail
+        });
+        (mockUser.updateAddress as jest.Mock).mockImplementation((newcity) => {
+            mockUser.data.address.city = newcity;
+        });
+        mockUserRepo.save.mockResolvedValue(true);
+        mockAuthRepo.save.mockResolvedValue(true);
+
+        const result = await userService.updateUserData("user123", mockNewData.data);
+        expect(mockUserRepo.getUser).toHaveBeenCalledWith("user123");
+        expect(mockAuthRepo.getAuth).toHaveBeenCalledWith("user123");
+        expect(mockUser.updateUserName).not.toHaveBeenCalled();
+        expect(mockUser.updateEmail).toHaveBeenCalledWith(mockNewData.data.email);
+        expect(mockAuth.updateEmail).toHaveBeenCalledWith(mockNewData.data.email);
+        expect(mockUser.updatePhoneNumber).toHaveBeenCalledWith(mockNewData.data.phoneNumber);
+        expect(mockUser.updateAddress).toHaveBeenCalledWith(mockNewData.data.address);
+        expect(mockUserRepo.save).toHaveBeenCalledWith(mockUser);
+        expect(mockAuthRepo.save).toHaveBeenCalledWith(mockAuth);
+        expect(result).toEqual(mockUser.data);
+    })
+
+    it("should not update phoneNumber when data.phoneNumber is not provided", async () => {
+        const mockUser = {
+            data: {
+                userName: "oldName",
+                email: "oldEmail@email.com",
+                phoneNumber: "123",
+                address: {
+                    city: "oldCity"
+                }
+
+            },
+            updateUserName: jest.fn(),
+            updateEmail: jest.fn(),
+            updatePhoneNumber: jest.fn(),
+            updateAddress: jest.fn()
+        };
+
+        const mockAuth = {
+            data: {
+                email: "oldEmail@email.com",
+                userId: "user123",
+                code: 12345,
+                expire: new Date().setMinutes(30)
+            },
+            updateEmail: jest.fn()
+        };
+
+        const mockNewData = {
+            data: {
+                userName: "newUserName",
+                email: "newEmail@email.com",
+                address: {
+                    city: "new city"
+                }
+            }
+        };
+
+        mockUserRepo.getUser.mockResolvedValue(mockUser as any);
+        mockAuthRepo.getAuth.mockResolvedValue(mockAuth as any);
+        (mockUser.updateUserName as jest.Mock).mockImplementation((newUserName) => {
+            mockUser.data.userName = newUserName;
+        });
+        (mockUser.updateEmail as jest.Mock).mockImplementation((newEmail) => {
+            mockUser.data.email = newEmail;
+        });
+        (mockAuth.updateEmail as jest.Mock).mockImplementation((newEmail) => {
+            mockAuth.data.email = newEmail
+        });
+        (mockUser.updateAddress as jest.Mock).mockImplementation((newcity) => {
+            mockUser.data.address.city = newcity;
+        });
+        mockUserRepo.save.mockResolvedValue(true);
+        mockAuthRepo.save.mockResolvedValue(true);
+        const result = await userService.updateUserData("user123", mockNewData.data);
+        expect(mockUserRepo.getUser).toHaveBeenCalledWith("user123");
+        expect(mockAuthRepo.getAuth).toHaveBeenCalledWith("user123");
+        expect(mockUser.updateUserName).toHaveBeenCalledWith(mockNewData.data.userName);
+        expect(mockUser.updateEmail).toHaveBeenCalledWith(mockNewData.data.email);
+        expect(mockAuth.updateEmail).toHaveBeenCalledWith(mockNewData.data.email);
+        expect(mockUser.updatePhoneNumber).not.toHaveBeenCalled();
+        expect(mockUser.updateAddress).toHaveBeenCalledWith(mockNewData.data.address);
+        expect(mockUserRepo.save).toHaveBeenCalledWith(mockUser);
+        expect(mockAuthRepo.save).toHaveBeenCalledWith(mockAuth);
+        expect(result).toEqual(mockUser.data);
+    })
+
+    it("should not update phoneNumber when data.email is not provided", async () => {
+        const mockUser = {
+            data: {
+                userName: "oldName",
+                email: "oldEmail@email.com",
+                phoneNumber: "123",
+                address: {
+                    city: "oldCity"
+                }
+
+            },
+            updateUserName: jest.fn(),
+            updateEmail: jest.fn(),
+            updatePhoneNumber: jest.fn(),
+            updateAddress: jest.fn()
+        };
+
+        const mockAuth = {
+            data: {
+                email: "oldEmail@email.com",
+                userId: "user123",
+                code: 12345,
+                expire: new Date().setMinutes(30)
+            },
+            updateEmail: jest.fn()
+        };
+
+        const mockNewData = {
+            data: {
+                userName: "newName",
+                phoneNumber: "1234567890",
+                address: {
+                    city: "new city"
+                }
+            }
+        };
+
+        mockUserRepo.getUser.mockResolvedValue(mockUser as any);
+        mockAuthRepo.getAuth.mockResolvedValue(mockAuth as any);
+        (mockUser.updateUserName as jest.Mock).mockImplementation((newUserName) => {
+            mockUser.data.userName = newUserName;
+        });
+        (mockUser.updatePhoneNumber as jest.Mock).mockImplementation((newPhoneNumber) => {
+            mockUser.data.phoneNumber = newPhoneNumber;
+        });
+        (mockUser.updateAddress as jest.Mock).mockImplementation((newcity) => {
+            mockUser.data.address.city = newcity;
+        });
+        mockUserRepo.save.mockResolvedValue(true);
+        mockAuthRepo.save.mockResolvedValue(true);
+
+        const result = await userService.updateUserData("user123", mockNewData.data);
+        expect(mockUserRepo.getUser).toHaveBeenCalledWith("user123");
+        expect(mockAuthRepo.getAuth).toHaveBeenCalledWith("user123");
+        expect(mockUser.updateUserName).toHaveBeenCalledWith(mockNewData.data.userName);
+        expect(mockUser.updateEmail).not.toHaveBeenCalled();
+        expect(mockAuth.updateEmail).not.toHaveBeenCalled();
+        expect(mockUser.updatePhoneNumber).toHaveBeenCalledWith(mockNewData.data.phoneNumber);
+        expect(mockUser.updateAddress).toHaveBeenCalledWith(mockNewData.data.address);
+        expect(mockUserRepo.save).toHaveBeenCalledWith(mockUser);
+        expect(mockAuthRepo.save).toHaveBeenCalledWith(mockAuth);
+        expect(result).toEqual(mockUser.data);
+    })
+
+    it("should not update address when data.address is not provided", async () => {
+        const mockUser = {
+            data: {
+                userName: "oldName",
+                email: "oldEmail@email.com",
+                phoneNumber: "123",
+                address: {
+                    city: "oldCity"
+                }
+
+            },
+            updateUserName: jest.fn(),
+            updateEmail: jest.fn(),
+            updatePhoneNumber: jest.fn(),
+            updateAddress: jest.fn()
+        };
+
+        const mockAuth = {
+            data: {
+                email: "oldEmail@email.com",
+                userId: "user123",
+                code: 12345,
+                expire: new Date().setMinutes(30)
+            },
+            updateEmail: jest.fn()
+        };
+
+        const mockNewData = {
+            data: {
+                userName: "newName",
+                email: "newEmail@email.com",
+                phoneNumber: "1234567890",
+            }
+        };
+
+        mockUserRepo.getUser.mockResolvedValue(mockUser as any);
+        mockAuthRepo.getAuth.mockResolvedValue(mockAuth as any);
+        (mockUser.updateUserName as jest.Mock).mockImplementation((newUserName) => {
+            mockUser.data.userName = newUserName;
+        });
+        (mockUser.updatePhoneNumber as jest.Mock).mockImplementation((newPhoneNumber) => {
+            mockUser.data.phoneNumber = newPhoneNumber;
+        });
+        (mockUser.updateEmail as jest.Mock).mockImplementation((newEmail) => {
+            mockUser.data.email = newEmail;
+        });
+        (mockAuth.updateEmail as jest.Mock).mockImplementation((newEmail) => {
+            mockAuth.data.email = newEmail
+        });
+        mockUserRepo.save.mockResolvedValue(true);
+        mockAuthRepo.save.mockResolvedValue(true);
+
+        const result = await userService.updateUserData("user123", mockNewData.data);
+        expect(mockUserRepo.getUser).toHaveBeenCalledWith("user123");
+        expect(mockAuthRepo.getAuth).toHaveBeenCalledWith("user123");
+        expect(mockUser.updateUserName).toHaveBeenCalledWith(mockNewData.data.userName);
+        expect(mockUser.updateEmail).toHaveBeenCalledWith(mockNewData.data.email);
+        expect(mockAuth.updateEmail).toHaveBeenCalledWith(mockNewData.data.email);
+        expect(mockUser.updatePhoneNumber).toHaveBeenCalledWith(mockNewData.data.phoneNumber);
+        expect(mockUser.updateAddress).not.toHaveBeenCalled();
         expect(mockUserRepo.save).toHaveBeenCalledWith(mockUser);
         expect(mockAuthRepo.save).toHaveBeenCalledWith(mockAuth);
         expect(result).toEqual(mockUser.data);

@@ -8,7 +8,7 @@ jest.mock("lib/mercadopago", () => ({
     },
 }))
 
-describe("test in method getMerchantOrderById", () => {
+describe("test in function getMerchantOrderById", () => {
     it("should return the order data associated with the id", async () => {
         const orderData = {
             merchantOrderId: 12458
@@ -40,7 +40,7 @@ describe("test in method getMerchantOrderById", () => {
     })
 
     it("should throw an error when getmerchantorderbyid does not find the order associated with the Id", async () => {
-        const error = new Error("No se encontra una orden relacionada al Id")
+        const error = new Error("No se encontro una orden relacionada al Id")
         const orderData = {
             merchantOrderId: 12458
         };

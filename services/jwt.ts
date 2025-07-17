@@ -13,13 +13,13 @@ export function generateToken(data: string | object | Buffer): string | jwt.JwtP
     }
 }
 
-export function decodeToken(token: string): string | jwt.JwtPayload {
+export function verifyToken(token: string): string | jwt.JwtPayload {
     try {
         if (!token || !secret) {
             throw new Error("faltan parametros para poder decodificar el token")
         }
-        const decoded = jwt.verify(token, secret)
-        return decoded
+        const verify = jwt.verify(token, secret)
+        return verify
     } catch (error) {
         console.error("Error en JWT:", error.message)
         throw error

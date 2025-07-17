@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from "next"
 import parseToken from "parse-bearer-token"
-import { decodeToken } from "services/jwt"
+import { verifyToken } from "services/jwt"
 
 export function authMiddleware(callback: (arg0: NextApiRequest, arg1: NextApiResponse, arg2: any) => void) {
     return function (req: NextApiRequest, res: NextApiResponse) {
@@ -9,7 +9,7 @@ export function authMiddleware(callback: (arg0: NextApiRequest, arg1: NextApiRes
             res.status(401).send({ message: "No hay token" })
         }
         try {
-            const decodedToken = decodeToken(token)
+            const decodedToken = verifyToken(token)
             if (decodedToken) {
                 callback(req, res, decodedToken)
             } else {

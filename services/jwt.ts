@@ -16,7 +16,7 @@ export function generateToken(data: string | object | Buffer): string | jwt.JwtP
 export function verifyToken(token: string): string | jwt.JwtPayload {
     try {
         if (!token || !secret) {
-            throw new Error("faltan parametros para poder decodificar el token")
+            throw new Error("faltan parametros para poder verificar el token")
         }
         const verify = jwt.verify(token, secret)
         return verify

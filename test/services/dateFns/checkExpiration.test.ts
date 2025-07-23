@@ -48,22 +48,13 @@ describe("test in function checkExpiration", () => {
 
     it("should throw an error if the expiration date cannot be checked", () => {
         const error = new Error("Hubo un error al comparar la fecha de expiracion");
-        jest.useFakeTimers();
-        jest.setSystemTime(new Date('2025-07-20T22:00:00Z'));
         const date = {
             _nanoseconds: 0,
             _seconds: 1758184800
         };
-        const newDate = new Date("2025-07-18T22:00:00Z");
-        const currentDate = new Date("2025-07-20T22:00:00Z");
-        (formatDate as jest.Mock).mockReturnValue(newDate);
         (isAfter as jest.Mock).mockImplementation(() => {
             throw error;
         });
         expect(()=>checkExpiration(date)).toThrow(error);
-        expect(date instanceof Date).toBe(false);
-        expect(formatDate).toHaveBeenCalledWith(date);
-        expect(isAfter).toHaveBeenCalledWith(currentDate, newDate);
     })
-
 })

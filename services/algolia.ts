@@ -1,35 +1,15 @@
 import { SearchIndex } from "algoliasearch";
 import { productIndex, productsAscIndex, productsDescIndex } from "lib/algolia"
-import type { ObjectWithObjectID } from "@algolia/client-search/dist/client-search"
 import { authAirtable } from "services/airtable"
-import { uploadCloudinary } from "services/cloudinary"
+import { processAirtableProducts } from "services/airtable"
 import { getFilters } from "utils/filters";
 import { getOffsetAndLimit } from "utils/pagination";
-
-async function mapAirtableToAlgolia(records: AirtableData[]): Promise<AlgoliaData[]> {
-    return Promise.all(
-        records.map(async (record) => {
-            if (!record.photo) {
-                throw new Error(`Error al procesar el producto con ID ${record.productId}`);
-            }
-            const photoUrl = await uploadCloudinary(record.photo);
-            return {
-                ...record,
-                objectID: record.productId,
-                photo: photoUrl.secure_url,
-                quantity: 0,
-                stock: 10,
-                totalPrice: record.price
-            }
-        })
-    )
-}
 
 export async function getProducts(): Promise<AlgoliaData[]> {
     try {
         const response = await authAirtable()
-        const productsData = await mapAirtableToAlgolia(response)
-        return productsData
+        const productsData = await processAirtableProducts(response)
+        return productsData.validRecords
     } catch (error) {
         console.error("error al obtener los productos:", error.message)
         throw error

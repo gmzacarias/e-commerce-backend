@@ -2,7 +2,7 @@ import { describe, expect } from "@jest/globals";
 import { verifyToken } from "services/jwt";
 
 describe("test in function verifyToken", () => {
-    it("", async () => {
+    it("should verify a token and return a userId within the payload", async () => {
         jest.resetModules();
         jest.doMock("lib/jwt", () => ({
             jwt: {

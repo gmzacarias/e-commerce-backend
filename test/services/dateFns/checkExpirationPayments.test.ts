@@ -15,7 +15,7 @@ afterEach(() => {
     jest.useRealTimers();
 })
 
-describe("test in function checkExpiration", () => {
+describe("test in function checkExpirationPayments", () => {
     it("should check the expiration date of the payments and return the difference in days.", () => {
         jest.useFakeTimers();
         jest.setSystemTime(new Date('2025-07-20T22:00:00Z'));

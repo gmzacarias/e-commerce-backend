@@ -3,11 +3,12 @@ import { OrderRepository } from "repositories/orderRepository"
 import { UserRepository } from "repositories/userRepository"
 import { CartService } from "./cart"
 import { formatProductsForOrder, calcTotalPrice, formatItemsForPreference, hasStock } from "utils/cart"
-import { checkExpirationPayments, formatExpireDateForPreference, formatDateFirebase } from "./dateFns"
+import { checkExpirationPayments, formatExpireDateForPreference} from "./dateFns"
 import { updateStockProducts } from "./algolia"
 import { createPreference, getMerchantOrderId, getPayment } from "./mercadopago"
 import { saleAlert, purchaseAlert } from "./sendgrid"
 import { getBaseUrl } from "utils/getBaseUrl"
+import { formatDate } from "utils/formatDate"
 
 export class OrderService {
     constructor(private repo: Partial<OrderRepository>, private userRepo: Partial<UserRepository>, private cartService: Partial<CartService>) { }
@@ -36,7 +37,7 @@ export class OrderService {
             await this.checkExpirationOrders(myOrders)
             const formatDateOrders = myOrders.map((item) => ({
                 ...item,
-                created: formatDateFirebase(item.created as FirestoreTimestamp).toLocaleString("es-AR", {
+                created: formatDate(item.created as FirestoreTimestamp).toLocaleString("es-AR", {
                     day: "2-digit",
                     month: "2-digit",
                     year: "numeric",
@@ -73,7 +74,7 @@ export class OrderService {
             const order = await this.repo.getOrderDoc(userId, orderId)
             const formatOrder = {
                 ...order.data,
-                created: formatDateFirebase(order.data.created as FirestoreTimestamp).toLocaleString("es-AR", {
+                created: formatDate(order.data.created as FirestoreTimestamp).toLocaleString("es-AR", {
                     day: "2-digit",
                     month: "2-digit",
                     year: "numeric",
@@ -221,7 +222,7 @@ export class OrderService {
             await this.repo.save(order)
             const formatOrder = {
                 ...order.data,
-                created: formatDateFirebase(order.data.created as FirestoreTimestamp).toLocaleString("es-AR", {
+                created: formatDate(order.data.created as FirestoreTimestamp).toLocaleString("es-AR", {
                     day: "2-digit",
                     month: "2-digit",
                     year: "numeric",

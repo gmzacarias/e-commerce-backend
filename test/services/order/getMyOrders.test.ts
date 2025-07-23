@@ -3,11 +3,11 @@ import { OrderService } from "services/order"
 import { OrderRepository } from "repositories/orderRepository"
 import { UserRepository } from "repositories/userRepository"
 import { CartService } from "services/cart"
-import { formatDateFirebase, checkExpirationPayments } from "services/dateFns"
+import { formatDate } from "utils/formatDate"
 
-jest.mock("services/dateFns", () => ({
-    formatDateFirebase: jest.fn().mockReturnValue("mock-date"),
-    checkExpirationPayments: jest.fn().mockReturnValue("mock-number")
+jest.mock("utils/formatDate", () => ({
+    formatDate: jest.fn().mockReturnValue("mock-date"),
+
 }))
 
 describe("test in method getMyOrders", () => {
@@ -19,6 +19,10 @@ describe("test in method getMyOrders", () => {
     beforeEach(() => {
         mockOrderRepo = {
             getOrders: jest.fn(),
+            getOrderDoc: jest.fn().mockResolvedValue({
+                updateExpire: jest.fn()
+            }),
+            save: jest.fn(),
         }
         mockUserRepo = {}
         mockCartService = {}
@@ -77,7 +81,7 @@ describe("test in method getMyOrders", () => {
 
         mockOrderRepo.getOrders.mockResolvedValue(mockOrders as any);
         jest.spyOn(orderService, "checkExpirationOrders");
-        (formatDateFirebase as jest.Mock).mockImplementation((date) => {
+        (formatDate as jest.Mock).mockImplementation((date) => {
             if (
                 date._seconds === mockOrders[0].created._seconds &&
                 date._nanoseconds === mockOrders[0].created._nanoseconds
@@ -90,7 +94,7 @@ describe("test in method getMyOrders", () => {
         const result = await orderService.getMyOrders("user1");
         expect(mockOrderRepo.getOrders).toHaveBeenCalledWith("user1");
         expect(orderService.checkExpirationOrders).toHaveBeenCalledWith(mockOrders);
-        expect(formatDateFirebase as jest.Mock).toHaveBeenCalledWith(mockOrders[0].created);
+        expect(formatDate as jest.Mock).toHaveBeenCalledWith(mockOrders[0].created);
         expect(result).toEqual(expectedOrders);
     })
 
@@ -152,13 +156,13 @@ describe("test in method getMyOrders", () => {
 
         mockOrderRepo.getOrders.mockResolvedValue(mockOrders as any);
         jest.spyOn(orderService, "checkExpirationOrders");
-        (formatDateFirebase as jest.Mock).mockImplementation(() => {
+        (formatDate as jest.Mock).mockImplementation(() => {
             throw error
         });
         await expect(orderService.getMyOrders("user1")).rejects.toThrow(error);
         expect(mockOrderRepo.getOrders).toHaveBeenCalledWith("user1");
         expect(orderService.checkExpirationOrders).toHaveBeenCalledWith(mockOrders);
-        expect(formatDateFirebase as jest.Mock).toHaveBeenCalledWith(mockOrders[0].created);
+        expect(formatDate as jest.Mock).toHaveBeenCalledWith(mockOrders[0].created);
     })
 
 

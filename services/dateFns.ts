@@ -1,15 +1,5 @@
 import { addHours, addMinutes, format, isAfter, differenceInDays } from "date-fns"
-
-export function formatDateFirebase(date: FirestoreTimestamp): Date {
-    try {
-        const { _nanoseconds, _seconds } = date
-        const newDate = new Date(_seconds * 1000 + Math.floor(_nanoseconds / 1000000))
-        return newDate
-    } catch (error) {
-        console.error("no se pudo formatear la fecha :", error.message)
-        throw error
-    }
-}
+import { formatDate } from "utils/formatDate"
 
 export function createExpireDate(minutes: number): Date {
     try {
@@ -28,7 +18,7 @@ export function checkExpiration(date: FirestoreTimestamp | Date): Boolean {
         if (date instanceof Date) {
             return isAfter(currentDate, date)
         }
-        const expirationDate = formatDateFirebase(date)
+        const expirationDate = formatDate(date)
         return isAfter(currentDate, expirationDate)
     } catch (error) {
         console.error("no se pudo chequear la fecha de expiracion:", error.message)
@@ -43,7 +33,7 @@ export function checkExpirationPayments(date: FirestoreTimestamp | Date) {
             const result = differenceInDays(currentDate, date)
             return result
         }
-        const expirationPayment = formatDateFirebase(date)
+        const expirationPayment = formatDate(date)
         const result = differenceInDays(currentDate, expirationPayment)
         return result
     } catch (error) {

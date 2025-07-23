@@ -3,15 +3,15 @@ import { OrderService } from "services/order"
 import { OrderRepository } from "repositories/orderRepository"
 import { UserRepository } from "repositories/userRepository"
 import { CartService } from "services/cart"
-import { formatDateFirebase } from "services/dateFns"
+import { formatDate } from "utils/formatDate"
 import { getPayment } from "services/mercadopago"
-
-jest.mock("services/dateFns", () => ({
-    formatDateFirebase: jest.fn().mockReturnValue("mock-date"),
-}))
 
 jest.mock("services/mercadopago", () => ({
     getPayment: jest.fn().mockReturnValue("mock-payment-data"),
+}))
+
+jest.mock("utils/formatDate", () => ({
+    formatDate: jest.fn().mockReturnValue("mock-date"),
 }))
 
 describe("test in method setPayment", () => {
@@ -134,7 +134,7 @@ describe("test in method setPayment", () => {
             mockOrder.data.payment = paymentData;
         });
         mockOrderRepo.save.mockResolvedValue(mockExpectedResult as any);
-        (formatDateFirebase as jest.Mock).mockImplementation((date) => {
+        (formatDate as jest.Mock).mockImplementation((date) => {
             if (
                 date._seconds === mockOrder.data.created._seconds &&
                 date._nanoseconds === mockOrder.data.created._nanoseconds
@@ -149,7 +149,7 @@ describe("test in method setPayment", () => {
         expect(mockOrderRepo.getOrderDoc).toHaveBeenCalledWith(userId, mockPayment.data.external_reference);
         expect(mockOrder.setPayment).toHaveBeenCalledWith(mockExpectedPaymentData);
         expect(mockOrderRepo.save).toHaveBeenCalledWith(mockOrder);
-        expect(formatDateFirebase).toHaveBeenCalledWith(mockOrder.data.created);
+        expect(formatDate).toHaveBeenCalledWith(mockOrder.data.created);
         expect(result).toEqual(mockExpectedResult);
     })
 
@@ -231,7 +231,7 @@ describe("test in method setPayment", () => {
             mockOrder.data.payment = null;
         });
         mockOrderRepo.save.mockResolvedValue(mockExpectedResult as any);
-        (formatDateFirebase as jest.Mock).mockImplementation((date) => {
+        (formatDate as jest.Mock).mockImplementation((date) => {
             if (
                 date._seconds === mockOrder.data.created._seconds &&
                 date._nanoseconds === mockOrder.data.created._nanoseconds
@@ -246,7 +246,7 @@ describe("test in method setPayment", () => {
         expect(mockOrderRepo.getOrderDoc).toHaveBeenCalledWith(userId, mockPayment.data.external_reference);
         expect(mockOrder.setPayment).toHaveBeenCalledWith(mockExpectedPaymentData);
         expect(mockOrderRepo.save).toHaveBeenCalledWith(mockOrder);
-        expect(formatDateFirebase).toHaveBeenCalledWith(mockOrder.data.created);
+        expect(formatDate).toHaveBeenCalledWith(mockOrder.data.created);
         expect(result).toEqual(mockExpectedResult);
     });
 
@@ -498,7 +498,7 @@ describe("test in method setPayment", () => {
             mockOrder.data.payment = paymentData;
         });
         mockOrderRepo.save.mockResolvedValue(true);
-        (formatDateFirebase as jest.Mock).mockImplementation(() => {
+        (formatDate as jest.Mock).mockImplementation(() => {
             throw error
         });
 
@@ -507,6 +507,6 @@ describe("test in method setPayment", () => {
         expect(mockOrderRepo.getOrderDoc).toHaveBeenCalledWith(userId, mockPayment.data.external_reference);
         expect(mockOrder.setPayment).toHaveBeenCalledWith(mockExpectedPaymentData);
         expect(mockOrderRepo.save).toHaveBeenCalledWith(mockOrder);
-        expect(formatDateFirebase).toHaveBeenCalledWith(mockOrder.data.created);
+        expect(formatDate).toHaveBeenCalledWith(mockOrder.data.created);
     })
 })

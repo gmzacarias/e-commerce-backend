@@ -3,10 +3,10 @@ import { OrderService } from "services/order"
 import { OrderRepository } from "repositories/orderRepository"
 import { UserRepository } from "repositories/userRepository"
 import { CartService } from "services/cart"
-import { formatDateFirebase } from "services/dateFns"
+import { formatDate } from "utils/formatDate"
 
-jest.mock("services/dateFns", () => ({
-    formatDateFirebase: jest.fn().mockReturnValue("mock-date"),
+jest.mock("utils/formatDate", () => ({
+    formatDate: jest.fn().mockReturnValue("mock-date"),
 }))
 
 describe("test in method getOrdersById", () => {
@@ -74,7 +74,7 @@ describe("test in method getOrdersById", () => {
 
 
         mockOrderRepo.getOrderDoc.mockResolvedValue(mockOrder as any);
-        (formatDateFirebase as jest.Mock).mockImplementation((date) => {
+        (formatDate as jest.Mock).mockImplementation((date) => {
             if (
                 date._seconds === mockOrder.data.created._seconds &&
                 date._nanoseconds === mockOrder.data.created._nanoseconds
@@ -86,7 +86,7 @@ describe("test in method getOrdersById", () => {
 
         const result = await orderService.getOrdersById(mockOrder.data.userId, mockOrder.data.orderId);
         expect(mockOrderRepo.getOrderDoc).toHaveBeenCalledWith(mockOrder.data.userId, mockOrder.data.orderId);
-        expect(formatDateFirebase as jest.Mock).toHaveBeenCalledWith(mockOrder.data.created)
+        expect(formatDate as jest.Mock).toHaveBeenCalledWith(mockOrder.data.created)
         expect(result).toEqual(expectedOrder);
     })
 
@@ -116,12 +116,12 @@ describe("test in method getOrdersById", () => {
         };
 
         mockOrderRepo.getOrderDoc.mockResolvedValue(mockOrder as any);
-        (formatDateFirebase as jest.Mock).mockImplementation(() => {
+        (formatDate as jest.Mock).mockImplementation(() => {
             throw error
         });
         await expect(orderService.getOrdersById(mockOrder.data.userId, mockOrder.data.orderId)).rejects.toThrow(error);
         expect(mockOrderRepo.getOrderDoc).toHaveBeenCalledWith(mockOrder.data.userId, mockOrder.data.orderId);
-        expect(formatDateFirebase as jest.Mock).toHaveBeenCalledWith(mockOrder.data.created);
+        expect(formatDate as jest.Mock).toHaveBeenCalledWith(mockOrder.data.created);
     })
 
 })

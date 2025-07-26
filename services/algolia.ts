@@ -42,7 +42,7 @@ export async function searchProductById(productId: string): Promise<ProductData>
     }
 }
 
-function checkIndexAlgolia(sort: string) {
+export function checkIndexAlgolia(sort: string) {
     const sortToIndexMap: Record<string, SearchIndex> = {
         "price_asc": productsAscIndex,
         "price_desc": productsDescIndex

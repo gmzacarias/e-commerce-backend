@@ -1,20 +1,8 @@
 import { SearchIndex } from "algoliasearch";
 import { productIndex, productsAscIndex, productsDescIndex } from "lib/algolia"
-import { authAirtable } from "services/airtable"
-import { processAirtableProducts } from "services/airtable"
+import { getProducts } from "services/products"
 import { getFilters } from "utils/filters";
 import { getOffsetAndLimit } from "utils/pagination";
-
-export async function getProducts(): Promise<AlgoliaData[]> {
-    try {
-        const response = await authAirtable()
-        const productsData = await processAirtableProducts(response)
-        return productsData.validRecords
-    } catch (error) {
-        console.error("error al obtener los productos:", error.message)
-        throw error
-    }
-}
 
 export async function getPrices() {
     try {
@@ -32,11 +20,12 @@ export async function getPrices() {
     }
 }
 
-export async function saveProductsAlgolia() {
+export async function saveProductsAlgolia(): Promise<boolean> {
     try {
         const productsData = await getProducts()
         const syncAlgolia = await productIndex.saveObjects(productsData)
-        return await Promise.all(syncAlgolia.taskIDs.map(taskId => productIndex.waitTask(taskId)))
+        await Promise.all(syncAlgolia.taskIDs.map(taskId => productIndex.waitTask(taskId)))
+        return true
     } catch (error) {
         console.error(`hubo un problema con la sincronizacion en Algolia : ${error.message}`)
         throw error;

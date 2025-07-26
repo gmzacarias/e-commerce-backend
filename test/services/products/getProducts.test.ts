@@ -1,5 +1,5 @@
 import { describe, expect } from "@jest/globals"
-import { getProducts } from "services/algolia"
+import { getProducts } from "services/products"
 import { authAirtable, processAirtableProducts } from "services/airtable"
 
 jest.mock("services/airtable", () => ({

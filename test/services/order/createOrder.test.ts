@@ -6,7 +6,7 @@ import { CartService } from "services/cart"
 import { formatProductsForOrder, calcTotalPrice, hasStock } from "utils/productsUtils"
 import { updateStockProducts } from "services/algolia"
 
-jest.mock("utils/cart", () => ({
+jest.mock("utils/productsUtils", () => ({
     formatProductsForOrder: jest.fn().mockReturnValue("mock-order-data"),
     calcTotalPrice: jest.fn().mockReturnValue("mock-total-price"),
     hasStock: jest.fn().mockReturnValue("mock-product-data"),

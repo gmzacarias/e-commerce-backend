@@ -10,7 +10,7 @@ import { createPreference } from "services/mercadopago"
 
 import { getBaseUrl } from "utils/getBaseUrl"
 
-jest.mock("utils/cart", () => ({
+jest.mock("utils/productsUtils", () => ({
     formatItemsForPreference: jest.fn().mockReturnValue("mock-items-data"),
 }))
 

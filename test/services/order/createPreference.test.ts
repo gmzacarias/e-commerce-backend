@@ -3,7 +3,7 @@ import { OrderService } from "services/order"
 import { OrderRepository } from "repositories/orderRepository"
 import { UserRepository } from "repositories/userRepository"
 import { CartService } from "services/cart"
-import { formatItemsForPreference } from "utils/cart"
+import { formatItemsForPreference } from "utils/productsUtils"
 import { formatExpireDateForPreference } from "services/dateFns"
 
 import { createPreference } from "services/mercadopago"

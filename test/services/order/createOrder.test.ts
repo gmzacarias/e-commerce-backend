@@ -3,7 +3,7 @@ import { OrderService } from "services/order"
 import { OrderRepository } from "repositories/orderRepository"
 import { UserRepository } from "repositories/userRepository"
 import { CartService } from "services/cart"
-import { formatProductsForOrder, calcTotalPrice, hasStock } from "utils/cart"
+import { formatProductsForOrder, calcTotalPrice, hasStock } from "utils/productsUtils"
 import { updateStockProducts } from "services/algolia"
 
 jest.mock("utils/cart", () => ({

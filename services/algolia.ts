@@ -1,24 +1,9 @@
-import { SearchIndex } from "algoliasearch";
-import { productIndex, productsAscIndex, productsDescIndex } from "lib/algolia"
+import { productIndex } from "lib/algolia"
 import { getProducts } from "services/products"
+import { checkIndex } from "utils/checkIndex";
 import { getFilters } from "utils/filters";
+import { getPrices } from "utils/getPrices";
 import { getOffsetAndLimit } from "utils/pagination";
-
-export async function getPrices() {
-    try {
-        const results = await productIndex.search('', {
-            facets: ['price'],
-            maxValuesPerFacet: 1
-        })
-        const prices = results.facets_stats.price
-        const minPriceValue = prices.min
-        const maxPriceValue = prices.max
-        return { minPriceValue, maxPriceValue }
-    } catch (error) {
-        console.error(error.message)
-        throw error
-    }
-}
 
 export async function saveProductsAlgolia(): Promise<boolean> {
     try {
@@ -42,23 +27,14 @@ export async function searchProductById(productId: string): Promise<ProductData>
     }
 }
 
-export function checkIndexAlgolia(sort: string) {
-    const sortToIndexMap: Record<string, SearchIndex> = {
-        "price_asc": productsAscIndex,
-        "price_desc": productsDescIndex
-    }
-    const currentIndex = sort ? sortToIndexMap[sort] : productIndex
-    return currentIndex
-}
-
 export async function searchProductsByQuery(data: QueryData) {
     const { offset, limit } = getOffsetAndLimit(data.offset, data.limit)
     const q = data.q
     const sort = data.sort
-    const getPricesData = await getPrices()
+    const getPricesData = await getPrices(data.sort)
     const filters = getFilters(data, getPricesData)
     try {
-        const currentIndex = checkIndexAlgolia(sort)
+        const currentIndex = checkIndex(sort)
         const results = await currentIndex.search<AlgoliaData>(q, {
             hitsPerPage: limit,
             page: offset > 1 ? Math.floor(offset / limit) : 0,

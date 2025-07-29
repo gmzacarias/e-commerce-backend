@@ -4,7 +4,7 @@ const { compilerOptions } = require('./tsconfig.json');
 /** @type {import('ts-jest').JestConfigWithTsJest} */
 module.exports = {
   preset: 'ts-jest',
-  testEnvironment: 'node',
+testEnvironment: 'jest-environment-jsdom',
   transform: {
     '^.+\\.(ts|tsx)$': 'ts-jest', 
   },
@@ -17,6 +17,6 @@ module.exports = {
     '**/?(*.)+(test|spec).ts?(x)',
     '**/test/**/*.test.ts?(x)',
   ],
-  setupFiles: ['<rootDir>/jest.setup.js'],
+setupFilesAfterEnv: ['<rootDir>/jest.setup.js'],
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
 };

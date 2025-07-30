@@ -4,15 +4,15 @@ import { OrderRepository } from "repositories/orderRepository"
 import { UserRepository } from "repositories/userRepository"
 import { CartService } from "services/cart"
 import { getMerchantOrderId } from "services/mercadopago"
-import { saleAlert, purchaseAlert } from "services/sendgrid"
+import { sendSaleConfirmed, sendPaymentConfirmed } from "services/sendgrid"
 
 jest.mock("services/mercadopago", () => ({
     getMerchantOrderId: jest.fn().mockReturnValue("mock-order-data"),
 }))
 
 jest.mock("services/sendgrid", () => ({
-    saleAlert: jest.fn().mockReturnValue("mock-send-sale-email"),
-    purchaseAlert: jest.fn().mockReturnValue("mock-send-purchase-email"),
+    sendSaleConfirmed: jest.fn().mockReturnValue("mock-send-sale-email"),
+    sendPaymentConfirmed: jest.fn().mockReturnValue("mock-send-purchase-email"),
 }))
 
 describe("test in method updateOrder", () => {
@@ -85,8 +85,8 @@ describe("test in method updateOrder", () => {
         mockUserRepo.getUser.mockResolvedValue(mockUser as any);
         (mockOrder.updateStatus as jest.Mock).mockReturnValue(true);
         mockOrderRepo.save.mockResolvedValue(true);
-        (purchaseAlert as jest.Mock).mockResolvedValue("Email de aviso de compra enviado");
-        (saleAlert as jest.Mock).mockResolvedValue("Email de aviso de venta enviado");
+        (sendPaymentConfirmed as jest.Mock).mockResolvedValue("Email de aviso de compra enviado");
+        (sendSaleConfirmed as jest.Mock).mockResolvedValue("Email de aviso de venta enviado");
 
         const result = await (orderService.UpdateOrder(userId, mockParams.topic, mockParams.id));
         expect(getMerchantOrderId).toHaveBeenCalledWith({ merchantOrderId: mockParams.id });
@@ -94,8 +94,8 @@ describe("test in method updateOrder", () => {
         expect(mockUserRepo.getUser).toHaveBeenCalledWith(userId);
         expect(mockOrder.updateStatus).toHaveBeenCalledWith(mockMerchantOrder.order_status);
         expect(mockOrderRepo.save).toHaveBeenCalledWith(mockOrder);
-        expect(purchaseAlert).toHaveBeenCalledWith(mockUser.data.email, mockUser.data.userName, mockOrder.data);
-        expect(saleAlert).toHaveBeenCalledWith(mockUser.data, mockOrder.data);
+        expect(sendPaymentConfirmed).toHaveBeenCalledWith(mockUser.data.email, mockUser.data.userName, mockOrder.data);
+        expect(sendSaleConfirmed).toHaveBeenCalledWith(mockUser.data, mockOrder.data);
         expect(result).toBe(mockOrder);
     })
 
@@ -363,7 +363,7 @@ describe("test in method updateOrder", () => {
         mockUserRepo.getUser.mockResolvedValue(mockUser as any);
         (mockOrder.updateStatus as jest.Mock).mockReturnValue(true);
         mockOrderRepo.save.mockResolvedValue(true);
-        (purchaseAlert as jest.Mock).mockRejectedValue(error);
+        (sendPaymentConfirmed as jest.Mock).mockRejectedValue(error);
 
         await expect((orderService.UpdateOrder(userId, mockParams.topic, mockParams.id))).rejects.toThrow(error);
         expect(getMerchantOrderId).toHaveBeenCalledWith({ merchantOrderId: mockParams.id });
@@ -371,7 +371,7 @@ describe("test in method updateOrder", () => {
         expect(mockUserRepo.getUser).toHaveBeenCalledWith(userId);
         expect(mockOrder.updateStatus).toHaveBeenCalledWith(mockMerchantOrder.order_status);
         expect(mockOrderRepo.save).toHaveBeenCalledWith(mockOrder);
-        expect(purchaseAlert).toHaveBeenCalledWith(mockUser.data.email, mockUser.data.userName, mockOrder.data);
+        expect(sendPaymentConfirmed).toHaveBeenCalledWith(mockUser.data.email, mockUser.data.userName, mockOrder.data);
     })
 
     it("should throw an error when the sale alert email fails to send", async () => {
@@ -424,8 +424,8 @@ describe("test in method updateOrder", () => {
         mockUserRepo.getUser.mockResolvedValue(mockUser as any);
         (mockOrder.updateStatus as jest.Mock).mockReturnValue(true);
         mockOrderRepo.save.mockResolvedValue(true);
-        (purchaseAlert as jest.Mock).mockResolvedValue("Email de aviso de compra enviado");
-        (saleAlert as jest.Mock).mockRejectedValue(error);
+        (sendPaymentConfirmed as jest.Mock).mockResolvedValue("Email de aviso de compra enviado");
+        (sendSaleConfirmed as jest.Mock).mockRejectedValue(error);
 
         await expect((orderService.UpdateOrder(userId, mockParams.topic, mockParams.id))).rejects.toThrow(error);
         expect(getMerchantOrderId).toHaveBeenCalledWith({ merchantOrderId: mockParams.id });
@@ -433,7 +433,7 @@ describe("test in method updateOrder", () => {
         expect(mockUserRepo.getUser).toHaveBeenCalledWith(userId);
         expect(mockOrder.updateStatus).toHaveBeenCalledWith(mockMerchantOrder.order_status);
         expect(mockOrderRepo.save).toHaveBeenCalledWith(mockOrder);
-        expect(purchaseAlert).toHaveBeenCalledWith(mockUser.data.email, mockUser.data.userName, mockOrder.data);
-        expect(saleAlert).toHaveBeenCalledWith(mockUser.data, mockOrder.data);
+        expect(sendPaymentConfirmed).toHaveBeenCalledWith(mockUser.data.email, mockUser.data.userName, mockOrder.data);
+        expect(sendSaleConfirmed).toHaveBeenCalledWith(mockUser.data, mockOrder.data);
     })
 })

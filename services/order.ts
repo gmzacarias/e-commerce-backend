@@ -6,7 +6,7 @@ import { formatProductsForOrder, calcTotalPrice, formatItemsForPreference, hasSt
 import { checkExpirationPayments, formatExpireDateForPreference } from "./dateFns"
 import { updateStockProducts } from "./algolia"
 import { createPreference, getMerchantOrderId, getPayment } from "./mercadopago"
-import { saleAlert, purchaseAlert } from "./sendgrid"
+import { sendPaymentConfirmed,sendSaleConfirmed } from "./sendgrid"
 import { getBaseUrl } from "utils/getBaseUrl"
 import { formatDate } from "utils/formatDate"
 
@@ -189,8 +189,8 @@ export class OrderService {
             order.updateStatus(order_status)
             await Promise.all([
                 this.repo.save(order),
-                purchaseAlert(user.data.email, user.data.userName, order.data),
-                saleAlert(user.data, order.data)
+                sendPaymentConfirmed(user.data.email, user.data.userName, order.data),
+                sendSaleConfirmed(user.data, order.data)
             ])
             return order
         } catch (error) {
@@ -261,6 +261,4 @@ export class OrderService {
         }
     }
 }
-
-
 

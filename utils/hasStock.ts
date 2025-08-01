@@ -7,10 +7,10 @@ export function hasStock(data: ProductData[]): ProductData[] {
         }
         const outOfStock = []
         for (const i of data) {
-            const resta = i.stock - i.quantity
-            i.stock = resta
-            if (resta < 0) {
-                outOfStock.push(i.objectID)
+            const subtract = i.stock - i.quantity
+            i.stock = subtract
+            if (subtract < 0) {
+                outOfStock.push(i.objectID ?? "producto sin ID")
             }
         }
         if (outOfStock.length > 0) {

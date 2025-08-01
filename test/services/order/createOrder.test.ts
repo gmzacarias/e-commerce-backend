@@ -3,13 +3,22 @@ import { OrderService } from "services/order"
 import { OrderRepository } from "repositories/orderRepository"
 import { UserRepository } from "repositories/userRepository"
 import { CartService } from "services/cart"
-import { formatProductsForOrder, calcTotalPrice, hasStock } from "utils/productsUtils"
+import { formatProducts } from "utils/formatProducts"
+import { calcTotalPrice } from "utils/calcToPrice"
+import { hasStock } from "utils/hasStock"
 import { updateStockProducts } from "services/algolia"
 
-jest.mock("utils/productsUtils", () => ({
-    formatProductsForOrder: jest.fn().mockReturnValue("mock-order-data"),
-    calcTotalPrice: jest.fn().mockReturnValue("mock-total-price"),
-    hasStock: jest.fn().mockReturnValue("mock-product-data"),
+jest.mock("utils/formatProducts", () => ({
+    formatProducts: jest.fn()
+}))
+
+jest.mock("utils/calcToPrice", () => ({
+    calcTotalPrice: jest.fn()
+
+}))
+
+jest.mock("utils/hasStock", () => ({
+    hasStock: jest.fn()
 }))
 
 jest.mock("services/algolia", () => ({
@@ -85,7 +94,7 @@ describe("test in method createOrder", () => {
         mockUserRepo.getUser.mockResolvedValue({ id: userId } as any);
         mockCartService.getCartData.mockResolvedValue(mockCartData as any);
         (hasStock as jest.Mock).mockReturnValue(mockCartData);
-        (formatProductsForOrder as jest.Mock).mockReturnValue(mockProducts);
+        (formatProducts as jest.Mock).mockReturnValue(mockProducts);
         (calcTotalPrice as jest.Mock).mockReturnValue(mockCartData[0].totalPrice);
         mockOrderRepo.newOrder.mockResolvedValue(mockOrder as any);
         (updateStockProducts as jest.Mock).mockResolvedValue(
@@ -99,7 +108,7 @@ describe("test in method createOrder", () => {
         expect(mockUserRepo.getUser).toHaveBeenCalledWith(userId);
         expect(mockCartService.getCartData).toHaveBeenCalledWith(userId);
         expect(hasStock).toHaveBeenCalledWith(mockCartData);
-        expect(formatProductsForOrder).toHaveBeenCalledWith(mockCartData);
+        expect(formatProducts).toHaveBeenCalledWith(mockCartData);
         expect(calcTotalPrice).toHaveBeenCalledWith(mockCartData);
         expect(mockOrderRepo.newOrder).toHaveBeenCalledWith(mockOrder);
         expect(updateStockProducts).toHaveBeenCalledWith(mockCartData);
@@ -151,7 +160,7 @@ describe("test in method createOrder", () => {
         mockUserRepo.getUser.mockResolvedValue({ id: userId } as any);
         mockCartService.getCartData.mockResolvedValue(mockCartData as any);
         (hasStock as jest.Mock).mockReturnValue(mockCartData);
-        (formatProductsForOrder as jest.Mock).mockReturnValue(mockProducts);
+        (formatProducts as jest.Mock).mockReturnValue(mockProducts);
         (calcTotalPrice as jest.Mock).mockReturnValue(mockCartData[0].totalPrice);
         mockOrderRepo.newOrder.mockResolvedValue(mockOrder as any);
         (updateStockProducts as jest.Mock).mockResolvedValue(
@@ -165,7 +174,7 @@ describe("test in method createOrder", () => {
         expect(mockUserRepo.getUser).toHaveBeenCalledWith(userId);
         expect(mockCartService.getCartData).toHaveBeenCalledWith(userId);
         expect(hasStock).toHaveBeenCalledWith(mockCartData);
-        expect(formatProductsForOrder).toHaveBeenCalledWith(mockCartData);
+        expect(formatProducts).toHaveBeenCalledWith(mockCartData);
         expect(calcTotalPrice).toHaveBeenCalledWith(mockCartData);
         expect(mockOrderRepo.newOrder).toHaveBeenCalledWith(mockOrder);
         expect(updateStockProducts).toHaveBeenCalledWith(mockCartData);
@@ -240,14 +249,14 @@ describe("test in method createOrder", () => {
         mockUserRepo.getUser.mockResolvedValue({ id: userId } as any);
         mockCartService.getCartData.mockResolvedValue(mockCartData as any);
         (hasStock as jest.Mock).mockReturnValue(mockCartData);
-        (formatProductsForOrder as jest.Mock).mockImplementation(() => {
+        (formatProducts as jest.Mock).mockImplementation(() => {
             throw error
         });
         await expect(orderService.createOrder(userId)).rejects.toThrow(error);
         expect(mockUserRepo.getUser).toHaveBeenCalledWith(userId);
         expect(mockCartService.getCartData).toHaveBeenCalledWith(userId);
         expect(hasStock).toHaveBeenCalledWith(mockCartData);
-        expect(formatProductsForOrder).toHaveBeenCalledWith(mockCartData);
+        expect(formatProducts).toHaveBeenCalledWith(mockCartData);
     })
 
     it("should throw an error when calcToPrice fails", async () => {
@@ -268,7 +277,9 @@ describe("test in method createOrder", () => {
         mockUserRepo.getUser.mockResolvedValue({ id: userId } as any);
         mockCartService.getCartData.mockResolvedValue(mockCartData as any);
         (hasStock as jest.Mock).mockReturnValue(mockCartData);
-        (formatProductsForOrder as jest.Mock).mockReturnValue(mockProducts);
+       (formatProducts as jest.Mock).mockImplementation(()=>{
+            return mockProducts;
+        });
         (calcTotalPrice as jest.Mock).mockImplementation(() => {
             throw error
         });
@@ -277,7 +288,7 @@ describe("test in method createOrder", () => {
         expect(mockUserRepo.getUser).toHaveBeenCalledWith(userId);
         expect(mockCartService.getCartData).toHaveBeenCalledWith(userId);
         expect(hasStock).toHaveBeenCalledWith(mockCartData);
-        expect(formatProductsForOrder).toHaveBeenCalledWith(mockCartData);
+        expect(formatProducts).toHaveBeenCalledWith(mockCartData);
         expect(calcTotalPrice).toHaveBeenCalledWith(mockCartData);
     })
 
@@ -327,7 +338,7 @@ describe("test in method createOrder", () => {
         mockUserRepo.getUser.mockResolvedValue({ id: userId } as any);
         mockCartService.getCartData.mockResolvedValue(mockCartData as any);
         (hasStock as jest.Mock).mockReturnValue(mockCartData);
-        (formatProductsForOrder as jest.Mock).mockReturnValue(mockProducts);
+        (formatProducts as jest.Mock).mockReturnValue(mockProducts);
         (calcTotalPrice as jest.Mock).mockReturnValue(mockCartData[0].totalPrice);
         mockOrderRepo.newOrder.mockRejectedValue(error);
 
@@ -335,7 +346,7 @@ describe("test in method createOrder", () => {
         expect(mockUserRepo.getUser).toHaveBeenCalledWith(userId);
         expect(mockCartService.getCartData).toHaveBeenCalledWith(userId);
         expect(hasStock).toHaveBeenCalledWith(mockCartData);
-        expect(formatProductsForOrder).toHaveBeenCalledWith(mockCartData);
+        expect(formatProducts).toHaveBeenCalledWith(mockCartData);
         expect(calcTotalPrice).toHaveBeenCalledWith(mockCartData);
         expect(mockOrderRepo.newOrder).toHaveBeenCalledWith(mockOrder);
     })
@@ -388,7 +399,7 @@ describe("test in method createOrder", () => {
         mockUserRepo.getUser.mockResolvedValue({ id: userId } as any);
         mockCartService.getCartData.mockResolvedValue(mockCartData as any);
         (hasStock as jest.Mock).mockReturnValue(mockCartData);
-        (formatProductsForOrder as jest.Mock).mockReturnValue(mockProducts);
+       (formatProducts as jest.Mock).mockReturnValue(mockProducts);
         (calcTotalPrice as jest.Mock).mockReturnValue(mockCartData[0].totalPrice);
         mockOrderRepo.newOrder.mockResolvedValue(mockOrder as any);
         (updateStockProducts as jest.Mock).mockImplementation(() => {
@@ -400,7 +411,7 @@ describe("test in method createOrder", () => {
         expect(mockUserRepo.getUser).toHaveBeenCalledWith(userId);
         expect(mockCartService.getCartData).toHaveBeenCalledWith(userId);
         expect(hasStock).toHaveBeenCalledWith(mockCartData);
-        expect(formatProductsForOrder).toHaveBeenCalledWith(mockCartData);
+        expect(formatProducts).toHaveBeenCalledWith(mockCartData);
         expect(calcTotalPrice).toHaveBeenCalledWith(mockCartData);
         expect(mockOrderRepo.newOrder).toHaveBeenCalledWith(mockOrder);
         expect(updateStockProducts).toHaveBeenCalledWith(mockCartData);

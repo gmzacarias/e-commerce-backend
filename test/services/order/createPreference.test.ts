@@ -3,15 +3,13 @@ import { OrderService } from "services/order"
 import { OrderRepository } from "repositories/orderRepository"
 import { UserRepository } from "repositories/userRepository"
 import { CartService } from "services/cart"
-import { formatItemsForPreference } from "utils/productsUtils"
+import { formatItems } from "utils/formatItems"
 import { formatExpireDateForPreference } from "services/dateFns"
-
 import { createPreference } from "services/mercadopago"
-
 import { getBaseUrl } from "utils/getBaseUrl"
 
-jest.mock("utils/productsUtils", () => ({
-    formatItemsForPreference: jest.fn().mockReturnValue("mock-items-data"),
+jest.mock("utils/formatItems", () => ({
+    formatItems: jest.fn().mockReturnValue("mock-items-data"),
 }))
 
 jest.mock("services/dateFns", () => ({
@@ -163,7 +161,7 @@ describe("test in method createPreference", () => {
 
         const createOrderSpy = jest.spyOn(orderService, "createOrder").mockResolvedValue(mockOrder as any);
         mockCartService.getCartData.mockResolvedValue(mockCartData as any);
-        (formatItemsForPreference as jest.Mock).mockReturnValue(mockItems);
+        (formatItems as jest.Mock).mockReturnValue(mockItems);
         mockUserRepo.getUser.mockReturnValue(mockUser as any);
         (formatExpireDateForPreference as jest.Mock).mockReturnValue(expireDateForPreference);
         (getBaseUrl as jest.Mock).mockImplementation(() => {
@@ -178,7 +176,7 @@ describe("test in method createPreference", () => {
         const result = await orderService.createPreference(userId, additionalInfo);
         expect(createOrderSpy).toHaveBeenCalledWith(userId, additionalInfo);
         expect(mockCartService.getCartData).toHaveBeenCalledWith(userId);
-        expect(formatItemsForPreference).toHaveBeenCalledWith(mockCartData);
+        expect(formatItems).toHaveBeenCalledWith(mockCartData);
         expect(mockUserRepo.getUser).toHaveBeenCalledWith(userId);
         expect(formatExpireDateForPreference).toHaveBeenCalled();
         expect(getBaseUrl).toHaveBeenCalled();
@@ -250,13 +248,13 @@ describe("test in method createPreference", () => {
 
         const createOrderSpy = jest.spyOn(orderService, "createOrder").mockResolvedValue(mockOrder as any);
         mockCartService.getCartData.mockResolvedValue(mockCartData as any);
-        (formatItemsForPreference as jest.Mock).mockImplementation(() => {
+        (formatItems as jest.Mock).mockImplementation(() => {
             throw error
         });
         await expect(orderService.createPreference(userId, additionalInfo)).rejects.toThrow(error);
         expect(createOrderSpy).toHaveBeenCalledWith(userId, additionalInfo);
         expect(mockCartService.getCartData).toHaveBeenCalledWith(userId);
-        expect(formatItemsForPreference).toHaveBeenCalledWith(mockCartData);
+        expect(formatItems).toHaveBeenCalledWith(mockCartData);
     })
 
     it("should throw an error when getUser does not return any data", async () => {
@@ -317,14 +315,14 @@ describe("test in method createPreference", () => {
 
         const createOrderSpy = jest.spyOn(orderService, "createOrder").mockResolvedValue(mockOrder as any);
         mockCartService.getCartData.mockResolvedValue(mockCartData as any);
-        (formatItemsForPreference as jest.Mock).mockReturnValue(mockItems);
+        (formatItems as jest.Mock).mockReturnValue(mockItems);
         mockUserRepo.getUser.mockImplementation(() => {
             throw error
         });
         await expect(orderService.createPreference(userId, additionalInfo)).rejects.toThrow(error);
         expect(createOrderSpy).toHaveBeenCalledWith(userId, additionalInfo);
         expect(mockCartService.getCartData).toHaveBeenCalledWith(userId);
-        expect(formatItemsForPreference).toHaveBeenCalledWith(mockCartData);
+        expect(formatItems).toHaveBeenCalledWith(mockCartData);
         expect(mockUserRepo.getUser).toHaveBeenCalledWith(userId);
     })
 
@@ -402,7 +400,7 @@ describe("test in method createPreference", () => {
 
         const createOrderSpy = jest.spyOn(orderService, "createOrder").mockResolvedValue(mockOrder as any);
         mockCartService.getCartData.mockResolvedValue(mockCartData as any);
-        (formatItemsForPreference as jest.Mock).mockReturnValue(mockItems);
+        (formatItems as jest.Mock).mockReturnValue(mockItems);
         mockUserRepo.getUser.mockReturnValue(mockUser as any);
         (formatExpireDateForPreference as jest.Mock).mockImplementation(() => {
             throw error
@@ -410,7 +408,7 @@ describe("test in method createPreference", () => {
         await expect(orderService.createPreference(userId, additionalInfo)).rejects.toThrow(error);
         expect(createOrderSpy).toHaveBeenCalledWith(userId, additionalInfo);
         expect(mockCartService.getCartData).toHaveBeenCalledWith(userId);
-        expect(formatItemsForPreference).toHaveBeenCalledWith(mockCartData);
+        expect(formatItems).toHaveBeenCalledWith(mockCartData);
         expect(mockUserRepo.getUser).toHaveBeenCalledWith(userId);
         expect(formatExpireDateForPreference).toHaveBeenCalled();
     })
@@ -491,7 +489,7 @@ describe("test in method createPreference", () => {
 
         const createOrderSpy = jest.spyOn(orderService, "createOrder").mockResolvedValue(mockOrder as any);
         mockCartService.getCartData.mockResolvedValue(mockCartData as any);
-        (formatItemsForPreference as jest.Mock).mockReturnValue(mockItems);
+        (formatItems as jest.Mock).mockReturnValue(mockItems);
         mockUserRepo.getUser.mockReturnValue(mockUser as any);
         (formatExpireDateForPreference as jest.Mock).mockReturnValue(expireDateForPreference);
         (getBaseUrl as jest.Mock).mockImplementation(() => {
@@ -500,7 +498,7 @@ describe("test in method createPreference", () => {
         await expect(orderService.createPreference(userId, additionalInfo)).rejects.toThrow(error);
         expect(createOrderSpy).toHaveBeenCalledWith(userId, additionalInfo);
         expect(mockCartService.getCartData).toHaveBeenCalledWith(userId);
-        expect(formatItemsForPreference).toHaveBeenCalledWith(mockCartData);
+        expect(formatItems).toHaveBeenCalledWith(mockCartData);
         expect(mockUserRepo.getUser).toHaveBeenCalledWith(userId);
         expect(formatExpireDateForPreference).toHaveBeenCalled();
         expect(getBaseUrl).toHaveBeenCalled();
@@ -615,7 +613,7 @@ describe("test in method createPreference", () => {
 
         const createOrderSpy = jest.spyOn(orderService, "createOrder").mockResolvedValue(mockOrder as any);
         mockCartService.getCartData.mockResolvedValue(mockCartData as any);
-        (formatItemsForPreference as jest.Mock).mockReturnValue(mockItems);
+        (formatItems as jest.Mock).mockReturnValue(mockItems);
         mockUserRepo.getUser.mockReturnValue(mockUser as any);
         (formatExpireDateForPreference as jest.Mock).mockReturnValue(expireDateForPreference);
         (getBaseUrl as jest.Mock).mockImplementation(() => {
@@ -625,7 +623,7 @@ describe("test in method createPreference", () => {
         await expect(orderService.createPreference(userId, additionalInfo)).rejects.toThrow(error);
         expect(createOrderSpy).toHaveBeenCalledWith(userId, additionalInfo);
         expect(mockCartService.getCartData).toHaveBeenCalledWith(userId);
-        expect(formatItemsForPreference).toHaveBeenCalledWith(mockCartData);
+        expect(formatItems).toHaveBeenCalledWith(mockCartData);
         expect(mockUserRepo.getUser).toHaveBeenCalledWith(userId);
         expect(formatExpireDateForPreference).toHaveBeenCalled();
         expect(getBaseUrl).toHaveBeenCalled();
@@ -746,7 +744,7 @@ describe("test in method createPreference", () => {
 
         const createOrderSpy = jest.spyOn(orderService, "createOrder").mockResolvedValue(mockOrder as any);
         mockCartService.getCartData.mockResolvedValue(mockCartData as any);
-        (formatItemsForPreference as jest.Mock).mockReturnValue(mockItems);
+        (formatItems as jest.Mock).mockReturnValue(mockItems);
         mockUserRepo.getUser.mockReturnValue(mockUser as any);
         (formatExpireDateForPreference as jest.Mock).mockReturnValue(expireDateForPreference);
         (getBaseUrl as jest.Mock).mockImplementation(() => {
@@ -759,7 +757,7 @@ describe("test in method createPreference", () => {
         await expect(orderService.createPreference(userId, additionalInfo)).rejects.toThrow(error);
         expect(createOrderSpy).toHaveBeenCalledWith(userId, additionalInfo);
         expect(mockCartService.getCartData).toHaveBeenCalledWith(userId);
-        expect(formatItemsForPreference).toHaveBeenCalledWith(mockCartData);
+        expect(formatItems).toHaveBeenCalledWith(mockCartData);
         expect(mockUserRepo.getUser).toHaveBeenCalledWith(userId);
         expect(formatExpireDateForPreference).toHaveBeenCalled();
         expect(getBaseUrl).toHaveBeenCalled();
@@ -882,7 +880,7 @@ describe("test in method createPreference", () => {
 
         const createOrderSpy = jest.spyOn(orderService, "createOrder").mockResolvedValue(mockOrder as any);
         mockCartService.getCartData.mockResolvedValue(mockCartData as any);
-        (formatItemsForPreference as jest.Mock).mockReturnValue(mockItems);
+        (formatItems as jest.Mock).mockReturnValue(mockItems);
         mockUserRepo.getUser.mockReturnValue(mockUser as any);
         (formatExpireDateForPreference as jest.Mock).mockReturnValue(expireDateForPreference);
         (getBaseUrl as jest.Mock).mockImplementation(() => {
@@ -897,7 +895,7 @@ describe("test in method createPreference", () => {
         await expect(orderService.createPreference(userId, additionalInfo)).rejects.toThrow(error);
         expect(createOrderSpy).toHaveBeenCalledWith(userId, additionalInfo);
         expect(mockCartService.getCartData).toHaveBeenCalledWith(userId);
-        expect(formatItemsForPreference).toHaveBeenCalledWith(mockCartData);
+        expect(formatItems).toHaveBeenCalledWith(mockCartData);
         expect(mockUserRepo.getUser).toHaveBeenCalledWith(userId);
         expect(formatExpireDateForPreference).toHaveBeenCalled();
         expect(getBaseUrl).toHaveBeenCalled();
@@ -1021,7 +1019,7 @@ describe("test in method createPreference", () => {
 
         const createOrderSpy = jest.spyOn(orderService, "createOrder").mockResolvedValue(mockOrder as any);
         mockCartService.getCartData.mockResolvedValue(mockCartData as any);
-        (formatItemsForPreference as jest.Mock).mockReturnValue(mockItems);
+        (formatItems as jest.Mock).mockReturnValue(mockItems);
         mockUserRepo.getUser.mockReturnValue(mockUser as any);
         (formatExpireDateForPreference as jest.Mock).mockReturnValue(expireDateForPreference);
         (getBaseUrl as jest.Mock).mockImplementation(() => {
@@ -1035,7 +1033,7 @@ describe("test in method createPreference", () => {
         await expect(orderService.createPreference(userId, additionalInfo)).rejects.toThrow(error);
         expect(createOrderSpy).toHaveBeenCalledWith(userId, additionalInfo);
         expect(mockCartService.getCartData).toHaveBeenCalledWith(userId);
-        expect(formatItemsForPreference).toHaveBeenCalledWith(mockCartData);
+        expect(formatItems).toHaveBeenCalledWith(mockCartData);
         expect(mockUserRepo.getUser).toHaveBeenCalledWith(userId);
         expect(formatExpireDateForPreference).toHaveBeenCalled();
         expect(getBaseUrl).toHaveBeenCalled();
@@ -1160,7 +1158,7 @@ describe("test in method createPreference", () => {
 
         const createOrderSpy = jest.spyOn(orderService, "createOrder").mockResolvedValue(mockOrder as any);
         mockCartService.getCartData.mockResolvedValue(mockCartData as any);
-        (formatItemsForPreference as jest.Mock).mockReturnValue(mockItems);
+        (formatItems as jest.Mock).mockReturnValue(mockItems);
         mockUserRepo.getUser.mockReturnValue(mockUser as any);
         (formatExpireDateForPreference as jest.Mock).mockReturnValue(expireDateForPreference);
         (getBaseUrl as jest.Mock).mockImplementation(() => {
@@ -1175,7 +1173,7 @@ describe("test in method createPreference", () => {
         await expect(orderService.createPreference(userId, additionalInfo)).rejects.toThrow(error);
         expect(createOrderSpy).toHaveBeenCalledWith(userId, additionalInfo);
         expect(mockCartService.getCartData).toHaveBeenCalledWith(userId);
-        expect(formatItemsForPreference).toHaveBeenCalledWith(mockCartData);
+        expect(formatItems).toHaveBeenCalledWith(mockCartData);
         expect(mockUserRepo.getUser).toHaveBeenCalledWith(userId);
         expect(formatExpireDateForPreference).toHaveBeenCalled();
         expect(getBaseUrl).toHaveBeenCalled();

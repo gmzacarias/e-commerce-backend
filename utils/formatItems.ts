@@ -9,7 +9,7 @@ export function formatItems(data: ProductData[]): ItemsData[] {
             return {
                 id: `${item.productId}`,
                 title: `${item.brand} ${item.familyModel} ${item.model}`,
-                description: `smartphone ${item.brand} ${item.model} `,
+                description: `smartphone ${item.brand} ${item.familyModel} ${item.model}`,
                 picture_url: item.photo,
                 category_id: "Phones",
                 quantity: item.quantity,

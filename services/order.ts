@@ -2,13 +2,16 @@ import { Order } from "models/order"
 import { OrderRepository } from "repositories/orderRepository"
 import { UserRepository } from "repositories/userRepository"
 import { CartService } from "./cart"
-import { formatProductsForOrder, calcTotalPrice, formatItemsForPreference, hasStock } from "utils/productsUtils"
 import { checkExpirationPayments, formatExpireDateForPreference } from "./dateFns"
 import { updateStockProducts } from "./algolia"
 import { createPreference, getMerchantOrderId, getPayment } from "./mercadopago"
 import { sendPaymentConfirmed,sendSaleConfirmed } from "./sendgrid"
 import { getBaseUrl } from "utils/getBaseUrl"
 import { formatDate } from "utils/formatDate"
+import { hasStock } from "utils/hasStock"
+import {formatProducts} from "utils/formatProducts"
+import { calcTotalPrice } from "utils/calcToPrice"
+import {formatItems} from "utils/formatItems"
 
 export class OrderService {
     constructor(private repo: Partial<OrderRepository>, private userRepo: Partial<UserRepository>, private cartService: Partial<CartService>) { }
@@ -110,7 +113,7 @@ export class OrderService {
             const getUserId = (await this.userRepo.getUser(userId)).id
             const cartData = await this.cartService.getCartData(getUserId)
             const stockData = hasStock(cartData)
-            const products = formatProductsForOrder(cartData)
+            const products = formatProducts(cartData)
             const totalPrice = calcTotalPrice(cartData)
             const order = await this.repo.newOrder({
                 orderId: null,
@@ -137,7 +140,7 @@ export class OrderService {
             const order = await this.createOrder(userId, additionalInfo)
             const { id, data } = order
             const cartData = await this.cartService.getCartData(userId)
-            const items = formatItemsForPreference(cartData)
+            const items = formatItems(cartData)
             const userData = await this.userRepo.getUser(userId)
             const expireDatePreference = formatExpireDateForPreference()
             const urlData = getBaseUrl()

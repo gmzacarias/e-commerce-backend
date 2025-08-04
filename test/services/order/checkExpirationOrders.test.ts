@@ -94,6 +94,26 @@ describe("test in method checkExpirationOrders", () => {
         expect(result).toBeUndefined();
     })
 
+    it("should not update or save the orders because the status is pending and the order has not expired yet", async () => {
+        const createdDate = new Date("2025-06-27T18:30:25Z");
+        const mockOrder = {
+            id: "order001",
+            userId: "user001",
+            orderId: "order001",
+            created: createdDate,
+            status: "pending",
+            expire: false,
+            updateExpire: jest.fn()
+        };
+        const mockOrderData = [mockOrder];
+        (checkExpirationPayments as jest.Mock).mockImplementation(() => 1);
+        await orderService.checkExpirationOrders(mockOrderData as any);
+        expect(checkExpirationPayments).toHaveBeenCalledWith(mockOrder.created);
+        expect(mockOrderRepo.getOrderDoc).not.toHaveBeenCalled();
+        expect(mockOrder.updateExpire).not.toHaveBeenCalled();
+        expect(mockOrderRepo.save).not.toHaveBeenCalled();
+    })
+
     it("should throw an error if checkExpirationPayments has no data to check", async () => {
         const error = new Error("No hay datos para realizar la consulta");
         const mockOrder = {

@@ -34,7 +34,7 @@ describe("test in function paymentMail", () => {
         expect(html).toContain(`Tu pedido #${mockOrder.orderId} ha sido confirmado`);
     });
 
-    it("renderiza los productos con sus cantidades y precios", () => {
+    it("should render the products with quantities and total price", () => {
         const html = renderEmail(paymentMail({ userName: "Juan", order: mockOrder as any }));
         expect(html).toContain(mockOrder.products[0].brand);
         expect(html).toContain(mockOrder.products[0].model);

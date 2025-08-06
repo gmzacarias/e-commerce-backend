@@ -1,6 +1,6 @@
 import { AuthRepository } from "repositories/authRepository"
 
-describe("AuthRepository - checkAuthDoc", () => {
+describe("test in method checkAuthDoc", () => {
     const mockDoc = (exists: boolean, userId?: string) => ({
         exists,
         data: () => ({ userId }),

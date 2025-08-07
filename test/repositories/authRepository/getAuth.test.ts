@@ -34,7 +34,7 @@ describe("test in method getAuth", () => {
         const error = new Error("el userId ingresado no coincide con los registros de la db");
         const mockDoc = {
             empty: true,
-            docs: [mockDocs]
+            docs: []
         };
         const repo = new AuthRepository() as any;
         repo.authCollection = {

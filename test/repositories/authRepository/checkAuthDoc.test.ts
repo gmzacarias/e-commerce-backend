@@ -23,12 +23,20 @@ describe("test in method checkAuthDoc", () => {
     })
 
     it("should throw an error when the document does not exist", async () => {
+        const error = new Error("no existe un documento asociado a este id");
         const repo = setupRepoWithMockDoc({ exists: false });
-        await expect(repo.checkAuthDoc("docId1234", "user123")).rejects.toThrow("no existe un documento asociado a este id");
+        const consoleSpy = jest.spyOn(console, "error").mockImplementation(() => { });
+        await expect(repo.checkAuthDoc("docId1234", "user123")).rejects.toThrow(error);
+        expect(consoleSpy).toHaveBeenCalledWith("no se pudo obtener el documento:", error.message);
+        consoleSpy.mockRestore();
     })
 
     it("should throw an error when userId does not match", async () => {
+        const error = new Error("el usuario no tiene acceso");
         const repo = setupRepoWithMockDoc(mockDoc(true, "user1234"));
-        await expect(repo.checkAuthDoc("docId1234", "user1235")).rejects.toThrow("el usuario no tiene acceso");
+        const consoleSpy = jest.spyOn(console, "error").mockImplementation(() => { });
+        await expect(repo.checkAuthDoc("docId1234", "user1235")).rejects.toThrow(error);
+        expect(consoleSpy).toHaveBeenCalledWith("no se pudo obtener el documento:", error.message);
+        consoleSpy.mockRestore();
     })
 })

@@ -29,7 +29,7 @@ describe("test in method getUserDoc", () => {
         expect(result).toEqual(mockResult);
     })
 
-    it("should throw an error when userId does not match", async () => {
+    it("should throw an error when the document does not exist", async () => {
         const error = new Error("no existe un documento asociado a este usuario");
         const mockUserDoc = {
             exists: false,

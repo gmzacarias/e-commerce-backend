@@ -2,7 +2,7 @@ import { UserRepository } from "repositories/userRepository"
 import { User } from "models/user"
 
 describe("test in method getCart", () => {
-    it("should update the order with the data received as parameters", async () => {
+    it("should update the user with the data received as parameters", async () => {
         const userData = [{
             id: "userId001",
             data: {

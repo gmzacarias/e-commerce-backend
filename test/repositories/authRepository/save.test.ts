@@ -2,7 +2,7 @@ import { AuthRepository } from "repositories/authRepository"
 import { Auth } from "models/auth"
 
 describe("test in method save", () => {
-    it("should update the order with the data received as parameters", async () => {
+    it("should update the auth with the data received as parameters", async () => {
         const authData = [{
             id: "user123",
             data: {

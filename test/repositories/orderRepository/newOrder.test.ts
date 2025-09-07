@@ -25,7 +25,6 @@ describe("test in method newOrder", () => {
         const result = await repo.newOrder(data);
         expect(result).toBeInstanceOf(Order);
         expect(mockAdd).toHaveBeenCalledWith(data);
-        console.log("datos",result.data,data)
         expect(result.data).toEqual(data);
     })
 

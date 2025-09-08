@@ -20,7 +20,7 @@ describe("test in function generateToken", () => {
             return mockToken;
         });
         const result = generateToken(data);
-        expect(jwt.sign).toHaveBeenCalledWith(data, secret);
+        expect(jwt.sign).toHaveBeenCalledWith(data, secret, { expiresIn: "15m" });
         expect(result).toEqual(mockToken);
     })
 

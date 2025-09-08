@@ -4,7 +4,7 @@ import { UserRepository } from "repositories/userRepository"
 import { cleanEmail } from "utils/cleanEmail"
 import { generateRandomCode } from "./randomSeed"
 import { checkExpiration, createExpireDate } from "./dateFns"
-import { generateToken } from "./jwt"
+import { generateRefreshToken, generateToken } from "./jwt"
 import { sendCodeAuth } from "./sendgrid"
 import type { JwtPayload } from "jsonwebtoken"
 
@@ -69,7 +69,7 @@ export class AuthService {
         }
     }
 
-    async authenticate(email: string, code: number): Promise<string | JwtPayload> {
+    async authenticate(email: string, code: number): Promise<{ token: string; refreshToken: string }> {
         const formatEmail = cleanEmail(email)
         try {
             await this.repo.findByEmail(formatEmail)
@@ -79,7 +79,8 @@ export class AuthService {
                 throw new Error("el code ingresado a expirado")
             }
             const token = generateToken({ userId: auth.data.userId })
-            return token
+            const refreshToken = generateRefreshToken({ userId: auth.data.userId })
+            return { token,refreshToken }
         } catch (error) {
             console.error(error.message)
             throw error

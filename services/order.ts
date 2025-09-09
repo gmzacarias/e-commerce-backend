@@ -3,29 +3,43 @@ import { OrderRepository } from "repositories/orderRepository"
 import { UserRepository } from "repositories/userRepository"
 import { CartService } from "./cart"
 import { checkExpirationPayments, formatExpireDateForPreference } from "./dateFns"
-import { updateStockProducts } from "./algolia"
+import { updateStockProducts, searchProductById } from "./algolia"
 import { createPreference, getMerchantOrderId, getPayment } from "./mercadopago"
-import { sendPaymentConfirmed,sendSaleConfirmed } from "./sendgrid"
+import { sendPaymentConfirmed, sendSaleConfirmed } from "./sendgrid"
 import { getBaseUrl } from "utils/getBaseUrl"
 import { formatDate } from "utils/formatDate"
 import { hasStock } from "utils/hasStock"
-import {formatProducts} from "utils/formatProducts"
+import { formatProducts } from "utils/formatProducts"
 import { calcTotalPrice } from "utils/calcToPrice"
-import {formatItems} from "utils/formatItems"
+import { formatItems } from "utils/formatItems"
 
 export class OrderService {
     constructor(private repo: Partial<OrderRepository>, private userRepo: Partial<UserRepository>, private cartService: Partial<CartService>) { }
 
     async checkExpirationOrders(orders: OrderData[]): Promise<void> {
         try {
-            let orderExpires = []
+            let orderExpires: string[] = []
             for (const item of orders) {
                 const result = checkExpirationPayments(item.created as FirestoreTimestamp)
-                if (result >= 2 || item.status === "closed") {
-                    const order = await this.repo.getOrderDoc(item.userId, item.orderId)
-                    order.updateExpire(true)
-                    orderExpires.push(item.orderId)
-                    await this.repo.save(order)
+                if (result >= 2) {
+                    if (item.status !== "closed") {
+                        const productsToReturn = await Promise.all(
+                            item.products.map(async (p) => {
+                                const product = await searchProductById(p.productId)
+                                return {
+                                    ...product,
+                                    objectID: product.objectID,
+                                    stock: product.stock,
+                                    quantity: p.quantity
+                                }
+                            })
+                        )
+                        await updateStockProducts(productsToReturn, "add")
+                        const order = await this.repo.getOrderDoc(item.userId, item.orderId)
+                        order.updateExpire(true)
+                        orderExpires.push(item.orderId)
+                        await this.repo.save(order)
+                    }
                 }
             }
         } catch (error) {
@@ -127,7 +141,7 @@ export class OrderService {
                 payment: null,
                 expire: false,
             })
-            await updateStockProducts(stockData)
+            await updateStockProducts(stockData, "subtract")
             return order
         } catch (error) {
             console.error(error.message)

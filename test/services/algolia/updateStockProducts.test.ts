@@ -15,7 +15,7 @@ describe("test in function updateStockProducts", () => {
         (productIndex.partialUpdateObjects as jest.Mock).mockResolvedValue("mock-response");
         const result = await updateStockProducts(data as any);
         expect(productIndex.partialUpdateObjects).toHaveBeenCalledWith(formatData as any);
-        expect(result).toBe("mock-response");
+        expect(result).toBe(true);
     })
 
     it("should throw an error when an objectID cannot be updated", async () => {
@@ -23,7 +23,7 @@ describe("test in function updateStockProducts", () => {
         const error = new Error(`No se puede actualizar el objectID${data[0].objectID}`);
         const formatData = [{ objectID: "1", stock: data[0].stock - data[0].quantity }];
         (productIndex.partialUpdateObjects as jest.Mock).mockRejectedValue(error);
-       await expect(updateStockProducts(data as any)).rejects.toThrow(error);
+        await expect(updateStockProducts(data as any)).rejects.toThrow(error);
         expect(productIndex.partialUpdateObjects).toHaveBeenCalledWith(formatData as any);
     })
 })

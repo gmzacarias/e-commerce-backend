@@ -3,11 +3,12 @@ import { AuthService } from "services/auth"
 import { AuthRepository } from "repositories/authRepository"
 import { UserRepository } from "repositories/userRepository"
 import { checkExpiration } from "services/dateFns"
-import { generateToken } from "services/jwt"
+import { generateRefreshToken, generateToken } from "services/jwt"
 import { cleanEmail } from "utils/cleanEmail"
 
 jest.mock("services/jwt", () => ({
-    generateToken: jest.fn().mockReturnValue("mock-token")
+    generateToken: jest.fn().mockReturnValue("mock-token"),
+    generateRefreshToken: jest.fn().mockReturnValue("mock-refreshToken")
 }))
 
 jest.mock("services/dateFns", () => ({
@@ -37,7 +38,6 @@ describe("test in method authenticate", () => {
     it("should return a token if the email and code match the auth data", async () => {
         jest.useFakeTimers();
         jest.setSystemTime(new Date('2025-06-29T20:00:00Z'));
-
         const auth = {
             data: {
                 email: "test@email.com",
@@ -46,7 +46,10 @@ describe("test in method authenticate", () => {
                 expire: new Date('2025-06-29T20:29:00Z')
             }
         };
-
+        const expectedResult = {
+            token: "fakeToken1234",
+            refreshToken: "fakeToken1234"
+        };
         (cleanEmail as jest.Mock).mockImplementation((value) => {
             return value.trim();
         });
@@ -54,12 +57,14 @@ describe("test in method authenticate", () => {
         mockAuthRepo.findByCode.mockResolvedValue(auth as any);
         (checkExpiration as jest.Mock).mockReturnValue(false);
         (generateToken as jest.Mock).mockReturnValue("fakeToken1234");
+        (generateRefreshToken as jest.Mock).mockReturnValue("fakeToken1234");
         const result = await authService.authenticate(auth.data.email, auth.data.code);
         expect(mockAuthRepo.findByEmail).toHaveBeenCalledWith(auth.data.email);
         expect(mockAuthRepo.findByCode).toHaveBeenCalledWith(auth.data.code);
         expect(checkExpiration).toHaveBeenCalledWith(auth.data.expire);
         expect(generateToken).toHaveBeenCalledWith({ userId: auth.data.userId });
-        expect(result).toEqual("fakeToken1234");
+        expect(generateRefreshToken).toHaveBeenCalledWith({ userId: auth.data.userId });
+        expect(result).toEqual(expectedResult);
     })
 
     it("should throw an error when cleanEmail cannot clean the string", async () => {
@@ -161,5 +166,37 @@ describe("test in method authenticate", () => {
         expect(mockAuthRepo.findByCode).toHaveBeenCalledWith(auth.data.code);
         expect(checkExpiration).toHaveBeenCalledWith(auth.data.expire);
         expect(generateToken).toHaveBeenCalledWith({ userId: auth.data.userId });
+    })
+
+    it("should throw an error if generateRefreshtoken fails to create a new token", async () => {
+        const error = new Error("faltan parametros para poder generar el token");
+        jest.useFakeTimers();
+        jest.setSystemTime(new Date('2025-06-29T20:00:00Z'));
+
+        const auth = {
+            data: {
+                email: "test@email.com",
+                userId: "user123",
+                code: 123456,
+                expire: new Date('2025-06-29T20:29:00Z')
+            }
+        };
+
+        (cleanEmail as jest.Mock).mockImplementation((value) => {
+            return value.trim();
+        });
+        mockAuthRepo.findByEmail.mockResolvedValue(auth as any);
+        mockAuthRepo.findByCode.mockResolvedValue(auth as any);
+        (checkExpiration as jest.Mock).mockReturnValue(false);
+        (generateToken as jest.Mock).mockReturnValue("fakeToken1234");
+        (generateRefreshToken as jest.Mock).mockImplementation(() => {
+            throw error;
+        });
+        await expect(authService.authenticate(auth.data.email, auth.data.code)).rejects.toThrow(error);
+        expect(mockAuthRepo.findByEmail).toHaveBeenCalledWith(auth.data.email);
+        expect(mockAuthRepo.findByCode).toHaveBeenCalledWith(auth.data.code);
+        expect(checkExpiration).toHaveBeenCalledWith(auth.data.expire);
+        expect(generateToken).toHaveBeenCalledWith({ userId: auth.data.userId });
+        expect(generateRefreshToken).toHaveBeenCalledWith({ userId: auth.data.userId });
     })
 })

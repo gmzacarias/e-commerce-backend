@@ -111,7 +111,7 @@ describe("test in method createOrder", () => {
         expect(formatProducts).toHaveBeenCalledWith(mockCartData);
         expect(calcTotalPrice).toHaveBeenCalledWith(mockCartData);
         expect(mockOrderRepo.newOrder).toHaveBeenCalledWith(mockOrder);
-        expect(updateStockProducts).toHaveBeenCalledWith(mockCartData);
+        expect(updateStockProducts).toHaveBeenCalledWith(mockCartData,"subtract");
         expect(result).toEqual(mockOrder);
     })
 
@@ -177,7 +177,7 @@ describe("test in method createOrder", () => {
         expect(formatProducts).toHaveBeenCalledWith(mockCartData);
         expect(calcTotalPrice).toHaveBeenCalledWith(mockCartData);
         expect(mockOrderRepo.newOrder).toHaveBeenCalledWith(mockOrder);
-        expect(updateStockProducts).toHaveBeenCalledWith(mockCartData);
+        expect(updateStockProducts).toHaveBeenCalledWith(mockCartData,"subtract");
         expect(result).toEqual(mockOrder);
     })
 
@@ -414,6 +414,6 @@ describe("test in method createOrder", () => {
         expect(formatProducts).toHaveBeenCalledWith(mockCartData);
         expect(calcTotalPrice).toHaveBeenCalledWith(mockCartData);
         expect(mockOrderRepo.newOrder).toHaveBeenCalledWith(mockOrder);
-        expect(updateStockProducts).toHaveBeenCalledWith(mockCartData);
+        expect(updateStockProducts).toHaveBeenCalledWith(mockCartData,"subtract");
     })
 })

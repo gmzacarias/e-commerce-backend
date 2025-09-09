@@ -86,16 +86,20 @@ export async function getFeaturedProducts(): Promise<AlgoliaData[]> {
     }
 }
 
-export async function updateStockProducts(data: ProductData[]) {
+export async function updateStockProducts(data: Partial<ProductData[]>, mode: "add" | "subtract" = "subtract"):Promise<boolean> {
     try {
         const formatData = data.map(item => {
+            const newStock =
+                mode === "add"
+                    ? item.stock + item.quantity
+                    : item.stock - item.quantity
             return {
                 objectID: item.objectID,
-                stock: item.stock - item.quantity
+                stock: newStock
             }
         })
-        const response = await productIndex.partialUpdateObjects(formatData)
-        return response
+        await productIndex.partialUpdateObjects(formatData)
+        return true
     } catch (error) {
         console.error("error al actualizar el stock:", error.message)
         throw error

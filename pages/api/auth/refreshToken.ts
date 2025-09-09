@@ -18,7 +18,7 @@ async function postHandler(req: NextApiRequest, res: NextApiResponse) {
             throw new Error("refresh token inválido o expirado")
         }
         const newToken = generateToken({ userId: payload.userId })
-        return res.status(200).json({
+        return res.status(200).send({
             message: "Nuevo token generado",
             token: newToken,
         })

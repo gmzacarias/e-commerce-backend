@@ -23,11 +23,9 @@ async function postHandler(req: NextApiRequest, res: NextApiResponse) {
             token: newToken,
         })
     } catch (error) {
-        if (error instanceof Error && error.message.includes("token")) {
-            res.status(401).send({ message: error.message })
-        } else {
-            res.status(500).send({ message: "Error en refresh token", error: error })
-        }
+        const message = error instanceof Error ? error.message : "Error desconocido"
+        const status = message.includes("token") ? 401 : 500
+        res.status(status).json({ message })
     }
 }
 

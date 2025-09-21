@@ -19,11 +19,9 @@ async function postHandler(req: NextApiRequest, res: NextApiResponse) {
         }))
         res.status(200).send({ message: "inicio de sesion correcto", token: token })
     } catch (error) {
-        if (error.message) {
-            res.status(401).send({ message: error.message })
-        } else {
-            res.status(500).send({ message: "Error interno del servidor", error: error })
-        }
+        const message = error instanceof Error ? error.message : "Error desconocido"
+        const status = message.includes("token") ? 401 : 500
+        res.status(status).json({ message })
     }
 }
 

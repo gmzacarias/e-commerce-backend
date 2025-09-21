@@ -11,11 +11,9 @@ async function postHandler(req: NextApiRequest, res: NextApiResponse) {
         await sendCode(email)
         return res.status(200).send({ message: "Codigo Enviado" })
     } catch (error) {
-        if (error.message) {
-            res.status(400).send({ message: error.message })
-        } else {
-            res.status(500).send({ message: "Error interno del servidor", error: error })
-        }
+          const message = error instanceof Error ? error.message : "Error desconocido"
+        const status = message.includes("Email") ? 400 : 500
+        res.status(status).json({ message })
     }
 }
 

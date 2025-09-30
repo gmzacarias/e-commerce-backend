@@ -12,8 +12,8 @@ async function postHandler(req: NextApiRequest, res: NextApiResponse) {
         const { token, refreshToken } = await signIn(email, code)
         res.setHeader("Set-Cookie", serialize("refresh_token", refreshToken, {
             httpOnly: true,
-            secure: process.env.NODE_ENV === "production",
-            sameSite: "strict",
+            secure: true,
+            sameSite: "none",
             path: "/",
             maxAge: 60 * 60 * 24 * 7,
         }))

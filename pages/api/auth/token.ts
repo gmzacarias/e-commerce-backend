@@ -12,11 +12,11 @@ async function postHandler(req: NextApiRequest, res: NextApiResponse) {
         const { token, refreshToken } = await signIn(email, code)
         res.setHeader("Set-Cookie", serialize("refresh_token", refreshToken, {
             httpOnly: true,
-            secure: true,
-            sameSite: "none",
+            secure: process.env.NODE_ENV === "production",
+            sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
             path: "/",
             maxAge: 60 * 60 * 24 * 7,
-        }))
+        }));
         res.status(200).send({ message: "inicio de sesion correcto", token: token })
     } catch (error) {
         const message = error instanceof Error ? error.message : "Error desconocido"

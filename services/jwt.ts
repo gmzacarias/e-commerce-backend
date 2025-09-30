@@ -5,7 +5,7 @@ export function generateToken(data: string | object | Buffer): string {
         if (!data || !secret) {
             throw new Error("faltan parametros para poder generar el token")
         }
-        const token = jwt.sign(data, secret, { expiresIn: "15m" })
+        const token = jwt.sign(data, secret, { expiresIn: "30m" })
         return token
     } catch (error) {
         console.error("Error en JWT:", error.message)

@@ -6,6 +6,7 @@ export function handlerCORS(callback: { (req: NextApiRequest, res: NextApiRespon
       await NextCors(req, res, {
         methods: ["GET", "HEAD", "PUT", "PATCH", "POST", "DELETE","OPTIONS"],
         origin: ["http://localhost:3000","https://localhost:3000","https://e-commerce-smartshop.vercel.app","https://e-commerce-smartshop-api-docs.vercel.app"],
+        credentials:true,
         optionsSuccessStatus: 200,
       })
       callback(req, res);

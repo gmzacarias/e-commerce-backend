@@ -3,7 +3,7 @@ import type { MerchantOrderResponse } from "mercadopago/dist/clients/merchantOrd
 import type { PreferenceCreateData } from "mercadopago/dist/clients/preference/create/types"
 import type { PaymentGetData } from "mercadopago/dist/clients/payment/get/types"
 import type { PreferenceResponse } from "mercadopago/dist/clients/preference/commonTypes"
-import type {PaymentResponse} from "mercadopago/dist/clients/payment/commonTypes"
+import type { PaymentResponse } from "mercadopago/dist/clients/payment/commonTypes"
 import { merchantOrder, preference, payment } from "lib/mercadopago"
 
 export async function getMerchantOrderId(orderData: MerchantOrderGetData): Promise<MerchantOrderResponse> {

@@ -10,7 +10,7 @@ async function getHandler(req: NextApiRequest, res: NextApiResponse, token: { us
             throw new Error("token invalido o no autorizado")
         }
         const ordersData = await getAllOrders(token.userId)
-        res.status(200).send({ data: ordersData })
+        res.status(200).send(ordersData)
     } catch (error) {
         if (error.message) {
             res.status(400).send({ message: error.message })

@@ -163,7 +163,7 @@ export class OrderService {
         }
     }
 
-    async setPayment(userId: string, id: string): Promise<boolean> {
+    async setPayment(userId: string, id: string): Promise<OrderData> {
         try {
             const data = await getPayment({ id: id })
             const orderId = data.external_reference
@@ -184,7 +184,7 @@ export class OrderService {
             const order = await this.repo.getOrderDoc(userId, orderId)
             order.setPayment(paymentData)
             await this.repo.save(order)
-            return true
+            return order.data
         } catch (error) {
             console.error(error.message)
             throw error

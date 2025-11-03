@@ -2,12 +2,12 @@ import { Order } from "models/order"
 import { OrderRepository } from "repositories/orderRepository"
 import { UserRepository } from "repositories/userRepository"
 import { CartService } from "./cart"
-import { checkExpirationPayments, formatExpireDateForPreference } from "./dateFns"
+import { checkExpiration, formatExpireDateForPreference } from "./dateFns"
 import { updateStockProducts, searchProductById } from "./algolia"
 import { createPreference, getMerchantOrderId, getPayment } from "./mercadopago"
 import { sendPaymentConfirmed, sendSaleConfirmed } from "./sendgrid"
 import { getBaseUrl } from "utils/getBaseUrl"
-import { formatDate } from "utils/formatDate"
+import { formatTimestamp } from "utils/formatTimeStamp"
 import { hasStock } from "utils/hasStock"
 import { formatProducts } from "utils/formatProducts"
 import { calcTotalPrice } from "utils/calcToPrice"
@@ -20,7 +20,7 @@ export class OrderService {
         try {
             let orderExpires: string[] = []
             for (const item of orders) {
-                const result = checkExpirationPayments(item.created as FirestoreTimestamp)
+                const result = checkExpiration(item.created as FirestoreTimestamp, "expiredPayment") as number
                 if (result >= 2) {
                     if (item.status !== "closed") {
                         const productsToReturn = await Promise.all(
@@ -52,34 +52,7 @@ export class OrderService {
         try {
             const myOrders = await this.repo.getOrders(userId)
             await this.checkExpirationOrders(myOrders)
-            const formatDateOrders = myOrders.map((item) => ({
-                ...item,
-                created: formatDate(item.created as FirestoreTimestamp).toLocaleString("es-AR", {
-                    day: "2-digit",
-                    month: "2-digit",
-                    year: "numeric",
-                    hour: "2-digit",
-                    minute: "2-digit",
-                    second: "2-digit",
-                    hour12: false,
-                }),
-                ...(item.payment && {
-                    payment: {
-                        ...item.payment,
-                        paymentCreated: new Date(item.payment.paymentCreated).toLocaleString("es-AR", {
-                            day: "2-digit",
-                            month: "2-digit",
-                            year: "numeric",
-                            hour: "2-digit",
-                            minute: "2-digit",
-                            second: "2-digit",
-                            hour12: false,
-                        }),
-                    },
-                })
-            }
-            ))
-            return formatDateOrders
+            return myOrders
         } catch (error) {
             console.error(error.message)
             throw error
@@ -89,33 +62,7 @@ export class OrderService {
     async getOrdersById(userId: string, orderId: string): Promise<OrderData> {
         try {
             const order = await this.repo.getOrderDoc(userId, orderId)
-            const formatOrder = {
-                ...order.data,
-                created: formatDate(order.data.created as FirestoreTimestamp).toLocaleString("es-AR", {
-                    day: "2-digit",
-                    month: "2-digit",
-                    year: "numeric",
-                    hour: "2-digit",
-                    minute: "2-digit",
-                    second: "2-digit",
-                    hour12: false,
-                }),
-                ...(order.data.payment && {
-                    payment: {
-                        ...order.data.payment,
-                        paymentCreated: new Date(order.data.payment.paymentCreated).toLocaleString("es-AR", {
-                            day: "2-digit",
-                            month: "2-digit",
-                            year: "numeric",
-                            hour: "2-digit",
-                            minute: "2-digit",
-                            second: "2-digit",
-                            hour12: false,
-                        }),
-                    },
-                })
-            }
-            return formatOrder
+            return order.data
         } catch (error) {
             console.error(error.message)
             throw error
@@ -216,7 +163,7 @@ export class OrderService {
         }
     }
 
-    async setPayment(userId: string, id: string): Promise<OrderData> {
+    async setPayment(userId: string, id: string): Promise<boolean> {
         try {
             const data = await getPayment({ id: id })
             const orderId = data.external_reference
@@ -237,31 +184,7 @@ export class OrderService {
             const order = await this.repo.getOrderDoc(userId, orderId)
             order.setPayment(paymentData)
             await this.repo.save(order)
-            const formatOrder = {
-                ...order.data,
-                created: formatDate(order.data.created as FirestoreTimestamp).toLocaleString("es-AR", {
-                    day: "2-digit",
-                    month: "2-digit",
-                    year: "numeric",
-                    hour: "2-digit",
-                    minute: "2-digit",
-                    second: "2-digit",
-                    hour12: false,
-                }),
-                payment: order.data.payment ? {
-                    ...order.data.payment,
-                    paymentCreated: new Date(order.data.payment.paymentCreated).toLocaleString("es-AR", {
-                        day: "2-digit",
-                        month: "2-digit",
-                        year: "numeric",
-                        hour: "2-digit",
-                        minute: "2-digit",
-                        second: "2-digit",
-                        hour12: false,
-                    }),
-                } : null
-            }
-            return formatOrder
+            return true
         } catch (error) {
             console.error(error.message)
             throw error

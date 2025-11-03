@@ -6,7 +6,6 @@ import { generateRandomCode } from "./randomSeed"
 import { checkExpiration, createExpireDate } from "./dateFns"
 import { generateRefreshToken, generateToken } from "./jwt"
 import { sendCodeAuth } from "./sendgrid"
-import type { JwtPayload } from "jsonwebtoken"
 
 export class AuthService {
     constructor(private repo: Partial<AuthRepository>, private userRepo: Partial<UserRepository>) { }
@@ -53,7 +52,7 @@ export class AuthService {
         const newExpireDate = createExpireDate(30)
         try {
             const auth = await this.newAuth(formatEmail)
-            const isExpired = checkExpiration(auth.data.expire)
+            const isExpired = checkExpiration(auth.data.expire,"expiredCode")
             let codeToSend = auth.data.code
             if (isExpired) {
                 auth.updateCode(newCode)
@@ -74,7 +73,7 @@ export class AuthService {
         try {
             await this.repo.findByEmail(formatEmail)
             const auth = await this.repo.findByCode(code)
-            const isExpired = checkExpiration(auth.data.expire)
+            const isExpired = checkExpiration(auth.data.expire,"expiredCode")
             if (isExpired) {
                 throw new Error("el code ingresado a expirado")
             }

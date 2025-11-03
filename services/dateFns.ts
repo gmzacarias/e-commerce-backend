@@ -1,9 +1,9 @@
-import { addHours, addMinutes, format, isAfter, differenceInDays } from "date-fns"
-import { formatDate } from "utils/formatDate"
+import { addHours, addMinutes, isAfter, differenceInDays, formatISO } from "date-fns"
+import { formatTimestamp } from "utils/formatTimeStamp"
 
 export function createExpireDate(minutes: number): Date {
     try {
-        const now = new Date()
+        const now = new Date(Date.now())
         const expireDate = addMinutes(now, minutes)
         return expireDate
     } catch (error) {
@@ -12,32 +12,16 @@ export function createExpireDate(minutes: number): Date {
     }
 }
 
-export function checkExpiration(date: FirestoreTimestamp | Date): Boolean {
+export function checkExpiration(date: FirestoreTimestamp | Date, mode: "expiredCode" | "expiredPayment" = "expiredCode"): boolean | number {
     try {
+        const formatDate = formatTimestamp(date)
         const currentDate = new Date()
-        if (date instanceof Date) {
-            return isAfter(currentDate, date)
+        if (mode === "expiredCode") {
+            return isAfter(currentDate, formatDate)
         }
-        const expirationDate = formatDate(date)
-        return isAfter(currentDate, expirationDate)
+        return differenceInDays(currentDate, formatDate)
     } catch (error) {
-        console.error("no se pudo chequear la fecha de expiracion:", error.message)
-        throw error
-    }
-}
-
-export function checkExpirationPayments(date: FirestoreTimestamp | Date) {
-    try {
-        const currentDate = new Date()
-        if (date instanceof Date) {
-            const result = differenceInDays(currentDate, date)
-            return result
-        }
-        const expirationPayment = formatDate(date)
-        const result = differenceInDays(currentDate, expirationPayment)
-        return result
-    } catch (error) {
-        console.error("no se pudo chequear la fecha de expiracion de los pagos:", error.message)
+        console.error(`No se pudo chequear la fecha de ${mode === "expiredCode" ? "expiracion del codigo" : "expiracion del pago"}:${error.message}`)
         throw error
     }
 }
@@ -46,7 +30,7 @@ export function formatExpireDateForPreference(): string {
     try {
         const currentDate = new Date()
         const newDate = addHours(currentDate, 48)
-        const formatDate = format(newDate, "yyyy-MM-dd'T'HH:mm:ss.SSSXXX")
+        const formatDate = formatISO(newDate, { representation: "complete" })
         return formatDate
     } catch (error) {
         console.error("no se pudo formatear la fecha para la preferencia:", error.message)

@@ -8,7 +8,7 @@ export function generateToken(data: string | object | Buffer): string {
         const token = jwt.sign(data, secret, { expiresIn: "30m" })
         return token
     } catch (error) {
-        console.error("Error en JWT:", error.message)
+        console.error("Error en generateToken:", error.message)
         throw error
     }
 }
@@ -21,7 +21,7 @@ export function generateRefreshToken(data: string | object | Buffer): string {
         const refreshToken = jwt.sign(data, secret, { expiresIn: "7d" })
         return refreshToken
     } catch (error) {
-        console.error("Error en JWT:", error.message)
+        console.error("Error en generateRefreshToken:", error.message)
         throw error
     }
 }
@@ -33,7 +33,7 @@ export function verifyToken(token: string): string | jwt.JwtPayload {
         const verify = jwt.verify(token, secret)
         return verify
     } catch (error) {
-        console.error("Error en JWT:", error.message)
+        console.error("Error en verifyToken:", error.message)
         throw error
     }
 }
